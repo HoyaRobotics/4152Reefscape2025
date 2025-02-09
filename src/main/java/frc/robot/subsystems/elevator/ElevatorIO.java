@@ -4,22 +4,19 @@
 
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
     @AutoLog
     class ElevatorInputs {
-        public Pose3d stage2Pose;
-        public Pose3d stage3Pose;
-        public double position;
+        public double positionMeters;
     }
 
-    void setPosition(double targetPosition);
+    default void setPosition(double targetPositionMeters) {}
 
-    void stop();
+    default void stop() {}
 
-    void updateInputs(ElevatorInputs inputs);
+    default void updateInputs(ElevatorInputs inputs) {}
 
-    void configureMotors();
+    default void configureMotors() {}
 }

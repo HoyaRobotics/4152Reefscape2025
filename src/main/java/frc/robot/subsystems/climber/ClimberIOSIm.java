@@ -10,8 +10,10 @@ import edu.wpi.first.units.measure.Angle;
 public class ClimberIOSIm implements ClimberIO {
 
     @Override
-    public void updateInputs(ClimberInputs inputs) {};
+    public void updateInputs(ClimberInputs inputs) {}
+    ;
 
     @Override
-    public void setAngle(Angle targetAngle) {};
+    public void setAngle(Angle targetAngle) {}
+    ;
 }
