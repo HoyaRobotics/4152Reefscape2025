@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.util.Units;
 
 public class ElevatorIOReal implements ElevatorIO {
     final TalonFX leftElevatorMotor = new TalonFX(0, "rio");
@@ -17,6 +18,10 @@ public class ElevatorIOReal implements ElevatorIO {
     double elevatorToDistacneRatio = 8.0 / (0.0572958 * Math.PI); // Meters
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
+
+    public ElevatorIOReal() {
+        configureMotors();
+    }
 
     @Override
     public void setPosition(double targetPositionMeters) {
@@ -37,8 +42,7 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.positionMeters = leftElevatorMotor.getPosition(true).getValueAsDouble();
     }
 
-    @Override
-    public void configureMotors() {
+    private void configureMotors() {
         TalonFXConfiguration elevatorMotorConfig = new TalonFXConfiguration();
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -53,8 +57,12 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.Slot0.kV = 0.0;
         elevatorMotorConfig.Slot0.kA = 0.0;
         elevatorMotorConfig.Slot0.kP = 0.0;
-        elevatorMotorConfig.Voltage.PeakForwardVoltage = 10;
-        elevatorMotorConfig.Voltage.PeakReverseVoltage = -10;
+        elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.inchesToMeters(52.25);
+        elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
+        elevatorMotorConfig.Voltage.PeakForwardVoltage = 10.0;
+        elevatorMotorConfig.Voltage.PeakReverseVoltage = -10.0;
 
         leftElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
 

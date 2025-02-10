@@ -4,25 +4,38 @@
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.*;
-
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.elevator.Elevator;
+import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
 
     private final ArmIO io;
     private ArmInputsAutoLogged inputs;
+    private Elevator elevator;
 
     /** Creates a new Arm. */
-    public Arm(ArmIO io) {
+    public Arm(ArmIO io, Elevator elevator) {
         this.io = io;
         this.inputs = new ArmInputsAutoLogged();
+        this.elevator = elevator;
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        this.io.updateInputs(inputs);
+        Logger.processInputs("Arm", inputs);
+        Pose3d armPose = new Pose3d(
+                0.0,
+                Units.inchesToMeters(6.625),
+                Units.inchesToMeters(21.875) + elevator.getPosition(),
+                new Rotation3d());
+        Logger.recordOutput("Arm/ArmPose", armPose);
     }
 
     void setIntakeSpeed(double speed) {}

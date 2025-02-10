@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.units.Units.*;
-
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -14,18 +11,17 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
     @AutoLog
     class ArmInputs {
-        public Pose3d pose;
         public Angle armAngle;
         public boolean hasGamePiece;
     }
 
-    void updateInputs(ArmInputs inputs);
+    default void updateInputs(ArmInputs inputs) {}
 
-    void setArmPosition(Angle targetAngle);
+    default void setArmPosition(Angle targetAngle) {}
 
-    void setIntakeSPeed(double speed);
+    default void setIntakeSpeed(double speed) {}
 
-    void stopIntake();
+    default void stopIntake() {}
 
-    void stopArm();
+    default void stopArm() {}
 }

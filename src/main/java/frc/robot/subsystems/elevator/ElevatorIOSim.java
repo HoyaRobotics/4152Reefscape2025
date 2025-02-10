@@ -32,7 +32,4 @@ public class ElevatorIOSim implements ElevatorIO {
         elevatorSim.setInputVoltage(elevatorController.calculate(elevatorSim.getPositionMeters()));
         elevatorSim.update(0.02);
     }
-
-    @Override
-    public void configureMotors() {}
 }

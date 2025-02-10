@@ -17,6 +17,4 @@ public interface ElevatorIO {
     default void stop() {}
 
     default void updateInputs(ElevatorInputs inputs) {}
-
-    default void configureMotors() {}
 }

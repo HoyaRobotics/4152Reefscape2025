@@ -24,6 +24,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOReal;
+import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -42,13 +46,13 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-
     private final Elevator elevator;
+    private final Arm arm;
 
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandXboxController driverController = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -66,6 +70,7 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(TunerConstants.BackRight),
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIOReal());
+                arm = new Arm(new ArmIOReal(), elevator);
 
                 break;
             case SIM:
@@ -85,6 +90,7 @@ public class RobotContainer {
                                 TunerConstants.BackRight, driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
                 elevator = new Elevator(new ElevatorIOSim());
+                arm = new Arm(new ArmIOSim(), elevator);
 
                 break;
 
@@ -98,6 +104,7 @@ public class RobotContainer {
                         new ModuleIO() {},
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIO() {});
+                arm = new Arm(new ArmIO() {}, elevator);
 
                 break;
         }
@@ -116,7 +123,7 @@ public class RobotContainer {
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
-        configureButtonBindings();
+        configureDriverButtonBindings();
     }
 
     /**
@@ -124,10 +131,13 @@ public class RobotContainer {
      * {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings() {
+    private void configureDriverButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX()));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
@@ -135,7 +145,7 @@ public class RobotContainer {
                         driveSimulation
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
     }
 
     /**
