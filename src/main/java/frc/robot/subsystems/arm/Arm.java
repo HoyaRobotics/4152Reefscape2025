@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -34,13 +36,13 @@ public class Arm extends SubsystemBase {
                 0.0,
                 Units.inchesToMeters(6.625),
                 Units.inchesToMeters(21.875) + elevator.getPosition(),
-                new Rotation3d());
+                new Rotation3d(Degrees.of(0), inputs.armAngle, Degrees.of(0)));
         Logger.recordOutput("Arm/ArmPose", armPose);
     }
 
     void setIntakeSpeed(double speed) {}
 
-    void setArmPosition(Angle targetAngle) {
+    public void setArmPosition(Angle targetAngle) {
         this.io.setArmPosition(targetAngle);
     }
 

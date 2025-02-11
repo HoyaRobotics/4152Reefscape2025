@@ -12,11 +12,12 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 public class ElevatorIOSim implements ElevatorIO {
 
     private ElevatorSim elevatorSim;
-    private PIDController elevatorController = new PIDController(1.0, 0, 0);
+    private PIDController elevatorController = new PIDController(100.0, 0, 0);
 
     public ElevatorIOSim() {
         elevatorSim = new ElevatorSim(
-                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.25), false, 0);
+                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.25), false, 0.0);
+        elevatorController.setTolerance(0.02);
     }
 
     @Override
@@ -31,5 +32,6 @@ public class ElevatorIOSim implements ElevatorIO {
     public void updateInputs(ElevatorInputs inputs) {
         elevatorSim.setInputVoltage(elevatorController.calculate(elevatorSim.getPositionMeters()));
         elevatorSim.update(0.02);
+        inputs.positionMeters = elevatorSim.getPositionMeters();
     }
 }

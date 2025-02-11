@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -24,11 +25,12 @@ public class ArmIOSim implements ArmIO {
                 185.7143,
                 0.0361366348,
                 14.0,
-                Units.degreesToRadians(-25.011685),
-                Units.degreesToRadians(64.988315 + 90 + 75),
+                Units.degreesToRadians(-49.0),
+                Units.degreesToRadians(206.0),
                 false,
-                Units.degreesToRadians(64.988315 + 90 + 75));
+                Units.degreesToRadians(-49.0));
         armController.setTolerance(2.0);
+        setArmPosition(Degrees.of(-49.0));
     }
 
     @Override

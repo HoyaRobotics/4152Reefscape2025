@@ -58,7 +58,7 @@ public class Elevator extends SubsystemBase {
         return this.inputs.positionMeters;
     }
 
-    void setPosition(double targetPositionMeters) {
+    public void setPosition(double targetPositionMeters) {
         this.io.setPosition(targetPositionMeters);
     }
 }
