@@ -4,18 +4,23 @@
 
 package frc.robot.subsystems.arm;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 import edu.wpi.first.units.measure.Angle;
 
 /** Add your docs here. */
 public class ArmIOReal implements ArmIO {
     final TalonFX armMotor = new TalonFX(2, "rio");
+    final CANcoder armEncoder = new CANcoder(3, "rio");
     double armRatio = 185.7143;
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
@@ -46,10 +51,15 @@ public class ArmIOReal implements ArmIO {
     }
 
     private void configureArmMotor() {
+        CANcoderConfiguration armEncoderConfig = new CANcoderConfiguration();
+        armEncoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.8;
+        armEncoderConfig.MagnetSensor.MagnetOffset = 0.0;
+        armEncoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        armEncoder.getConfigurator().apply(armEncoderConfig);
         TalonFXConfiguration armConfig = new TalonFXConfiguration();
         armConfig.CurrentLimits.StatorCurrentLimit = 60;
         armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        armConfig.Feedback.FeedbackRemoteSensorID = 2;
+        armConfig.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
         armConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         armConfig.Feedback.RotorToSensorRatio = armRatio;
         armConfig.MotionMagic.MotionMagicAcceleration = 0.01;
