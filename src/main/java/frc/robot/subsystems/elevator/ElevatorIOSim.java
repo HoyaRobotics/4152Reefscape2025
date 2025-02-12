@@ -8,6 +8,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.units.measure.Distance;
+import static edu.wpi.first.units.Units.*;
 
 public class ElevatorIOSim implements ElevatorIO {
 
@@ -21,8 +23,8 @@ public class ElevatorIOSim implements ElevatorIO {
     }
 
     @Override
-    public void setPosition(double targetPositionMeters) {
-        elevatorController.setSetpoint(targetPositionMeters);
+    public void setPosition(Distance targetPosition) {
+        elevatorController.setSetpoint(targetPosition.in(Meters));
     }
 
     @Override
@@ -32,6 +34,6 @@ public class ElevatorIOSim implements ElevatorIO {
     public void updateInputs(ElevatorInputs inputs) {
         elevatorSim.setInputVoltage(elevatorController.calculate(elevatorSim.getPositionMeters()));
         elevatorSim.update(0.02);
-        inputs.positionMeters = elevatorSim.getPositionMeters();
+        inputs.position = Meters.of(elevatorSim.getPositionMeters());
     }
 }

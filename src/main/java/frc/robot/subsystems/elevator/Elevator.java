@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.units.measure.Distance;
+import static edu.wpi.first.units.Units.*;
 
 public class Elevator extends SubsystemBase {
 
@@ -28,18 +30,18 @@ public class Elevator extends SubsystemBase {
         // This method will be called once per scheduler run
         Pose3d elevatorStage2Pose;
         Pose3d carriagePose;
-        if (inputs.positionMeters > Units.inchesToMeters(24.25)) {
+        if (inputs.position.in(Meters) > Units.inchesToMeters(24.25)) {
             elevatorStage2Pose = new Pose3d(
                     0.0,
                     Units.inchesToMeters(11.0),
-                    inputs.positionMeters + Units.inchesToMeters(4.875) - Units.inchesToMeters(24.25),
+                    inputs.position.in(Meters) + Units.inchesToMeters(4.875) - Units.inchesToMeters(24.25),
                     new Rotation3d());
         } else {
             elevatorStage2Pose =
                     new Pose3d(0.0, Units.inchesToMeters(11.0), Units.inchesToMeters(4.875), new Rotation3d());
         }
         carriagePose = new Pose3d(
-                0.0, Units.inchesToMeters(11.0), inputs.positionMeters + Units.inchesToMeters(5.875), new Rotation3d());
+                0.0, Units.inchesToMeters(11.0), inputs.position.in(Meters) + Units.inchesToMeters(5.875), new Rotation3d());
         Logger.recordOutput("Elevator/CarriagePose", carriagePose);
         Logger.recordOutput("Elevator/ElevatorPose", elevatorStage2Pose);
     }
@@ -48,17 +50,18 @@ public class Elevator extends SubsystemBase {
         this.io.stop();
     }
 
-    boolean isAtPosition(double queriedPosition) {
-        double error = Math.abs(queriedPosition - this.inputs.positionMeters);
+    boolean isAtPosition(Distance queriedPosition) {
+        Distance difference = queriedPosition.minus(this.inputs.position);
+        double error = Math.abs(difference.in(Inches));
 
-        return error < ElevatorConstants.positionError;
+        return error < ElevatorConstants.positionErrorInches;
     }
 
-    public double getPosition() {
-        return this.inputs.positionMeters;
+    public Distance getPosition() {
+        return this.inputs.position;
     }
 
-    public void setPosition(double targetPositionMeters) {
-        this.io.setPosition(targetPositionMeters);
+    public void setPosition(Distance targetPosition) {
+        this.io.setPosition(targetPosition);
     }
 }

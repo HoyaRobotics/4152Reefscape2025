@@ -35,7 +35,7 @@ public class MoveToLevel extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        elevator.setPosition(elevatorPosition.in(Meters));
+        elevator.setPosition(elevatorPosition);
         arm.setArmPosition(armAngle);
     }
 
@@ -46,7 +46,7 @@ public class MoveToLevel extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        elevator.setPosition(ElevatorConstants.l_Positions.Base.in(Meters));
+        elevator.setPosition(ElevatorConstants.l_Positions.Base);
         arm.setArmPosition(ArmConstants.l_Angles.Base);
     }
 

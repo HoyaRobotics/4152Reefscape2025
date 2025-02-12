@@ -11,6 +11,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+import static edu.wpi.first.units.Units.*;
 
 public class ElevatorIOReal implements ElevatorIO {
     final TalonFX leftElevatorMotor = new TalonFX(0, "rio");
@@ -24,11 +26,11 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     @Override
-    public void setPosition(double targetPositionMeters) {
+    public void setPosition(Distance targetPosition) {
         leftElevatorMotor.setControl(
-                magicRequest.withPosition(targetPositionMeters).withSlot(0));
+                magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
         rightElevatorMotor.setControl(
-                magicRequest.withPosition(targetPositionMeters).withSlot(0));
+                magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
     }
 
     @Override
@@ -39,7 +41,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorInputs inputs) {
-        inputs.positionMeters = leftElevatorMotor.getPosition(true).getValueAsDouble();
+        inputs.position = Meters.of(leftElevatorMotor.getPosition(true).getValueAsDouble());
     }
 
     private void configureMotors() {
@@ -69,6 +71,6 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         rightElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
 
-        setPosition(0.0);
+        setPosition(Meters.of(0.0));
     }
 }

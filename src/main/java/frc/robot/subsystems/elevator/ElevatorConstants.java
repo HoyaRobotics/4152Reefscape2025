@@ -7,7 +7,7 @@ import static edu.wpi.first.units.Units.*;
 
 /** Add your docs here. */
 public class ElevatorConstants {
-    public static final double positionError = 0.05;
+    public static final double positionErrorInches = 0.05;
 
     public class l_Positions {
         // TODO: Add actual values

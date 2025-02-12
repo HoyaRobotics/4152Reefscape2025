@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.elevator.Elevator;
 import org.littletonrobotics.junction.Logger;
+import static edu.wpi.first.units.Units.*;
 
 public class Arm extends SubsystemBase {
 
@@ -35,7 +36,7 @@ public class Arm extends SubsystemBase {
         Pose3d armPose = new Pose3d(
                 0.0,
                 Units.inchesToMeters(6.625),
-                Units.inchesToMeters(21.875) + elevator.getPosition(),
+                Units.inchesToMeters(21.875) + elevator.getPosition().in(Meters),
                 new Rotation3d(Degrees.of(0), inputs.armAngle, Degrees.of(0)));
         Logger.recordOutput("Arm/ArmPose", armPose);
     }
