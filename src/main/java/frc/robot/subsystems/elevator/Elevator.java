@@ -4,13 +4,14 @@
 // McT testing Git
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.units.measure.Distance;
-import static edu.wpi.first.units.Units.*;
 
 public class Elevator extends SubsystemBase {
 
@@ -41,7 +42,10 @@ public class Elevator extends SubsystemBase {
                     new Pose3d(0.0, Units.inchesToMeters(11.0), Units.inchesToMeters(4.875), new Rotation3d());
         }
         carriagePose = new Pose3d(
-                0.0, Units.inchesToMeters(11.0), inputs.position.in(Meters) + Units.inchesToMeters(5.875), new Rotation3d());
+                0.0,
+                Units.inchesToMeters(11.0),
+                inputs.position.in(Meters) + Units.inchesToMeters(5.875),
+                new Rotation3d());
         Logger.recordOutput("Elevator/CarriagePose", carriagePose);
         Logger.recordOutput("Elevator/ElevatorPose", elevatorStage2Pose);
     }

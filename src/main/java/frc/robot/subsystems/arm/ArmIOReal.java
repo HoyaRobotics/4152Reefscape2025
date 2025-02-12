@@ -39,12 +39,6 @@ public class ArmIOReal implements ArmIO {
     }
 
     @Override
-    public void setIntakeSpeed(double speed) {}
-
-    @Override
-    public void stopIntake() {}
-
-    @Override
     public void stopArm() {
         armMotor.stopMotor();
     }

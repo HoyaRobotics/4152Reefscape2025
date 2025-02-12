@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -13,7 +14,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.elevator.Elevator;
 import org.littletonrobotics.junction.Logger;
-import static edu.wpi.first.units.Units.*;
 
 public class Arm extends SubsystemBase {
 
@@ -41,16 +41,8 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/ArmPose", armPose);
     }
 
-    public void setIntakeSpeed(double speed) {
-
-    }
-
     public void setArmPosition(Angle targetAngle) {
         this.io.setArmPosition(targetAngle);
-    }
-
-    boolean hasGamePiece() {
-        return this.inputs.hasGamePiece;
     }
 
     boolean isArmAtPosition(Angle queriedAngle) {
@@ -61,8 +53,6 @@ public class Arm extends SubsystemBase {
     Angle getArmPosition() {
         return this.inputs.armAngle;
     }
-
-    void stopIntake() {}
 
     void stopArm() {}
 }

@@ -149,17 +149,13 @@ public class RobotContainer {
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
         driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        
-        driverController.y().whileTrue(new MoveToLevel(
-                elevator,
-                arm,
-                ElevatorConstants.l_Positions.L4,
-                ArmConstants.l_Angles.L4));
-        driverController.x().whileTrue(new MoveToLevel(
-                elevator,
-                arm,
-                ElevatorConstants.l_Positions.L3,
-                ArmConstants.l_Angles.L3));
+
+        driverController
+                .y()
+                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4));
+        driverController
+                .x()
+                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
     }
 
     /**

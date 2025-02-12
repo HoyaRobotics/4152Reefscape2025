@@ -12,16 +12,11 @@ public interface ArmIO {
     @AutoLog
     class ArmInputs {
         public Angle armAngle;
-        public boolean hasGamePiece;
     }
 
     default void updateInputs(ArmInputs inputs) {}
 
     default void setArmPosition(Angle targetAngle) {}
-
-    default void setIntakeSpeed(double speed) {}
-
-    default void stopIntake() {}
 
     default void stopArm() {}
 }
