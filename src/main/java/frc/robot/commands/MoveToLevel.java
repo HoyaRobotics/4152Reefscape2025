@@ -10,15 +10,24 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Angle;
+import static edu.wpi.first.units.Units.*;
+import frc.robot.subsystems.arm.ArmConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class L4 extends Command {
+public class MoveToLevel extends Command {
     private final Elevator elevator;
     private final Arm arm;
-    /** Creates a new L4. */
-    public L4(Elevator elevator, Arm arm) {
+    private final Distance elevatorPosition;
+    private final Angle armAngle;
+
+    public MoveToLevel(Elevator elevator, Arm arm, Distance elevatorPosition, Angle armAngle) {
         this.elevator = elevator;
         this.arm = arm;
+        this.armAngle = armAngle;
+        this.elevatorPosition = elevatorPosition;
         addRequirements(elevator, arm);
         // Use addRequirements() here to declare subsystem dependencies.
     }
@@ -26,8 +35,8 @@ public class L4 extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        elevator.setPosition(Units.inchesToMeters(53.25));
-        arm.setArmPosition(Degrees.of(170));
+        elevator.setPosition(elevatorPosition.in(Meters));
+        arm.setArmPosition(armAngle);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -37,8 +46,8 @@ public class L4 extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        elevator.setPosition(Units.inchesToMeters(0.0));
-        arm.setArmPosition(Degrees.of(-49));
+        elevator.setPosition(ElevatorConstants.l_Positions.Base.in(Meters));
+        arm.setArmPosition(ArmConstants.l_Angles.Base);
     }
 
     // Returns true when the command should end.
