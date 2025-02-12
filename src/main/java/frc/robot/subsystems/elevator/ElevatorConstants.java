@@ -14,7 +14,7 @@ public class ElevatorConstants {
         public static final Distance Base = Inches.of(0.0),
                 Trough = Inches.of(0),
                 L2 = Inches.of(0),
-                L3 = Inches.of(20.875),
+                L3 = Inches.of(5.625),
                 L4 = Inches.of(53.25),
                 Loading = Inches.of(0.0),
                 Processing = Inches.of(0.0);
