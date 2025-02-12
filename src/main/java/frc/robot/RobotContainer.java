@@ -23,14 +23,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.L4;
+import frc.robot.commands.MoveToLevel;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOReal;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOReal;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
@@ -147,7 +149,17 @@ public class RobotContainer {
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
         driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        driverController.y().whileTrue(new L4(elevator, arm));
+        
+        driverController.y().whileTrue(new MoveToLevel(
+                elevator,
+                arm,
+                ElevatorConstants.l_Positions.L4,
+                ArmConstants.l_Angles.L4));
+        driverController.x().whileTrue(new MoveToLevel(
+                elevator,
+                arm,
+                ElevatorConstants.l_Positions.L3,
+                ArmConstants.l_Angles.L3));
     }
 
     /**
