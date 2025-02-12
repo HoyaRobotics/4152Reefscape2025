@@ -34,12 +34,12 @@ public class ArmIOReal implements ArmIO {
     }
 
     @Override
-    public void setArmPosition(Angle targetAngle) {
+    public void setPosition(Angle targetAngle) {
         armMotor.setControl(magicRequest.withPosition(targetAngle).withSlot(0));
     }
 
     @Override
-    public void stopArm() {
+    public void stop() {
         armMotor.stopMotor();
     }
 

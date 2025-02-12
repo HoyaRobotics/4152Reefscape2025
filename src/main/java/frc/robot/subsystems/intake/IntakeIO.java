@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
-import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
@@ -15,9 +15,9 @@ public interface IntakeIO {
         public boolean hasGamePiece;
     }
 
-    default void setSpeed(Velocity targetSpeed) {};
+    default void setSpeed(AngularVelocity targetSpeed) {};
 
-    default void stopIntake() {};
+    default void stop() {};
 
     default void updateInputs(IntakeInputs inputs) {};
 }

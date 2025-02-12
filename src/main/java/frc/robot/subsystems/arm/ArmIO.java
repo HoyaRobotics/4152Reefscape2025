@@ -16,7 +16,7 @@ public interface ArmIO {
 
     default void updateInputs(ArmInputs inputs) {}
 
-    default void setArmPosition(Angle targetAngle) {}
+    default void setPosition(Angle targetAngle) {}
 
-    default void stopArm() {}
+    default void stop() {}
 }

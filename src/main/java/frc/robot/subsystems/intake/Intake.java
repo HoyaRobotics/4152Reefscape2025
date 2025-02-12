@@ -30,6 +30,6 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopIntake() {
-      this.io.stopIntake();
+      this.io.stop();
     }
 }

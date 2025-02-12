@@ -30,7 +30,7 @@ public class ArmIOSim implements ArmIO {
                 false,
                 Units.degreesToRadians(-49.0));
         armController.setTolerance(2.0);
-        setArmPosition(Degrees.of(-49.0));
+        setPosition(Degrees.of(-49.0));
     }
 
     @Override
@@ -41,10 +41,12 @@ public class ArmIOSim implements ArmIO {
     }
 
     @Override
-    public void setArmPosition(Angle targetAngle) {
+    public void setPosition(Angle targetAngle) {
         armController.setSetpoint(targetAngle.in(Radians));
     }
 
     @Override
-    public void stopArm() {}
+    public void stop() {
+
+    }
 }

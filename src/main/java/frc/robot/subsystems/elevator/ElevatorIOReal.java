@@ -18,7 +18,7 @@ import edu.wpi.first.units.measure.Distance;
 public class ElevatorIOReal implements ElevatorIO {
     final TalonFX leftElevatorMotor = new TalonFX(0, "rio");
     final TalonFX rightElevatorMotor = new TalonFX(1, "rio");
-    double elevatorToDistacneRatio = 8.0 / (0.0572958 * Math.PI); // Meters
+    double elevatorToDistanceRatio = 8.0 / (0.0572958 * Math.PI); // Meters
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
 
@@ -49,7 +49,7 @@ public class ElevatorIOReal implements ElevatorIO {
         TalonFXConfiguration elevatorMotorConfig = new TalonFXConfiguration();
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistacneRatio;
+        elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistanceRatio;
         elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 0.05;
         elevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 0.05;
         elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

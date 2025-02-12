@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
-import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 /** Add your docs here. */
 public class IntakeIOSim implements IntakeIO {
@@ -14,12 +14,12 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
-    public void setSpeed(Velocity targetSpeed) {
+    public void setSpeed(AngularVelocity targetSpeed) {
 
     }
 
     @Override 
-    public void stopIntake() {
+    public void stop() {
 
     }
 

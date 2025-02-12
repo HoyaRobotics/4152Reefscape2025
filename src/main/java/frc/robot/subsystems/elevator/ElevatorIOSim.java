@@ -29,7 +29,9 @@ public class ElevatorIOSim implements ElevatorIO {
     }
 
     @Override
-    public void stop() {}
+    public void stop() {
+        
+    }
 
     @Override
     public void updateInputs(ElevatorInputs inputs) {
