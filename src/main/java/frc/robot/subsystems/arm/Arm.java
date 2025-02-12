@@ -41,7 +41,9 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/ArmPose", armPose);
     }
 
-    void setIntakeSpeed(double speed) {}
+    public void setIntakeSpeed(double speed) {
+
+    }
 
     public void setArmPosition(Angle targetAngle) {
         this.io.setArmPosition(targetAngle);
