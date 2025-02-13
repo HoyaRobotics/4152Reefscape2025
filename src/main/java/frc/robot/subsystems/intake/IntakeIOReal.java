@@ -3,12 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.intake;
-import edu.wpi.first.units.measure.AngularVelocity;
+
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 /** Add your docs here. */
 public class IntakeIOReal implements IntakeIO {
@@ -21,7 +22,7 @@ public class IntakeIOReal implements IntakeIO {
         configureMotors();
     }
 
-    private void configureMotors(){
+    private void configureMotors() {
         TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
         intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
         intakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -36,13 +37,14 @@ public class IntakeIOReal implements IntakeIO {
         intakeMotor.setControl(velocityRequest.withVelocity(targetSpeed));
     }
 
-    @Override 
+    @Override
     public void stop() {
-
+        setSpeed(RotationsPerSecond.of(0));
     }
 
     @Override
-    public void updateInputs(IntakeInputs inputs){
-
+    public void updateInputs(IntakeInputs inputs) {
+        // check sensors for game piece
+        inputs.speed = RotationsPerSecond.of(intakeMotor.getVelocity().getValueAsDouble());
     }
 }

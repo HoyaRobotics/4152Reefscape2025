@@ -46,7 +46,5 @@ public class ArmIOSim implements ArmIO {
     }
 
     @Override
-    public void stop() {
-
-    }
+    public void stop() {}
 }

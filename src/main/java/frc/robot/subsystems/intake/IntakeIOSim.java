@@ -9,22 +9,14 @@ import edu.wpi.first.units.measure.AngularVelocity;
 /** Add your docs here. */
 public class IntakeIOSim implements IntakeIO {
 
-    public IntakeIOSim() {
-
-    }
+    public IntakeIOSim() {}
 
     @Override
-    public void setSpeed(AngularVelocity targetSpeed) {
-
-    }
-
-    @Override 
-    public void stop() {
-
-    }
+    public void setSpeed(AngularVelocity targetSpeed) {}
 
     @Override
-    public void updateInputs(IntakeInputs inputs){
+    public void stop() {}
 
-    }
+    @Override
+    public void updateInputs(IntakeInputs inputs) {}
 }

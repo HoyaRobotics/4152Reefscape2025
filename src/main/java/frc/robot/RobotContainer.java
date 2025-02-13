@@ -156,6 +156,13 @@ public class RobotContainer {
         driverController
                 .x()
                 .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
+        driverController
+                .a()
+                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
+        driverController
+                .b()
+                .whileTrue(new MoveToLevel(
+                        elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough));
     }
 
     /**

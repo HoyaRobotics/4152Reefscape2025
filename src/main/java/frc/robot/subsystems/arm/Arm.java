@@ -42,7 +42,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmPosition(Angle targetAngle) {
-        this.io.setArmPosition(targetAngle);
+        this.io.setPosition(targetAngle);
     }
 
     boolean isArmAtPosition(Angle queriedAngle) {

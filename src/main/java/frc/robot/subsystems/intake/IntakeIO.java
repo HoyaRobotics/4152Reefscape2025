@@ -11,13 +11,16 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
     @AutoLog
     class IntakeInputs {
-        public double speed;
+        public AngularVelocity speed;
         public boolean hasGamePiece;
     }
 
-    default void setSpeed(AngularVelocity targetSpeed) {};
+    default void setSpeed(AngularVelocity targetSpeed) {}
+    ;
 
-    default void stop() {};
+    default void stop() {}
+    ;
 
-    default void updateInputs(IntakeInputs inputs) {};
+    default void updateInputs(IntakeInputs inputs) {}
+    ;
 }
