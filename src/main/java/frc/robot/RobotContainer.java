@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -159,10 +161,16 @@ public class RobotContainer {
         driverController
                 .a()
                 .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
+        /*
         driverController
                 .b()
                 .whileTrue(new MoveToLevel(
                         elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough));
+        */
+
+        driverController
+                .b()
+                .whileTrue(DriveCommands.driveToPose(drive, new Pose2d(2, 2, new Rotation2d(Degrees.of(45)))));
     }
 
     /**

@@ -15,9 +15,12 @@ public interface IntakeIO {
         public boolean hasGamePiece;
     }
 
-    default void setSpeed(AngularVelocity targetSpeed) {};
+    default void setSpeed(AngularVelocity targetSpeed) {}
+    ;
 
-    default void stop() {};
+    default void stop() {}
+    ;
 
-    default void updateInputs(IntakeInputs inputs) {};
+    default void updateInputs(IntakeInputs inputs) {}
+    ;
 }
