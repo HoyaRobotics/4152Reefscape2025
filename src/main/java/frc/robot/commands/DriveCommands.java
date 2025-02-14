@@ -132,7 +132,6 @@ public class DriveCommands {
                                     drive.getRotation()));
                         },
                         drive)
-
                 // Reset PID controller when command starts
                 .beforeStarting(() -> {
                     angleController.reset(drive.getRotation().getRadians());
@@ -143,7 +142,7 @@ public class DriveCommands {
                     yController.setSetpoint(endPose.getY());
                     yController.setTolerance(Units.inchesToMeters(2.0));
                     angleController.setGoal(endPose.getRotation().getRadians());
-                    angleController.setTolerance(2.0);
+                    angleController.setTolerance(Math.PI / 90);
                 })
                 .until(() -> {
                     return xController.atSetpoint() && yController.atSetpoint() && angleController.atGoal();
