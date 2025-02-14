@@ -13,7 +13,15 @@
 
 package frc.robot.commands;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,12 +37,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
@@ -91,6 +93,74 @@ public class DriveCommands {
                 },
                 drive);
     }
+
+        /*
+         * Drives to provided field relative pose, rotating first if necessary
+         */
+        public static Command driveToPose(Drive drive, Pose2d endPose, boolean isRedAlliance) {
+
+                PIDController xController = new PIDController(ANGLE_KP, 0, ANGLE_KD);
+                PIDController yController = new PIDController(ANGLE_KP, 0, ANGLE_KD);
+                // look into this, replace them with profiled controllers?
+                ProfiledPIDController angleController = new ProfiledPIDController(
+                        ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+                angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+                // Construct command
+                return Commands.run(
+                                () -> {
+                                        double angleSpeed = angleController.calculate(drive.getRotation().getRadians());
+                                        angleSpeed = MathUtil.clamp(angleSpeed, -3.8, 3.8);
+                                        double xSpeed = 0.0;
+                                        double ySpeed = 0.0;
+
+                                        // starts driving once almost fully turned
+                                        if (Math.abs(angleController.getPositionError()) < 5) {
+                                                xSpeed = xController.calculate(drive.getPose().getX());
+                                                xSpeed = MathUtil.clamp(xSpeed, -4.0, 4.0);
+                                                ySpeed = yController.calculate(drive.getPose().getY());
+                                                ySpeed = MathUtil.clamp(ySpeed, -4.0, 4.0);
+                                        }
+
+                                        if (isRedAlliance) {
+                                                xSpeed = -xSpeed;
+                                                ySpeed = -ySpeed;
+                                        }
+
+                                        // Convert to field relative speeds & send command
+                                        ChassisSpeeds speeds = new ChassisSpeeds(
+                                                xSpeed * drive.getMaxLinearSpeedMetersPerSec(),
+                                                ySpeed * drive.getMaxLinearSpeedMetersPerSec(),
+                                                angleSpeed);
+                                        boolean isFlipped = DriverStation.getAlliance().isPresent()
+                                                && DriverStation.getAlliance().get() == Alliance.Red;
+                                        drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+                                                speeds,
+                                                isFlipped
+                                                        ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                                        : drive.getRotation()));
+                                },
+                                drive)
+
+                        // Reset PID controller when command starts
+                        .beforeStarting(() -> {
+                                angleController.reset(drive.getRotation().getRadians());
+                                xController.reset();
+                                yController.reset();
+                                xController.setSetpoint(endPose.getX());
+                                xController.setTolerance(Units.inchesToMeters(2.0));
+                                yController.setSetpoint(endPose.getY());
+                                yController.setTolerance(Units.inchesToMeters(2.0));
+                                angleController.setGoal(endPose.getRotation().getRadians());
+                                angleController.setTolerance(2.0);
+                        }).until(() -> {
+                                return xController.atSetpoint() && yController.atSetpoint();
+                        }).finallyDo(() -> {
+                                xController.reset();
+                                yController.reset();
+                        });
+        }
+
 
     /**
      * Field relative drive command using joystick for linear control and PID for angular control. Possible use cases
