@@ -170,10 +170,10 @@ public class RobotContainer {
         */
 
         driverController.b().onTrue(DriveCommands.driveToPose(drive, () -> {
-                Pose2d reefPose = drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces));
-                Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
-                Logger.recordOutput("Reef/NearestPose", reefPose);
-                return reefPose;
+            Pose2d reefPose = drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces));
+            Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
+            Logger.recordOutput("Reef/NearestPose", reefPose);
+            return reefPose;
         }));
     }
 
