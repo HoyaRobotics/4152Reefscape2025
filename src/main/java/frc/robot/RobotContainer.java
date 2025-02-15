@@ -38,6 +38,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOReal;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
+import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -168,9 +169,12 @@ public class RobotContainer {
                         elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough));
         */
 
-        driverController
-                .b()
-                .whileTrue(DriveCommands.driveToPose(drive, new Pose2d(2, 2, new Rotation2d(Degrees.of(45)))));
+        driverController.b().onTrue(DriveCommands.driveToPose(drive, () -> {
+                Pose2d reefPose = drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces));
+                Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
+                Logger.recordOutput("Reef/NearestPose", reefPose);
+                return reefPose;
+        }));
     }
 
     /**

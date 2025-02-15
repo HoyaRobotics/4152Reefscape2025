@@ -96,7 +96,8 @@ public class DriveCommands {
     /*
      * Drives to provided field relative pose, rotating first if necessary
      */
-    public static Command driveToPose(Drive drive, Pose2d endPose) {
+    public static Command driveToPose(Drive drive, Supplier<Pose2d> poseSupplier) {
+        Pose2d endPose = poseSupplier.get();
 
         PIDController xController = new PIDController(3.5, 0, 0.02);
         PIDController yController = new PIDController(3.5, 0, 0.02);
@@ -127,9 +128,7 @@ public class DriveCommands {
                                     xSpeed * drive.getMaxLinearSpeedMetersPerSec(),
                                     ySpeed * drive.getMaxLinearSpeedMetersPerSec(),
                                     angleSpeed);
-                            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    speeds,
-                                    drive.getRotation()));
+                            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
                         },
                         drive)
                 // Reset PID controller when command starts
