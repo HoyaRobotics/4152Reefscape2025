@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.FieldConstants.Reef.Side;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.MoveToLevel;
 import frc.robot.generated.TunerConstants;
@@ -162,15 +163,10 @@ public class RobotContainer {
         driverController
                 .a()
                 .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
-        /*
-        driverController
-                .b()
-                .whileTrue(new MoveToLevel(
-                        elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough));
-        */
 
         driverController.b().onTrue(DriveCommands.driveToPose(drive, () -> {
-            Pose2d reefPose = drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces));
+            Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
+                    drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces)), Side.LEFT);
             Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
             Logger.recordOutput("Reef/NearestPose", reefPose);
             return reefPose;
