@@ -17,8 +17,8 @@ public class ElevatorConstants {
                 Trough = Inches.of(0),
                 L2 = Inches.of(20),
                 L3 = Inches.of(30),
-                L4 = Inches.of(40),
-                Loading = Inches.of(0.0),
+                L4 = Inches.of(55),
+                Loading = Inches.of(15.0),
                 Processing = Inches.of(0.0);
     }
 }

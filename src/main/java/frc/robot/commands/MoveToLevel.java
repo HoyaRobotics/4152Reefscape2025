@@ -4,15 +4,11 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveToLevel extends Command {
@@ -43,10 +39,7 @@ public class MoveToLevel extends Command {
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {
-        elevator.setPosition(ElevatorConstants.l_Positions.Base);
-        arm.setArmPosition(ArmConstants.l_Angles.Base);
-    }
+    public void end(boolean interrupted) {}
 
     // Returns true when the command should end.
     @Override

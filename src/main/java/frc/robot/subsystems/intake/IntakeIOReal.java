@@ -20,8 +20,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 /** Add your docs here. */
 public class IntakeIOReal implements IntakeIO {
-    private final TalonFX intakeMotor = new TalonFX(4, "rio");
-    private final LaserCan lasercan = new LaserCan(60);
+    private final TalonFX intakeMotor = new TalonFX(34, "rio");
+    private final LaserCan lasercan = new LaserCan(35);
     double intakeRatio = 60.0 / 14; // Meters
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);

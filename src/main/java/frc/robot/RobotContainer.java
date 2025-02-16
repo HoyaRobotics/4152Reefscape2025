@@ -13,8 +13,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.FieldConstants.Reef.Side;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.MoveToLevel;
+import frc.robot.commands.RunIntake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
@@ -39,6 +38,10 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOReal;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOReal;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -55,6 +58,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Elevator elevator;
     private final Arm arm;
+    private final Intake intake;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -78,6 +82,7 @@ public class RobotContainer {
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIOReal());
                 arm = new Arm(new ArmIOReal(), elevator);
+                intake = new Intake(new IntakeIOReal());
 
                 break;
             case SIM:
@@ -98,6 +103,7 @@ public class RobotContainer {
                         driveSimulation::setSimulationWorldPose);
                 elevator = new Elevator(new ElevatorIOSim());
                 arm = new Arm(new ArmIOSim(), elevator);
+                intake = new Intake(new IntakeIOSim());
 
                 break;
 
@@ -112,6 +118,7 @@ public class RobotContainer {
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIO() {});
                 arm = new Arm(new ArmIO() {}, elevator);
+                intake = new Intake(new IntakeIO() {});
 
                 break;
         }
@@ -155,14 +162,28 @@ public class RobotContainer {
         driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         driverController
+                .rightTrigger(0.1)
+                .whileTrue(new MoveToLevel(
+                                elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
+                        .alongWith(new RunIntake(intake)))
+                .onFalse(
+                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
+
+        driverController
                 .y()
-                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4));
+                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4))
+                .onFalse(
+                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
         driverController
                 .x()
-                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
+                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3))
+                .onFalse(
+                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
         driverController
                 .a()
-                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
+                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2))
+                .onFalse(
+                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
 
         driverController.b().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(

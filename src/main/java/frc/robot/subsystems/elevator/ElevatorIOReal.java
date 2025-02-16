@@ -12,12 +12,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorIOReal implements ElevatorIO {
-    final TalonFX leftElevatorMotor = new TalonFX(0, "rio");
-    final TalonFX rightElevatorMotor = new TalonFX(1, "rio");
+    final TalonFX frontElevatorMotor = new TalonFX(30, "rio");
+    final TalonFX backElevatorMotor = new TalonFX(31, "rio");
     double elevatorToDistanceRatio = 8.0 / (0.0572958 * Math.PI); // Meters
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
@@ -28,21 +27,21 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void setPosition(Distance targetPosition) {
-        leftElevatorMotor.setControl(
+        frontElevatorMotor.setControl(
                 magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
-        rightElevatorMotor.setControl(
+        backElevatorMotor.setControl(
                 magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
     }
 
     @Override
     public void stop() {
-        leftElevatorMotor.stopMotor();
-        rightElevatorMotor.stopMotor();
+        frontElevatorMotor.stopMotor();
+        backElevatorMotor.stopMotor();
     }
 
     @Override
     public void updateInputs(ElevatorInputs inputs) {
-        inputs.position = Meters.of(leftElevatorMotor.getPosition(true).getValueAsDouble());
+        inputs.position = Meters.of(frontElevatorMotor.getPosition(true).getValueAsDouble());
     }
 
     private void configureMotors() {
@@ -50,27 +49,27 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistanceRatio;
-        elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 0.05;
-        elevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 0.05;
-        elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 0.5;
+        elevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 1.5;
+        elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         elevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         elevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-        elevatorMotorConfig.Slot0.kG = 0.0;
-        elevatorMotorConfig.Slot0.kS = 0.0;
-        elevatorMotorConfig.Slot0.kV = 0.0;
-        elevatorMotorConfig.Slot0.kA = 0.0;
-        elevatorMotorConfig.Slot0.kP = 0.0;
+        elevatorMotorConfig.Slot0.kG = 0.25;
+        elevatorMotorConfig.Slot0.kS = 0.28;
+        elevatorMotorConfig.Slot0.kV = 5.97;
+        elevatorMotorConfig.Slot0.kA = 0.592;
+        elevatorMotorConfig.Slot0.kP = 30;
         elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.inchesToMeters(52.25);
+        elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 1.4;
         elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
         elevatorMotorConfig.Voltage.PeakForwardVoltage = 10.0;
         elevatorMotorConfig.Voltage.PeakReverseVoltage = -10.0;
 
-        leftElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
+        frontElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
 
-        elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        rightElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
+        elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        backElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
 
         setPosition(Meters.of(0.0));
     }

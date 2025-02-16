@@ -10,9 +10,9 @@ public class ArmConstants {
         public static final Angle Base = Degrees.of(-49),
                 Trough = Degrees.of(170),
                 L2 = Degrees.of(145),
-                L3 = Degrees.of(170),
+                L3 = Degrees.of(145),
                 L4 = Degrees.of(170),
-                Loading = Radians.of(0.0),
+                Loading = Degrees.of(4),
                 Processing = Radians.of(0.0);
     }
 }
