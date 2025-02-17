@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.FieldConstants.Reef.Side;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.HoldPosition;
 import frc.robot.commands.MoveToLevel;
 import frc.robot.commands.RunIntake;
 import frc.robot.generated.TunerConstants;
@@ -166,26 +167,27 @@ public class RobotContainer {
                 .whileTrue(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
                         .alongWith(new RunIntake(intake)))
-                .onFalse(
-                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
+                .onFalse(new HoldPosition(elevator, arm, intake));
 
         driverController
                 .y()
                 .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4))
-                .onFalse(
-                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
+                .onFalse(new HoldPosition(elevator, arm, intake));
         driverController
                 .x()
                 .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3))
-                .onFalse(
-                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
+                .onFalse(new HoldPosition(elevator, arm, intake));
         driverController
                 .a()
                 .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2))
-                .onFalse(
-                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base));
+                .onFalse(new HoldPosition(elevator, arm, intake));
+        driverController
+                .b()
+                .whileTrue(new MoveToLevel(
+                        elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough))
+                .onFalse(new HoldPosition(elevator, arm, intake));
 
-        driverController.b().onTrue(DriveCommands.driveToPose(drive, () -> {
+        driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
                     drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces)), Side.LEFT);
             Logger.recordOutput("Reef/PercievedRobot", drive.getPose());

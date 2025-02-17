@@ -50,11 +50,11 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/ElevatorPose", elevatorStage2Pose);
     }
 
-    void stop() {
+    public void stop() {
         this.io.stop();
     }
 
-    boolean isAtPosition(Distance queriedPosition) {
+    public boolean isAtPosition(Distance queriedPosition) {
         Distance difference = queriedPosition.minus(this.inputs.position);
         double error = Math.abs(difference.in(Inches));
 

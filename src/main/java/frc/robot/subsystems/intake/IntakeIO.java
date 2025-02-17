@@ -12,7 +12,7 @@ public interface IntakeIO {
     @AutoLog
     class IntakeInputs {
         public AngularVelocity speed;
-        public boolean hasGamePiece;
+        public boolean hasCoral;
     }
 
     default void setSpeed(AngularVelocity targetSpeed) {}

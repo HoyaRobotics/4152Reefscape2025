@@ -23,8 +23,8 @@ public class ArmIOSim implements ArmIO {
         armSim = new SingleJointedArmSim(
                 DCMotor.getKrakenX60(1),
                 185.7143,
-                0.0361366348,
-                14.0,
+                0.16931712,
+                0.28778209,
                 Units.degreesToRadians(-49.0),
                 Units.degreesToRadians(206.0),
                 false,

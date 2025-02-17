@@ -32,4 +32,8 @@ public class Intake extends SubsystemBase {
     public void stopIntake() {
         this.io.stop();
     }
+
+    public boolean hasCoral() {
+        return inputs.hasCoral;
+    }
 }

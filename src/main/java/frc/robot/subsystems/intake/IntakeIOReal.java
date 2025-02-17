@@ -78,6 +78,6 @@ public class IntakeIOReal implements IntakeIO {
     public void updateInputs(IntakeInputs inputs) {
         // check sensors for game piece
         inputs.speed = RotationsPerSecond.of(intakeMotor.getVelocity().getValueAsDouble());
-        inputs.hasGamePiece = hasCoral();
+        inputs.hasCoral = hasCoral();
     }
 }
