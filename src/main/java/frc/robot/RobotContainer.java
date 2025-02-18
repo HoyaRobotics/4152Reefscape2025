@@ -25,8 +25,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.FieldConstants.Reef.Side;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.MoveToLevel;
-import frc.robot.commands.RunIntake;
+import frc.robot.commands.PlacingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
@@ -40,9 +41,11 @@ import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOReal;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
+
 import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -166,26 +169,21 @@ public class RobotContainer {
                 .rightTrigger(0.1)
                 .whileTrue(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
-                        .alongWith(new RunIntake(intake)))
+                        .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)))
                 .onFalse(new HoldPosition(elevator, arm, intake));
 
         driverController
                 .y()
-                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4))
-                .onFalse(new HoldPosition(elevator, arm, intake));
+                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .x()
-                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3))
-                .onFalse(new HoldPosition(elevator, arm, intake));
+                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .a()
-                .whileTrue(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2))
-                .onFalse(new HoldPosition(elevator, arm, intake));
+                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .b()
-                .whileTrue(new MoveToLevel(
-                        elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough))
-                .onFalse(new HoldPosition(elevator, arm, intake));
+                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
 
         driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
