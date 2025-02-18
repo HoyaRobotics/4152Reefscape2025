@@ -45,9 +45,8 @@ public class Arm extends SubsystemBase {
         this.io.setPosition(targetAngle);
     }
 
-    boolean isArmAtPosition(Angle queriedAngle) {
-        // TODO: implement
-        return false;
+    public boolean isArmAtPosition(Angle queriedAngle) {
+        return (queriedAngle.minus(inputs.armAngle).abs(Degrees) <= ArmConstants.positionError.in(Degree));
     }
 
     Angle getArmPosition() {

@@ -55,10 +55,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isAtPosition(Distance queriedPosition) {
-        Distance difference = queriedPosition.minus(this.inputs.position);
-        double error = Math.abs(difference.in(Inches));
-
-        return error < ElevatorConstants.positionErrorInches;
+        return queriedPosition.minus(inputs.position).abs(Inches) <= ElevatorConstants.positionError.in(Inches);
     }
 
     public Distance getPosition() {

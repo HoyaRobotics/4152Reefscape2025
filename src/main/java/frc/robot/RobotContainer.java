@@ -174,16 +174,16 @@ public class RobotContainer {
 
         driverController
                 .y()
-                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .x()
-                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .a()
-                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .b()
-                .whileTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
 
         driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
