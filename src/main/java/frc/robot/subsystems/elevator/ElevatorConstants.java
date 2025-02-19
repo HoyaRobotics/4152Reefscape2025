@@ -21,6 +21,8 @@ public class ElevatorConstants {
                 Loading = Inches.of(17.0),
                 Processing = Inches.of(0.0),
                 Barge = Inches.of(55),
-                Hold = Inches.of(0.0);
+                Hold = Inches.of(0.0),
+                L2Algae = Inches.of(12),
+                l3Algae = Inches.of(32);
     }
 }
