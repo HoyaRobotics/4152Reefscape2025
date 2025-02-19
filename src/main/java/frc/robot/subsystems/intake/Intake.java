@@ -4,17 +4,11 @@
 
 package frc.robot.subsystems.intake;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.elevator.Elevator;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -36,8 +30,8 @@ public class Intake extends SubsystemBase {
         // This method will be called once per scheduler run
         this.io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
-        //Pose3d coralPose = new Pose3d(0, 0, 0, new Rotation3d(Degrees.of(0), arm.getArmPosition(), Degrees.of(0)));
-        //Logger.recordOutput("IntakeCoral", coralPose);
+        // Pose3d coralPose = new Pose3d(0, 0, 0, new Rotation3d(Degrees.of(0), arm.getArmPosition(), Degrees.of(0)));
+        // Logger.recordOutput("IntakeCoral", coralPose);
     }
 
     public void setSpeed(AngularVelocity targetSpeed) {

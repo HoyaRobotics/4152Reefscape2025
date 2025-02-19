@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 /** Add your docs here. */
 public class IntakeCommands {
@@ -18,6 +19,27 @@ public class IntakeCommands {
                 () -> {
                     intake.setSpeed(speed);
                 },
-                intake);
+                intake)
+                .finallyDo(() -> intake.stopIntake());
+    }
+
+    public static Command RunIntakeTimeout(Intake intake, AngularVelocity speed) {
+        return Commands.run(
+                () -> {
+                    intake.setSpeed(speed);
+                },
+                intake)
+                .withTimeout(IntakeConstants.PlacingTimeout)
+                .finallyDo(() -> intake.stopIntake());  
+    }
+
+    public static Command RunIntakeTillSensed(Intake intake, AngularVelocity speed) {
+        return Commands.run(
+                () -> {
+                    intake.setSpeed(speed);
+                },
+                intake)
+                .until(() -> intake.hasCoral())
+                .finallyDo(() -> intake.stopIntake());
     }
 }

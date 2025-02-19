@@ -14,4 +14,6 @@ public class IntakeConstants {
         public static final AngularVelocity intaking = RevolutionsPerSecond.of(15.0),
                 placing = RevolutionsPerSecond.of(-6.0);
     }
+
+    public static final double PlacingTimeout = 0.5;
 }

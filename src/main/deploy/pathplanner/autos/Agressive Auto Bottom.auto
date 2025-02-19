@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Agressive Auto.6"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": true
+}
