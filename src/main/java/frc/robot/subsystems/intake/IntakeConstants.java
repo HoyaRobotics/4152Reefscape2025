@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 /** Add your docs here. */
 public class IntakeConstants {
     public class IntakeSpeeds {
-        public static final AngularVelocity intaking = RevolutionsPerSecond.of(1.0),
-        placing = RevolutionsPerSecond.of(-1.0);
+        public static final AngularVelocity intaking = RevolutionsPerSecond.of(15.0),
+                placing = RevolutionsPerSecond.of(-6.0);
     }
 }

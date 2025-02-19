@@ -71,6 +71,9 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         backElevatorMotor.getConfigurator().apply(elevatorMotorConfig);
 
+        frontElevatorMotor.setPosition(0.0);
+        backElevatorMotor.setPosition(0.0);
+
         setPosition(Meters.of(0.0));
     }
 }

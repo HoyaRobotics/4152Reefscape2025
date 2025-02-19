@@ -46,7 +46,7 @@ public class ArmIOReal implements ArmIO {
     private void configureArmMotor() {
         CANcoderConfiguration armEncoderConfig = new CANcoderConfiguration();
         armEncoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.8;
-        armEncoderConfig.MagnetSensor.MagnetOffset = 0.118652;
+        armEncoderConfig.MagnetSensor.MagnetOffset = 0.11;
         armEncoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         armEncoder.getConfigurator().apply(armEncoderConfig);
         TalonFXConfiguration armConfig = new TalonFXConfiguration();
@@ -55,8 +55,8 @@ public class ArmIOReal implements ArmIO {
         armConfig.Feedback.FeedbackRemoteSensorID = 33;
         armConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         armConfig.Feedback.RotorToSensorRatio = armRatio;
-        armConfig.MotionMagic.MotionMagicAcceleration = 0.4;
-        armConfig.MotionMagic.MotionMagicCruiseVelocity = 0.8;
+        armConfig.MotionMagic.MotionMagicAcceleration = 1.0; // 0.4
+        armConfig.MotionMagic.MotionMagicCruiseVelocity = 0.6;
         armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         armConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
@@ -64,11 +64,11 @@ public class ArmIOReal implements ArmIO {
         armConfig.Slot0.kS = 0.15;
         armConfig.Slot0.kV = 21.04111;
         armConfig.Slot0.kA = 0.0;
-        armConfig.Slot0.kP = 1;
+        armConfig.Slot0.kP = 100;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.5;
+        armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.7;
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.1;
+        armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.12;
         armConfig.Voltage.PeakForwardVoltage = 10.0;
         armConfig.Voltage.PeakReverseVoltage = 10.0;
 

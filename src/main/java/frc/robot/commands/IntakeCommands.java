@@ -14,6 +14,10 @@ public class IntakeCommands {
     private IntakeCommands() {}
 
     public static Command RunIntake(Intake intake, AngularVelocity speed) {
-        return Commands.run(()-> {intake.setSpeed(speed);}, intake);
+        return Commands.run(
+                () -> {
+                    intake.setSpeed(speed);
+                },
+                intake);
     }
 }

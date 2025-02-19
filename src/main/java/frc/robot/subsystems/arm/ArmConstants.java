@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 
 public class ArmConstants {
-    public static final Angle positionError = Degrees.of(1);
+    public static final Angle positionError = Degrees.of(3);
 
     public class l_Angles {
         public static final Angle Base = Degrees.of(-49),

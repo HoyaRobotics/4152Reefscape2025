@@ -45,7 +45,6 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
-
 import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -174,16 +173,40 @@ public class RobotContainer {
 
         driverController
                 .y()
-                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(
+                        elevator,
+                        arm,
+                        intake,
+                        ElevatorConstants.l_Positions.L4,
+                        ArmConstants.l_Angles.L4,
+                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .x()
-                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(
+                        elevator,
+                        arm,
+                        intake,
+                        ElevatorConstants.l_Positions.L3,
+                        ArmConstants.l_Angles.L3,
+                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .a()
-                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(
+                        elevator,
+                        arm,
+                        intake,
+                        ElevatorConstants.l_Positions.L2,
+                        ArmConstants.l_Angles.L2,
+                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
         driverController
                 .b()
-                .onTrue(new PlacingCommand(elevator, arm, intake, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough, ()-> driverController.leftTrigger(0.1).getAsBoolean()));
+                .onTrue(new PlacingCommand(
+                        elevator,
+                        arm,
+                        intake,
+                        ElevatorConstants.l_Positions.Trough,
+                        ArmConstants.l_Angles.Trough,
+                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
 
         driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(

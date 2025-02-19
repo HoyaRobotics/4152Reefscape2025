@@ -16,13 +16,14 @@ import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 /** Add your docs here. */
 public class IntakeIOReal implements IntakeIO {
     private final TalonFX intakeMotor = new TalonFX(34, "rio");
     private final LaserCan lasercan = new LaserCan(35);
-    double intakeRatio = 60.0 / 14; // Meters
+    double intakeRatio = 60.0 / 14;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
 
@@ -61,12 +62,15 @@ public class IntakeIOReal implements IntakeIO {
         intakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         intakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;
         intakeMotorConfig.Voltage.PeakReverseVoltage = 11.0;
-        intakeMotorConfig.Slot0.kV = 0.0;
+        intakeMotorConfig.Slot0.kV = 0.5;
+        intakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        intakeMotor.getConfigurator().apply(intakeMotorConfig);
     }
 
     @Override
     public void setSpeed(AngularVelocity targetSpeed) {
-        intakeMotor.setControl(velocityRequest.withVelocity(targetSpeed));
+        intakeMotor.setControl(velocityRequest.withVelocity(targetSpeed).withSlot(0));
     }
 
     @Override
