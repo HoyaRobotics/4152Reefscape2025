@@ -15,9 +15,11 @@ import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 
 /** Add your docs here. */
 public class IntakeIOReal implements IntakeIO {
@@ -26,6 +28,7 @@ public class IntakeIOReal implements IntakeIO {
     double intakeRatio = 60.0 / 14;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
+    private VoltageOut voltageRequest = new VoltageOut(0.0);
 
     public IntakeIOReal() {
         configureMotors();
@@ -74,8 +77,13 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
+    public void setVoltage(Voltage voltage) {
+        intakeMotor.setControl(voltageRequest.withOutput(voltage));
+    }
+
+    @Override
     public void stop() {
-        setSpeed(RotationsPerSecond.of(0));
+        intakeMotor.stopMotor();
     }
 
     @Override

@@ -49,7 +49,7 @@ public class Arm extends SubsystemBase {
         return (queriedAngle.minus(inputs.armAngle).abs(Degrees) <= ArmConstants.positionError.in(Degree));
     }
 
-    Angle getArmPosition() {
+    public Angle getArmPosition() {
         return this.inputs.armAngle;
     }
 

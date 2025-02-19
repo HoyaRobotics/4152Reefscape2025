@@ -85,7 +85,7 @@ public class RobotContainer {
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIOReal());
                 arm = new Arm(new ArmIOReal(), elevator);
-                intake = new Intake(new IntakeIOReal());
+                intake = new Intake(new IntakeIOReal(), elevator, arm);
 
                 break;
             case SIM:
@@ -106,7 +106,7 @@ public class RobotContainer {
                         driveSimulation::setSimulationWorldPose);
                 elevator = new Elevator(new ElevatorIOSim());
                 arm = new Arm(new ArmIOSim(), elevator);
-                intake = new Intake(new IntakeIOSim());
+                intake = new Intake(new IntakeIOSim(), elevator, arm);
 
                 break;
 
@@ -121,7 +121,7 @@ public class RobotContainer {
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIO() {});
                 arm = new Arm(new ArmIO() {}, elevator);
-                intake = new Intake(new IntakeIO() {});
+                intake = new Intake(new IntakeIO() {}, elevator, arm);
 
                 break;
         }
