@@ -2,7 +2,7 @@
 
 ### 2025 Robot With AdvantageKit and MapleSim Simulation
 
-![Robot Image](/assets/2025CAD.jpg)
+![Robot Image](/assets/2025CAD.png)
 
 ---
 
