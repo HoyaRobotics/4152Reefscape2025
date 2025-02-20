@@ -8,11 +8,11 @@ public class ArmConstants {
     public static final Angle positionError = Degrees.of(3);
 
     public class l_Angles {
-        public static final Angle Base = Degrees.of(-45), // 51.5 horizontal
+        public static final Angle Base = Degrees.of(-25), // 51.5 horizontal, -35 safe
                 Trough = Degrees.of(147.5),
                 L2 = Degrees.of(142.5), // 165
                 L3 = Degrees.of(142.5), // 165
-                L4 = Degrees.of(160),
+                L4 = Degrees.of(170),
                 Loading = Degrees.of(-21.5),
                 Processing = Radians.of(0.0),
                 Barge = Degrees.of(40),

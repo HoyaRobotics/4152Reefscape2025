@@ -13,12 +13,12 @@ public class ElevatorConstants {
 
     public class l_Positions {
         // TODO: Add actual values
-        public static final Distance Base = Inches.of(0.0),
+        public static final Distance Base = Inches.of(0.5),
                 Trough = Inches.of(0.0),
                 L2 = Inches.of(4.5), // 16
                 L3 = Inches.of(19.5), // 31
                 L4 = Inches.of(52.5),
-                Loading = Inches.of(18.5),
+                Loading = Inches.of(19.5),
                 Processing = Inches.of(0.0),
                 Barge = Inches.of(52.5),
                 Hold = Inches.of(0.0),

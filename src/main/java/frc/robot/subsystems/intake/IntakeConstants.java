@@ -13,8 +13,8 @@ public class IntakeConstants {
     public class IntakeSpeeds {
         public static final AngularVelocity intaking = RevolutionsPerSecond.of(15.0),
                 placing = RevolutionsPerSecond.of(-10.0),
-                placingTrough = RevolutionsPerSecond.of(-2.0);
+                placingTrough = RevolutionsPerSecond.of(-4.0);
     }
 
-    public static final double PlacingTimeout = 0.5;
+    public static final double PlacingTimeout = 0.8;
 }

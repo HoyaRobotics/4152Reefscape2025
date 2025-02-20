@@ -50,8 +50,8 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistanceRatio;
-        elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 0.5;
-        elevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 1.5;
+        elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 2.5;
+        elevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 2.0;
         elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         elevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         elevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
