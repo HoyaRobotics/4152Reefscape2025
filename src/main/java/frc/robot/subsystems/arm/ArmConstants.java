@@ -8,16 +8,17 @@ public class ArmConstants {
     public static final Angle positionError = Degrees.of(3);
 
     public class l_Angles {
-        public static final Angle Base = Degrees.of(-49),
-                Trough = Degrees.of(150),
-                L2 = Degrees.of(145), // 165
-                L3 = Degrees.of(145), // 165
-                L4 = Degrees.of(162.5),
-                Loading = Degrees.of(-19),
+        public static final Angle Base = Degrees.of(-45), // 51.5 horizontal
+                Trough = Degrees.of(147.5),
+                L2 = Degrees.of(142.5), // 165
+                L3 = Degrees.of(142.5), // 165
+                L4 = Degrees.of(160),
+                Loading = Degrees.of(-21.5),
                 Processing = Radians.of(0.0),
                 Barge = Degrees.of(40),
                 Hold = Degrees.of(40),
                 L2Algae = Degrees.of(165),
-                l3Algae = Degrees.of(165);
+                l3Algae = Degrees.of(165),
+                Starting = Degrees.of(60);
     }
 }

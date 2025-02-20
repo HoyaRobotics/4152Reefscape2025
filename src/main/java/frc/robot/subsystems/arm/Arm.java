@@ -35,9 +35,9 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
         Pose3d armPose = new Pose3d(
                 0.0,
-                Units.inchesToMeters(6.625),
+                Units.inchesToMeters(-6.625),
                 Units.inchesToMeters(21.875) + elevator.getPosition().in(Meters),
-                new Rotation3d(Degrees.of(0), inputs.armAngle, Degrees.of(0)));
+                new Rotation3d(Degrees.of(0), inputs.armAngle.unaryMinus(), Degrees.of(0)));
         Logger.recordOutput("Arm/ArmPose", armPose);
     }
 

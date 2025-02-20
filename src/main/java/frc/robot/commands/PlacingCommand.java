@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,16 +29,16 @@ public class PlacingCommand extends SequentialCommandGroup {
             Intake intake,
             Distance elevatorPosition,
             Angle armPosition,
-            BooleanSupplier placeObject) {
+            BooleanSupplier placeObject,
+            AngularVelocity outakeSpeed) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
                 new MoveToLevel(elevator, arm, elevatorPosition, armPosition),
                 new WaitUntilCommand(placeObject),
-                IntakeCommands.RunIntakeTimeout(
-                        intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.PlacingTimeout),
+                IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PlacingTimeout),
                 new ParallelRaceGroup(
-                        IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 1.0),
+                        IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, 1.0),
                         new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base)),
                 new HoldPosition(elevator, arm, intake));
     }

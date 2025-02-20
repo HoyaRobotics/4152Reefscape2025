@@ -46,7 +46,7 @@ public class ArmIOReal implements ArmIO {
     private void configureArmMotor() {
         CANcoderConfiguration armEncoderConfig = new CANcoderConfiguration();
         armEncoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.8;
-        armEncoderConfig.MagnetSensor.MagnetOffset = 0.11;
+        armEncoderConfig.MagnetSensor.MagnetOffset = 0.117;
         armEncoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         armEncoder.getConfigurator().apply(armEncoderConfig);
         TalonFXConfiguration armConfig = new TalonFXConfiguration();

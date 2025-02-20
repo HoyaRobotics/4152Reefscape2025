@@ -34,16 +34,16 @@ public class Elevator extends SubsystemBase {
         if (inputs.position.in(Meters) > Units.inchesToMeters(24.25)) {
             elevatorStage2Pose = new Pose3d(
                     0.0,
-                    Units.inchesToMeters(11.0),
+                    Units.inchesToMeters(-11.0),
                     inputs.position.in(Meters) + Units.inchesToMeters(4.875) - Units.inchesToMeters(24.25),
                     new Rotation3d());
         } else {
             elevatorStage2Pose =
-                    new Pose3d(0.0, Units.inchesToMeters(11.0), Units.inchesToMeters(4.875), new Rotation3d());
+                    new Pose3d(0.0, Units.inchesToMeters(-11.0), Units.inchesToMeters(4.875), new Rotation3d());
         }
         carriagePose = new Pose3d(
                 0.0,
-                Units.inchesToMeters(11.0),
+                Units.inchesToMeters(-11.0),
                 inputs.position.in(Meters) + Units.inchesToMeters(5.875),
                 new Rotation3d());
         Logger.recordOutput("Elevator/CarriagePose", carriagePose);

@@ -198,7 +198,8 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.L4,
                         ArmConstants.l_Angles.L4,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
+                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
+                        IntakeConstants.IntakeSpeeds.placing));
         driverController
                 .x()
                 .onTrue(new PlacingCommand(
@@ -207,7 +208,8 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.L3,
                         ArmConstants.l_Angles.L3,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
+                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
+                        IntakeConstants.IntakeSpeeds.placing));
         driverController
                 .a()
                 .onTrue(new PlacingCommand(
@@ -216,7 +218,8 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.L2,
                         ArmConstants.l_Angles.L2,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
+                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
+                        IntakeConstants.IntakeSpeeds.placing));
         driverController
                 .b()
                 .onTrue(new PlacingCommand(
@@ -225,7 +228,8 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.Trough,
                         ArmConstants.l_Angles.Trough,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
+                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
+                        IntakeConstants.IntakeSpeeds.placingTrough));
 
         driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
