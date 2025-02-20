@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -60,7 +61,7 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.Slot0.kA = 0.592;
         elevatorMotorConfig.Slot0.kP = 30;
         elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 1.4;
+        elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.inchesToMeters(54);
         elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
         elevatorMotorConfig.Voltage.PeakForwardVoltage = 10.0;

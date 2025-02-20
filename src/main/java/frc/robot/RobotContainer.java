@@ -15,7 +15,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -128,33 +127,23 @@ public class RobotContainer {
                 break;
         }
 
-        NamedCommands.registerCommand("intakeReceiveWithSensor",
+        NamedCommands.registerCommand(
+                "intakeReceiveWithSensor",
                 IntakeCommands.RunIntakeTillSensed(intake, IntakeConstants.IntakeSpeeds.intaking));
-        NamedCommands.registerCommand("intakePlace", 
-                IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing));
-        NamedCommands.registerCommand("intakeReceive", 
-                IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking));
+        NamedCommands.registerCommand(
+                "intakePlace", IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 0.5));
+        NamedCommands.registerCommand(
+                "intakeReceive", IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking));
 
-        NamedCommands.registerCommand("goToL4",new MoveToLevel(
-                elevator,
-                arm,
-                ElevatorConstants.l_Positions.L4,
-                ArmConstants.l_Angles.L4));
-        NamedCommands.registerCommand("goToL3", new MoveToLevel(
-                elevator,
-                arm,
-                ElevatorConstants.l_Positions.L3,
-                ArmConstants.l_Angles.L3));
-        NamedCommands.registerCommand("goToL2",new MoveToLevel(
-                elevator,
-                arm,
-                ElevatorConstants.l_Positions.L2,
-                ArmConstants.l_Angles.L2));
-        NamedCommands.registerCommand("goToTrough", new MoveToLevel(
-                elevator,
-                arm,
-                ElevatorConstants.l_Positions.Trough,
-                ArmConstants.l_Angles.Trough));
+        NamedCommands.registerCommand(
+                "goToL4", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4));
+        NamedCommands.registerCommand(
+                "goToL3", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
+        NamedCommands.registerCommand(
+                "goToL2", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
+        NamedCommands.registerCommand(
+                "goToTrough",
+                new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

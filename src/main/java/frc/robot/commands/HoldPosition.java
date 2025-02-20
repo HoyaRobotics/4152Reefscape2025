@@ -41,7 +41,8 @@ public class HoldPosition extends Command {
         } else if (!intake.hasCoral()) {
             elevator.setPosition(ElevatorConstants.l_Positions.Base);
             arm.setArmPosition(ArmConstants.l_Angles.Base);
-            intake.stopIntake();
+            intake.setSpeed(RevolutionsPerSecond.of(1));
+            ;
             ;
         }
     }

@@ -8,10 +8,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import java.util.function.BooleanSupplier;
@@ -33,8 +34,11 @@ public class PlacingCommand extends SequentialCommandGroup {
         addCommands(
                 new MoveToLevel(elevator, arm, elevatorPosition, armPosition),
                 new WaitUntilCommand(placeObject),
+                IntakeCommands.RunIntakeTimeout(
+                        intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.PlacingTimeout),
                 new ParallelRaceGroup(
-                        IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.placing), new WaitCommand(0.5)),
+                        IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 1.0),
+                        new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Base, ArmConstants.l_Angles.Base)),
                 new HoldPosition(elevator, arm, intake));
     }
 }
