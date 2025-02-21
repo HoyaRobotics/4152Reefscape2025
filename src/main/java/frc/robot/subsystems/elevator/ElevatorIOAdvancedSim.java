@@ -13,7 +13,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.ChassisReference;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -51,19 +50,20 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
     @Override
     public void updateInputs(ElevatorInputs inputs) {
         var frontElevatorMotorSim = frontElevatorMotor.getSimState();
-        //var backElevatorMotorSim = backElevatorMotor.getSimState();
+        // var backElevatorMotorSim = backElevatorMotor.getSimState();
         frontElevatorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-        //backElevatorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-        frontElevatorMotorSim.Orientation = ChassisReference.Clockwise_Positive;
-        //backElevatorMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
+        // backElevatorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        frontElevatorMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
+        // backElevatorMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
 
         var frontMotorVoltage = frontElevatorMotorSim.getMotorVoltageMeasure();
-        //var backMotorVoltage = backElevatorMotorSim.getMotorVoltageMeasure();
+        // var backMotorVoltage = backElevatorMotorSim.getMotorVoltageMeasure();
 
         elevatorSim.setInputVoltage(frontMotorVoltage.in(Volts));
         elevatorSim.update(0.02);
-        
-        //frontElevatorMotorSim.setRawRotorPosition(elevatorSim.getPositionMeters())
+
+        frontElevatorMotorSim.setRawRotorPosition(elevatorSim.getPositionMeters() * elevatorToDistanceRatio);
+        frontElevatorMotorSim.setRotorVelocity(elevatorSim.getVelocityMetersPerSecond() * elevatorToDistanceRatio);
 
         inputs.position = Meters.of(frontElevatorMotor.getPosition(true).getValueAsDouble());
     }
