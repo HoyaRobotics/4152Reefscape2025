@@ -33,6 +33,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOAdvancedSim;
 import frc.robot.subsystems.arm.ArmIOReal;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.*;
@@ -107,6 +108,7 @@ public class RobotContainer {
                         driveSimulation::setSimulationWorldPose);
                 elevator = new Elevator(new ElevatorIOSim());
                 arm = new Arm(new ArmIOSim(), elevator);
+                // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 intake = new Intake(new IntakeIOSim(), elevator, arm);
 
                 break;
@@ -187,6 +189,13 @@ public class RobotContainer {
                 .rightTrigger(0.1)
                 .whileTrue(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
+                        .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)))
+                .onFalse(new HoldPosition(elevator, arm, intake));
+
+        driverController
+                .rightBumper()
+                .whileTrue(new MoveToLevel(
+                                elevator, arm, ElevatorConstants.l_Positions.L2Algae, ArmConstants.l_Angles.L2Algae)
                         .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)))
                 .onFalse(new HoldPosition(elevator, arm, intake));
 

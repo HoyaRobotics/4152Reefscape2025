@@ -17,8 +17,8 @@ public class ArmConstants {
                 Processing = Radians.of(0.0),
                 Barge = Degrees.of(40),
                 Hold = Degrees.of(40),
-                L2Algae = Degrees.of(165),
-                l3Algae = Degrees.of(165),
+                L2Algae = Degrees.of(0.0),
+                l3Algae = Degrees.of(0.0),
                 Starting = Degrees.of(60);
     }
 }

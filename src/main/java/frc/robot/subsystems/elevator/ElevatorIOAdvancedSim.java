@@ -12,18 +12,26 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.ChassisReference;
+
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
-public class ElevatorIOReal implements ElevatorIO {
+public class ElevatorIOAdvancedSim implements ElevatorIO {
     final TalonFX frontElevatorMotor = new TalonFX(30, "rio");
     final TalonFX backElevatorMotor = new TalonFX(31, "rio");
     double elevatorToDistanceRatio = 8.0 / (0.0572958 * Math.PI); // Meters
+    private ElevatorSim elevatorSim;
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
 
-    public ElevatorIOReal() {
+    public ElevatorIOAdvancedSim() {
         configureMotors();
+        elevatorSim = new ElevatorSim(
+                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.25), false, 0.0);
     }
 
     @Override
@@ -42,6 +50,21 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorInputs inputs) {
+        var frontElevatorMotorSim = frontElevatorMotor.getSimState();
+        //var backElevatorMotorSim = backElevatorMotor.getSimState();
+        frontElevatorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        //backElevatorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        frontElevatorMotorSim.Orientation = ChassisReference.Clockwise_Positive;
+        //backElevatorMotorSim.Orientation = ChassisReference.CounterClockwise_Positive;
+
+        var frontMotorVoltage = frontElevatorMotorSim.getMotorVoltageMeasure();
+        //var backMotorVoltage = backElevatorMotorSim.getMotorVoltageMeasure();
+
+        elevatorSim.setInputVoltage(frontMotorVoltage.in(Volts));
+        elevatorSim.update(0.02);
+        
+        //frontElevatorMotorSim.setRawRotorPosition(elevatorSim.getPositionMeters())
+
         inputs.position = Meters.of(frontElevatorMotor.getPosition(true).getValueAsDouble());
     }
 
