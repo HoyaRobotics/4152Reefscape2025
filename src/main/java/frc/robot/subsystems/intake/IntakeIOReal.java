@@ -40,7 +40,7 @@ public class IntakeIOReal implements IntakeIO {
 
         if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
             double measureDistance = measurement.distance_mm;
-            double coralDistance = Inches.of(5).in(Millimeters);
+            double coralDistance = Inches.of(2).in(Millimeters);
 
             return measureDistance <= coralDistance;
         } else {
