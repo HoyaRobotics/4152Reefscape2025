@@ -6,6 +6,7 @@ package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -39,7 +40,7 @@ public class ArmIOAdvancedSim implements ArmIO {
         configureArmMotor();
         armSim = new SingleJointedArmSim(
                 DCMotor.getKrakenX60(1),
-                185.7143,
+                armRatio,
                 0.16931712,
                 0.28778209,
                 ArmConstants.l_Angles.Base.in(Radians),
@@ -66,10 +67,7 @@ public class ArmIOAdvancedSim implements ArmIO {
         armEncoderSim.setRawPosition(Radians.of(armSim.getAngleRads()));
         armEncoderSim.setVelocity(RadiansPerSecond.of(armSim.getVelocityRadPerSec()));
         armMotorSim.setRawRotorPosition(Radians.of(armSim.getAngleRads()).times(armRatio));
-        armMotorSim.setRotorVelocity(
-                RadiansPerSecond.of(armSim.getVelocityRadPerSec()).times(armRatio));
-        armMotorSim.setForwardLimit(false);
-        armMotorSim.setReverseLimit(false);
+        armMotorSim.setRotorVelocity(RadiansPerSecond.of(armSim.getVelocityRadPerSec()).times(armRatio));
 
         inputs.armAngle = armMotor.getPosition(true).getValue();
     }
