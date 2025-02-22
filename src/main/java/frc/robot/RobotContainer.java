@@ -33,7 +33,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.arm.ArmIOAdvancedSim;
 import frc.robot.subsystems.arm.ArmIOReal;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.*;
@@ -47,7 +46,6 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
-import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -108,7 +106,7 @@ public class RobotContainer {
                         driveSimulation::setSimulationWorldPose);
                 // elevator = new Elevator(new ElevatorIOSim());
                 elevator = new Elevator(new ElevatorIOAdvancedSim());
-                 arm = new Arm(new ArmIOSim(), elevator);
+                arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 intake = new Intake(new IntakeIOSim(), elevator, arm);
 
@@ -243,7 +241,15 @@ public class RobotContainer {
 
         driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
-                    drive.getPose().nearest(Arrays.asList(FieldConstants.Reef.centerFaces)), Side.LEFT);
+                    drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT);
+            Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
+            Logger.recordOutput("Reef/NearestPose", reefPose);
+            return reefPose;
+        }));
+
+        driverController.rightStick().onTrue(DriveCommands.driveToPose(drive, () -> {
+            Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
+                    drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT);
             Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
             Logger.recordOutput("Reef/NearestPose", reefPose);
             return reefPose;
