@@ -33,14 +33,15 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOAdvancedSim;
 import frc.robot.subsystems.arm.ArmIOReal;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOAdvancedSim;
 import frc.robot.subsystems.elevator.ElevatorIOReal;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
@@ -105,8 +106,10 @@ public class RobotContainer {
                         new ModuleIOTalonFXSim(
                                 TunerConstants.BackRight, driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
-                elevator = new Elevator(new ElevatorIOSim());
-                arm = new Arm(new ArmIOSim(), elevator);
+                // elevator = new Elevator(new ElevatorIOSim());
+                elevator = new Elevator(new ElevatorIOAdvancedSim());
+                 arm = new Arm(new ArmIOSim(), elevator);
+                // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 intake = new Intake(new IntakeIOSim(), elevator, arm);
 
                 break;
@@ -187,6 +190,13 @@ public class RobotContainer {
                 .rightTrigger(0.1)
                 .whileTrue(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
+                        .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)))
+                .onFalse(new HoldPosition(elevator, arm, intake));
+
+        driverController
+                .rightBumper()
+                .whileTrue(new MoveToLevel(
+                                elevator, arm, ElevatorConstants.l_Positions.L2Algae, ArmConstants.l_Angles.L2Algae)
                         .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)))
                 .onFalse(new HoldPosition(elevator, arm, intake));
 

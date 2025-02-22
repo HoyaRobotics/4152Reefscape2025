@@ -15,14 +15,14 @@ public class ElevatorConstants {
         // TODO: Add actual values
         public static final Distance Base = Inches.of(0.5),
                 Trough = Inches.of(0.0),
-                L2 = Inches.of(4.5), // 16
-                L3 = Inches.of(19.5), // 31
+                L2 = Inches.of(4.5),
+                L3 = Inches.of(19.5),
                 L4 = Inches.of(52.5),
-                Loading = Inches.of(19.5),
+                Loading = Inches.of(20.5), // 19.5
                 Processing = Inches.of(0.0),
                 Barge = Inches.of(52.5),
                 Hold = Inches.of(0.0),
-                L2Algae = Inches.of(12),
-                l3Algae = Inches.of(32);
+                L2Algae = Inches.of(10),
+                l3Algae = Inches.of(20);
     }
 }
