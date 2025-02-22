@@ -45,4 +45,6 @@ public interface VisionIO {
     }
 
     default void updateInputs(VisionIOInputs inputs) {}
+
+    default void setThrottle(int skippedFrames) {}
 }

@@ -20,7 +20,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,6 +34,8 @@ import java.util.function.Supplier;
 public class VisionIOLimelight implements VisionIO {
     private final Supplier<Rotation2d> rotationSupplier;
     private final DoubleArrayPublisher orientationPublisher;
+    private final IntegerPublisher imuModePublisher;
+    private final IntegerPublisher throttlePublisher;
 
     private final DoubleSubscriber latencySubscriber;
     private final DoubleSubscriber txSubscriber;
@@ -50,17 +54,32 @@ public class VisionIOLimelight implements VisionIO {
         this.rotationSupplier = rotationSupplier;
         orientationPublisher =
                 table.getDoubleArrayTopic("robot_orientation_set").publish();
+        imuModePublisher = table.getIntegerTopic("imumode_set").publish();
+        throttlePublisher = table.getIntegerTopic("throttle-set").publish();
         latencySubscriber = table.getDoubleTopic("tl").subscribe(0.0);
         txSubscriber = table.getDoubleTopic("tx").subscribe(0.0);
         tySubscriber = table.getDoubleTopic("ty").subscribe(0.0);
         megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
         megatag2Subscriber = table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+
+        imuModePublisher.accept(4);
+    }
+
+    @Override
+    public void setThrottle(int skippedFrames) {
+        throttlePublisher.accept(skippedFrames);
     }
 
     @Override
     public void updateInputs(VisionIOInputs inputs) {
         // Update connection status based on whether an update has been seen in the last 250ms
         inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+
+        if (!DriverStation.isDSAttached() || DriverStation.isDisabled()) {
+            throttlePublisher.accept(200);
+        } else {
+            throttlePublisher.accept(0);
+        }
 
         // Update target observation
         inputs.latestTargetObservation = new TargetObservation(

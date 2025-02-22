@@ -46,6 +46,11 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -59,6 +64,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Vision vision;
     private final Elevator elevator;
     private final Arm arm;
     private final Intake intake;
@@ -87,6 +93,8 @@ public class RobotContainer {
                 arm = new Arm(new ArmIOReal(), elevator);
                 intake = new Intake(new IntakeIOReal(), elevator, arm);
 
+                vision = new Vision(drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
+
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -104,6 +112,12 @@ public class RobotContainer {
                         new ModuleIOTalonFXSim(
                                 TunerConstants.BackRight, driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
+                vision = new Vision(
+                        drive,
+                        new VisionIOPhotonVisionSim(
+                                VisionConstants.camera0Name,
+                                VisionConstants.robotToCamera0,
+                                driveSimulation::getSimulatedDriveTrainPose));
                 // elevator = new Elevator(new ElevatorIOSim());
                 elevator = new Elevator(new ElevatorIOAdvancedSim());
                 arm = new Arm(new ArmIOSim(), elevator);
@@ -121,6 +135,7 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {},
                         (pose) -> {});
+                vision = new Vision(drive, new VisionIO() {});
                 elevator = new Elevator(new ElevatorIO() {});
                 arm = new Arm(new ArmIO() {}, elevator);
                 intake = new Intake(new IntakeIO() {}, elevator, arm);
@@ -239,7 +254,7 @@ public class RobotContainer {
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
                         IntakeConstants.IntakeSpeeds.placingTrough));
 
-        driverController.leftStick().onTrue(DriveCommands.driveToPose(drive, () -> {
+        driverController.leftStick().whileTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
                     drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT);
             Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
@@ -247,7 +262,7 @@ public class RobotContainer {
             return reefPose;
         }));
 
-        driverController.rightStick().onTrue(DriveCommands.driveToPose(drive, () -> {
+        driverController.rightStick().whileTrue(DriveCommands.driveToPose(drive, () -> {
             Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
                     drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT);
             Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
