@@ -28,17 +28,19 @@ public class PlacingCommand extends SequentialCommandGroup {
             Intake intake,
             Distance elevatorPosition,
             Angle armPosition,
+            Angle preArmPosition,
             BooleanSupplier placeObject,
             AngularVelocity outakeSpeed) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
+                new MoveToLevel(elevator, arm, elevatorPosition, preArmPosition),
                 new MoveToLevel(elevator, arm, elevatorPosition, armPosition),
                 new WaitUntilCommand(placeObject),
                 IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PlacingTimeout),
+                //IntakeCommands.RunIntakeTillEmpty(intake, outakeSpeed),
                 new ParallelRaceGroup(
-                        IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, 0.5),
-                        new MoveToLevel(elevator, arm, elevatorPosition, ArmConstants.l_Angles.Base)),
-                new HoldPosition(elevator, arm, intake));
+                        IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PostPlacingTimeout),
+                        new MoveToLevel(elevator, arm, elevatorPosition, ArmConstants.l_Angles.Base)));
     }
 }

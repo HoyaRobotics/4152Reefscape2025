@@ -30,7 +30,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
     public ElevatorIOAdvancedSim() {
         configureMotors();
         elevatorSim = new ElevatorSim(
-                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.25), false, 0.0);
+                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.25), true, 0.0);
     }
 
     @Override

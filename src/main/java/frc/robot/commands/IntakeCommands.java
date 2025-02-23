@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 /** Add your docs here. */
 public class IntakeCommands {
@@ -15,11 +16,11 @@ public class IntakeCommands {
 
     public static Command RunIntake(Intake intake, AngularVelocity speed) {
         return Commands.run(
-                        () -> {
-                            intake.setSpeed(speed);
-                        },
-                        intake)
-                .finallyDo(() -> intake.stopIntake());
+                () -> {
+                    intake.setSpeed(speed);
+                },
+                intake);
+        // .finallyDo(() -> intake.stopIntake());
     }
 
     public static Command RunIntakeTimeout(Intake intake, AngularVelocity speed, double timeoutSeconds) {
@@ -28,8 +29,8 @@ public class IntakeCommands {
                             intake.setSpeed(speed);
                         },
                         intake)
-                .withTimeout(timeoutSeconds)
-                .finallyDo(() -> intake.stopIntake());
+                .withTimeout(timeoutSeconds);
+        // .finallyDo(() -> intake.stopIntake());
     }
 
     public static Command RunIntakeTillSensed(Intake intake, AngularVelocity speed) {
@@ -38,7 +39,25 @@ public class IntakeCommands {
                             intake.setSpeed(speed);
                         },
                         intake)
-                .until(() -> intake.hasCoral())
-                .finallyDo(() -> intake.stopIntake());
+                .until(() -> intake.hasCoral());
+        // .finallyDo(() -> intake.stopIntake());
+    }
+
+    public static Command RunIntakeTillEmpty(Intake intake, AngularVelocity speed) {
+        return Commands.run(
+                        () -> {
+                            intake.setSpeed(speed);
+                        },
+                        intake)
+                .until(() -> !intake.hasCoral());
+        // .finallyDo(() -> intake.stopIntake());
+    }
+
+    public static Command StopIntake(Intake intake) {
+        return Commands.runOnce(() -> intake.stopIntake(), intake);
+    }
+
+    public static Command HoldIntake(Intake intake) {
+        return Commands.runOnce(() -> intake.setSpeed(IntakeConstants.IntakeSpeeds.holding), intake);
     }
 }
