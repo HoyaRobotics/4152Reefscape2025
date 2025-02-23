@@ -244,7 +244,7 @@ public class RobotContainer {
                 ? () -> drive.setPose(
                         driveSimulation
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
-                : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+                : () -> drive.setPose(new Pose2d()); // zero gyro
         driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         driverController
