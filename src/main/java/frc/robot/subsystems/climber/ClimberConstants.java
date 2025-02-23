@@ -7,13 +7,15 @@ package frc.robot.subsystems.climber;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 
 /** Add your docs here. */
 public class ClimberConstants {
 
     // TODO: fill in constants
 
-    public static final Angle deployAngle = Degrees.of(5);
-    public static final Angle baseAngle = Degrees.of(0);
-    public static final double speed = 0.0;
+    public static final Angle deployAngle = Degrees.of(90);
+    public static final Angle baseAngle = Degrees.of(-90);
+    public static final Voltage climbUpVoltage = Volts.of(5.0);
+    public static final Voltage climbDownVoltage = Volts.of(-5.0);
 }

@@ -4,19 +4,22 @@
 
 package frc.robot.subsystems.climber;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
 public interface ClimberIO {
     @AutoLog
     public class ClimberInputs {
-        public Pose3d pose;
         public Angle angle;
+        public boolean pastUpLimit;
+        public boolean pastDownLimit;
     }
 
-    void updateInputs(ClimberInputs inputs);
+    default void updateInputs(ClimberInputs inputs) {}
 
-    void setAngle(Angle targetAngle);
+    default void setAngle(Angle targetAngle) {}
+
+    default void setVoltage(Voltage volts) {}
 }

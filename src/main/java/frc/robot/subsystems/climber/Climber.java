@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.climber;
 
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -21,12 +22,8 @@ public class Climber extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    void deploy() {
-        this.io.setAngle(ClimberConstants.deployAngle);
-    }
-
-    void climb() {
-        this.io.setAngle(ClimberConstants.baseAngle);
+    public void setVoltage(Voltage volts) {
+        io.setVoltage(volts);
     }
 
     boolean isAtPosition() {

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.FieldConstants.Reef.Side;
+import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.IntakeCommands;
@@ -35,6 +36,10 @@ import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOReal;
 import frc.robot.subsystems.arm.ArmIOSim;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOReal;
+import frc.robot.subsystems.climber.ClimberIOSIm;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -68,6 +73,7 @@ public class RobotContainer {
     private final Elevator elevator;
     private final Arm arm;
     private final Intake intake;
+    private final Climber climber;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -92,6 +98,7 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorIOReal());
                 arm = new Arm(new ArmIOReal(), elevator);
                 intake = new Intake(new IntakeIOReal(), elevator, arm);
+                climber = new Climber(new ClimberIOReal());
 
                 vision = new Vision(drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
 
@@ -123,6 +130,7 @@ public class RobotContainer {
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 intake = new Intake(new IntakeIOSim(), elevator, arm);
+                climber = new Climber(new ClimberIOSIm());
 
                 break;
 
@@ -139,6 +147,7 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorIO() {});
                 arm = new Arm(new ArmIO() {}, elevator);
                 intake = new Intake(new IntakeIO() {}, elevator, arm);
+                climber = new Climber(new ClimberIO() {});
 
                 break;
         }
@@ -254,21 +263,22 @@ public class RobotContainer {
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
                         IntakeConstants.IntakeSpeeds.placingTrough));
 
-        driverController.leftStick().whileTrue(DriveCommands.driveToPose(drive, () -> {
-            Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
-                    drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT);
-            Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
-            Logger.recordOutput("Reef/NearestPose", reefPose);
-            return reefPose;
-        }));
+        driverController.povUp().whileTrue(ClimbCommands.climbUp(climber));
+        driverController.povDown().whileTrue(ClimbCommands.climbDown(climber));
 
-        driverController.rightStick().whileTrue(DriveCommands.driveToPose(drive, () -> {
-            Pose2d reefPose = FieldConstants.Reef.offsetReefPose(
-                    drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT);
-            Logger.recordOutput("Reef/PercievedRobot", drive.getPose());
-            Logger.recordOutput("Reef/NearestPose", reefPose);
-            return reefPose;
-        }));
+        driverController
+                .leftStick()
+                .whileTrue(DriveCommands.driveToPose(
+                        drive,
+                        () -> FieldConstants.Reef.offsetReefPose(
+                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
+
+        driverController
+                .rightStick()
+                .whileTrue(DriveCommands.driveToPose(
+                        drive,
+                        () -> FieldConstants.Reef.offsetReefPose(
+                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
     }
 
     /**
