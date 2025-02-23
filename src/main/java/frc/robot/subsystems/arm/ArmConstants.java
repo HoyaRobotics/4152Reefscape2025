@@ -9,8 +9,8 @@ public class ArmConstants {
 
     public class l_Angles {
         public static final Angle Base = Degrees.of(-25), // 51.5 horizontal, -35 safe
-                Trough = Degrees.of(147.5),
-                preTrough = Degrees.of(135),
+                Trough = Degrees.of(-35), // 147.5
+                preTrough = Degrees.of(-35),
                 L2 = Degrees.of(142.5), // 165
                 preL2 = Degrees.of(135),
                 L3 = Degrees.of(142.5), // 165

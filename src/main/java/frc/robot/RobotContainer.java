@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,6 +39,7 @@ import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOReal;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOReal;
 import frc.robot.subsystems.climber.ClimberIOSIm;
@@ -58,6 +61,7 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -129,7 +133,28 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorIOAdvancedSim());
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
-                intake = new Intake(new IntakeIOSim(), elevator, arm);
+                intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
+                /*
+                intake = new Intake(
+                        new IntakeIOSim(driveSimulation, (targetSpeed) -> {
+                            SimulatedArena.getInstance()
+                                    .addGamePieceProjectile(new ReefscapeCoralOnFly(
+                                            driveSimulation
+                                                    .getSimulatedDriveTrainPose()
+                                                    .getTranslation(),
+                                            null,
+                                            driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                                            driveSimulation
+                                                            .getSimulatedDriveTrainPose()
+                                                            .getRotation()
+                                                    + Angles.of(180),
+                                            null,
+                                            targetSpeed,
+                                            null));
+                        }),
+                        elevator,
+                        arm);
+                        */
                 climber = new Climber(new ClimberIOSIm());
 
                 break;
@@ -153,9 +178,14 @@ public class RobotContainer {
         }
 
         NamedCommands.registerCommand(
-                "intakePlace", IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 0.5).andThen(IntakeCommands.StopIntake(intake)));
+                "intakePlace",
+                IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 0.5)
+                        .andThen(IntakeCommands.StopIntake(intake)));
         NamedCommands.registerCommand(
-                "intakePlaceWithSensor", IntakeCommands.RunIntakeTillEmpty(intake, IntakeConstants.IntakeSpeeds.placing).andThen(IntakeCommands.StopIntake(intake)));
+                "intakePlaceWithSensor",
+                IntakeCommands.RunIntakeTillEmpty(intake, IntakeConstants.IntakeSpeeds.placing)
+                        // .andThen(new WaitCommand(0.25))
+                        .andThen(IntakeCommands.StopIntake(intake)));
         NamedCommands.registerCommand(
                 "intakeReceive",
                 IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)
@@ -165,7 +195,8 @@ public class RobotContainer {
                 "intakeReceiveWithSensor",
                 IntakeCommands.RunIntakeTillSensed(intake, IntakeConstants.IntakeSpeeds.intaking)
                         .deadlineFor(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)).andThen(IntakeCommands.HoldIntake(intake)));
+                                elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading))
+                        .andThen(IntakeCommands.HoldIntake(intake)));
 
         NamedCommands.registerCommand(
                 "goToL4", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4));
@@ -274,8 +305,14 @@ public class RobotContainer {
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
                         IntakeConstants.IntakeSpeeds.placingTrough));
 
-        driverController.povUp().whileTrue(ClimbCommands.climbUp(climber));
-        driverController.povDown().whileTrue(ClimbCommands.climbDown(climber));
+        driverController
+                .povUp()
+                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage))
+                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
+        driverController
+                .povDown()
+                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage))
+                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
 
         driverController
                 .leftStick()

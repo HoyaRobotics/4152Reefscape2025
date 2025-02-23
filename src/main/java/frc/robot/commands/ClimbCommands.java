@@ -4,20 +4,16 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberConstants;
 
 /** Add your docs here. */
 public class ClimbCommands {
     private ClimbCommands() {}
 
-    public static Command climbUp(Climber climber) {
-        return Commands.run(() -> climber.setVoltage(ClimberConstants.climbUpVoltage), climber);
-    }
-
-    public static Command climbDown(Climber climber) {
-        return Commands.run(() -> climber.setVoltage(ClimberConstants.climbDownVoltage), climber);
+    public static Command moveClimber(Climber climber, Voltage targetVoltage) {
+        return Commands.run(() -> climber.setVoltage(targetVoltage), climber);
     }
 }

@@ -41,8 +41,6 @@ public class HoldPosition extends Command {
             elevator.setPosition(ElevatorConstants.l_Positions.Base);
             arm.setArmPosition(ArmConstants.l_Angles.Base);
             intake.setSpeed(IntakeConstants.IntakeSpeeds.empty);
-            ;
-            ;
         }
     }
 

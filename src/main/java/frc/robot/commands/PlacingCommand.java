@@ -38,7 +38,7 @@ public class PlacingCommand extends SequentialCommandGroup {
                 new MoveToLevel(elevator, arm, elevatorPosition, armPosition),
                 new WaitUntilCommand(placeObject),
                 IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PlacingTimeout),
-                //IntakeCommands.RunIntakeTillEmpty(intake, outakeSpeed),
+                // IntakeCommands.RunIntakeTillEmpty(intake, outakeSpeed),
                 new ParallelRaceGroup(
                         IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PostPlacingTimeout),
                         new MoveToLevel(elevator, arm, elevatorPosition, ArmConstants.l_Angles.Base)));

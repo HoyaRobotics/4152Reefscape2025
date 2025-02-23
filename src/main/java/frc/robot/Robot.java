@@ -140,7 +140,11 @@ public class Robot extends LoggedRobot {
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+        // Pose3d robotPose = new Pose3d(robotContainer.drive.getPose());
+        // Pose3d cameraPose = robotPose.transformBy(VisionConstants.robotToCamera0);
+        // Logger.recordOutput("Vision/cameraPose", cameraPose);
+    }
 
     /** This function is called once when test mode is enabled. */
     @Override

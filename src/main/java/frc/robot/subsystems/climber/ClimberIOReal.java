@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
@@ -17,7 +19,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Add your docs here. */
 public class ClimberIOReal implements ClimberIO {
 
-    SparkFlex climberMotor = new SparkFlex(0, MotorType.kBrushless);
+    SparkFlex climberMotor = new SparkFlex(36, MotorType.kBrushless);
     private double climberRatio = 5.0 * 5.0 * (68.0 / 18.0) * (32.0 / 12.0);
 
     public ClimberIOReal() {
@@ -41,14 +43,18 @@ public class ClimberIOReal implements ClimberIO {
     private void configureMotors() {
         SparkFlexConfig climberMotorConfig = new SparkFlexConfig();
 
-        climberMotorConfig.encoder.positionConversionFactor(1.0 / climberRatio);
+        // climberMotorConfig.encoder.positionConversionFactor(1.0 / climberRatio);
         climberMotorConfig.closedLoop.maxMotion.maxAcceleration(0.1);
         climberMotorConfig.closedLoop.maxMotion.maxVelocity(0.1);
-        climberMotorConfig.encoder.inverted(false);
+        // climberMotorConfig.encoder.inverted(false);
+        /*
         climberMotorConfig.softLimit.forwardSoftLimit(0.3);
         climberMotorConfig.softLimit.reverseSoftLimit(-0.26);
         climberMotorConfig.softLimit.forwardSoftLimitEnabled(true);
         climberMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+        */
+        climberMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+        climberMotorConfig.idleMode(IdleMode.kBrake);
 
         climberMotor.configure(climberMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }

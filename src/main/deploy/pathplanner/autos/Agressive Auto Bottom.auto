@@ -11,6 +11,18 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "goToL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakePlace"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.1"
@@ -20,6 +32,18 @@
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "goToL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakePlace"
           }
         },
         {
@@ -35,6 +59,18 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "goToL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakePlace"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.5"
@@ -44,6 +80,18 @@
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "goToL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakePlace"
           }
         }
       ]

@@ -5,18 +5,40 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import java.util.function.Consumer;
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 /** Add your docs here. */
 public class IntakeIOSim implements IntakeIO {
+    private final IntakeSimulation intakeSimulation;
+    private final SwerveDriveSimulation driveSimulation;
+    private final Consumer<AngularVelocity> placeCoral;
 
-    public IntakeIOSim() {}
+    public IntakeIOSim(SwerveDriveSimulation driveSimulation, Consumer<AngularVelocity> placeCoral) {
+        this.driveSimulation = driveSimulation;
+        this.intakeSimulation = IntakeSimulation.OverTheBumperIntake(
+                "Coral", driveSimulation, null, null, IntakeSimulation.IntakeSide.FRONT, 1);
+        this.placeCoral = placeCoral;
+    }
 
     @Override
-    public void setSpeed(AngularVelocity targetSpeed) {}
+    public void setSpeed(AngularVelocity targetSpeed) {
+        if (targetSpeed == IntakeConstants.IntakeSpeeds.intaking) {
+            intakeSimulation.startIntake();
+        } else if (targetSpeed == IntakeConstants.IntakeSpeeds.placing
+                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough) {
+            placeCoral.accept(targetSpeed);
+        }
+    }
 
     @Override
-    public void stop() {}
+    public void stop() {
+        intakeSimulation.stopIntake();
+    }
 
     @Override
-    public void updateInputs(IntakeInputs inputs) {}
+    public void updateInputs(IntakeInputs inputs) {
+        inputs.hasCoral = intakeSimulation.getGamePiecesAmount() != 0;
+    }
 }
