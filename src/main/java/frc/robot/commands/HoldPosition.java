@@ -4,14 +4,13 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class HoldPosition extends Command {
@@ -37,11 +36,11 @@ public class HoldPosition extends Command {
         if (intake.hasCoral()) {
             elevator.setPosition(ElevatorConstants.l_Positions.Hold);
             arm.setArmPosition(ArmConstants.l_Angles.Hold);
-            intake.setSpeed(RevolutionsPerSecond.of(1));
+            intake.setSpeed(IntakeConstants.IntakeSpeeds.holding);
         } else if (!intake.hasCoral()) {
             elevator.setPosition(ElevatorConstants.l_Positions.Base);
             arm.setArmPosition(ArmConstants.l_Angles.Base);
-            intake.setSpeed(RevolutionsPerSecond.of(1));
+            intake.setSpeed(IntakeConstants.IntakeSpeeds.empty);
             ;
             ;
         }
