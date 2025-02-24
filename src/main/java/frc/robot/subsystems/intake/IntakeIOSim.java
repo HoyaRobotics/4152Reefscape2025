@@ -22,6 +22,7 @@ public class IntakeIOSim implements IntakeIO {
         this.driveSimulation = driveSimulation;
         this.intakeSimulation = IntakeSimulation.OverTheBumperIntake(
                 "Coral", driveSimulation, Inches.of(20), Inches.of(8), IntakeSimulation.IntakeSide.FRONT, 1);
+        this.intakeSimulation.addGamePieceToIntake();
         this.placeCoral = placeCoral;
     }
 
@@ -30,8 +31,8 @@ public class IntakeIOSim implements IntakeIO {
         if (targetSpeed == IntakeConstants.IntakeSpeeds.intaking) {
             intakeSimulation.startIntake();
         } else if ((targetSpeed == IntakeConstants.IntakeSpeeds.placing
-                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough)
-                        && intakeSimulation.obtainGamePieceFromIntake()) {
+                        || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough)
+                && intakeSimulation.obtainGamePieceFromIntake()) {
             placeCoral.accept(targetSpeed);
         }
     }

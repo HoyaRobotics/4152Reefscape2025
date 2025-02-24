@@ -13,20 +13,24 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.*;
 
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly.CoralStationsSide;
+import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -179,13 +183,35 @@ public class Robot extends LoggedRobot {
         // coral station logic
         // check if we are in a certain distance, drop once and wait until
         // we leave and come back within that distance to drop again
+        // also wait for the robot to be facing it
+        // difference between angles less than 20
+        // make sides field relative, doesnt work on red
+        boolean isRed = DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
         Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
+        Angle angleDiff = robotContainer
+                .driveSimulation
+                .getSimulatedDriveTrainPose()
+                .getRotation()
+                .minus(Rotation2d.fromDegrees(54))
+                .getMeasure()
+                .plus(Degrees.of(180));
+        Pose2d robotPose = robotContainer.driveSimulation.getSimulatedDriveTrainPose();
+        Logger.recordOutput("CoralStation/RightSidePose", rightSidePose);
+        if (isRed) {
+            rightSidePose = new Pose2d(
+                FieldMirroringUtils.flip(rightSidePose.getTranslation()),
+                FieldMirroringUtils.flip(rightSidePose.getRotation()));
+        }
+        Logger.recordOutput("CoralStation/RightSidePoseAdjusted", rightSidePose);
         Transform2d poseDiff =
                 robotContainer.driveSimulation.getSimulatedDriveTrainPose().minus(rightSidePose);
         Distance difference =
                 Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
 
-        if (difference.lt(Meters.of(2)) && ! inCoralStationRange) {
+        boolean enteredRange = difference.lt(Meters.of(0.75));
+            // && Math.abs(angleDiff.in(Degrees)) < 10.0;
+        if (enteredRange && !inCoralStationRange) {
             inCoralStationRange = true;
             // right side station not field relative??
             SimulatedArena.getInstance()
@@ -193,7 +219,7 @@ public class Robot extends LoggedRobot {
                             CoralStationsSide.RIGHT_STATION,
                             DriverStation.getAlliance().get(),
                             false));
-        } else if (difference.gt(Meters.of(2))) {
+        } else if (difference.gt(Meters.of(1.0))) {
             inCoralStationRange = false;
         }
         robotContainer.displaySimFieldToAdvantageScope();
