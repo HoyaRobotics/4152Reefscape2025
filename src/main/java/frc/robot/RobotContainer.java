@@ -157,8 +157,9 @@ public class RobotContainer {
                                     elevator.getCarriagePose().getMeasureZ().plus(intakeZFromCarriage);
                             Translation2d intakePosition = new Translation2d(intakeX, intakeY);
                             // convert from angular to linear velocity?
-                            LinearVelocity intakeSpeed =
-                                    MetersPerSecond.of(targetSpeed.in(RadiansPerSecond) * armLength.in(Meters));
+                            // wheel vs arm radius?
+                            LinearVelocity intakeSpeed = MetersPerSecond.of(targetSpeed.in(RadiansPerSecond)
+                                    * Inches.of(1.5).in(Meters));
                             SimulatedArena.getInstance()
                                     .addGamePieceProjectile(new ReefscapeCoralOnFly(
                                             driveSimulation

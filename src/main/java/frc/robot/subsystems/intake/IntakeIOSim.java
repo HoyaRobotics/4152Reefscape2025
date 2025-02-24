@@ -16,6 +16,7 @@ public class IntakeIOSim implements IntakeIO {
     private final IntakeSimulation intakeSimulation;
     private final SwerveDriveSimulation driveSimulation;
     private final Consumer<AngularVelocity> placeCoral;
+    private boolean placed = false;
 
     public IntakeIOSim(SwerveDriveSimulation driveSimulation, Consumer<AngularVelocity> placeCoral) {
         this.driveSimulation = driveSimulation;
@@ -29,14 +30,16 @@ public class IntakeIOSim implements IntakeIO {
         if (targetSpeed == IntakeConstants.IntakeSpeeds.intaking) {
             intakeSimulation.startIntake();
         } else if (targetSpeed == IntakeConstants.IntakeSpeeds.placing
-                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough) {
+                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough && !placed) {
             placeCoral.accept(targetSpeed);
+            placed = true;
         }
     }
 
     @Override
     public void stop() {
         intakeSimulation.stopIntake();
+        placed = false;
     }
 
     @Override
