@@ -13,11 +13,20 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly.CoralStationsSide;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -33,6 +42,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
+    private boolean inCoralStationRange = false;
 
     public Robot() {
         CanBridge.runTCP();
@@ -165,6 +175,27 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
+
+        // coral station logic
+        // check if we are in a certain distance, drop once and wait until
+        // we leave and come back within that distance to drop again
+        Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
+        Transform2d poseDiff =
+                robotContainer.driveSimulation.getSimulatedDriveTrainPose().minus(rightSidePose);
+        Distance difference =
+                Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
+
+        if (difference.lt(Meters.of(2)) && ! inCoralStationRange) {
+            inCoralStationRange = true;
+            // right side station not field relative??
+            SimulatedArena.getInstance()
+                    .addGamePieceProjectile(ReefscapeCoralOnFly.DropFromCoralStation(
+                            CoralStationsSide.RIGHT_STATION,
+                            DriverStation.getAlliance().get(),
+                            false));
+        } else if (difference.gt(Meters.of(2))) {
+            inCoralStationRange = false;
+        }
         robotContainer.displaySimFieldToAdvantageScope();
     }
 }

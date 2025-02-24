@@ -21,15 +21,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -81,6 +74,11 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -96,7 +94,7 @@ public class RobotContainer {
     private final Intake intake;
     private final Climber climber;
 
-    private SwerveDriveSimulation driveSimulation = null;
+    public SwerveDriveSimulation driveSimulation = null;
 
     // Controller
     private final CommandXboxController driverController = new CommandXboxController(0);
@@ -156,15 +154,16 @@ public class RobotContainer {
                         // -113.5 + 90 + 15 = -8.5
                         // intake is also at a 15 degree angle from the arm
                         new IntakeIOSim(driveSimulation, (targetSpeed) -> {
-                                // notes: too much of an angle, not high enough
+                            // notes: too much of an angle, not high enough
                             Distance armLength = Inches.of(18.0);
                             Distance intakeY = Inches.of(-1.013);
                             Distance intakeX = armLength.times(
                                     -Math.cos(arm.getArmPosition().in(Radians)));
                             Distance intakeZFromCarriage = armLength.times(
                                     Math.sin(arm.getArmPosition().in(Radians)));
-                            Distance intakeHeight =
-                                    elevator.getPosition().plus(Inches.of(21.875)).plus(intakeZFromCarriage);
+                            Distance intakeHeight = elevator.getPosition()
+                                    .plus(Inches.of(21.875))
+                                    .plus(intakeZFromCarriage);
                             Translation2d intakePosition = new Translation2d(intakeX, intakeY);
                             // convert from angular to linear velocity?
                             // wheel vs arm radius?
