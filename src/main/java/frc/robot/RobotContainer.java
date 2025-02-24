@@ -13,18 +13,12 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -76,7 +70,12 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import static edu.wpi.first.units.Units.*;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
  * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
@@ -148,28 +147,32 @@ public class RobotContainer {
                 // intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
                 intake = new Intake(
                         new IntakeIOSim(driveSimulation, (targetSpeed) -> {
-                                Distance armLength = Inches.of(18.0);
-                                Distance intakeY = Inches.of(-1.013);
-                                Distance intakeX = armLength.times(Math.cos(arm.getArmPosition().in(Radians)));
-                                Distance intakeZFromCarriage = armLength.times(Math.sin(arm.getArmPosition().in(Radians)));
-                                Distance intakeHeight = elevator.getCarriagePose().getMeasureZ().plus(intakeZFromCarriage);
-                                Translation2d intakePosition = new Translation2d(intakeX, intakeY);
-                                // convert from angular to linear velocity?
-                                LinearVelocity intakeSpeed = MetersPerSecond.of(targetSpeed.in(RadiansPerSecond) * armLength.in(Meters));
-                                SimulatedArena.getInstance()
-                                        .addGamePieceProjectile(new ReefscapeCoralOnFly(
-                                                driveSimulation
-                                                        .getSimulatedDriveTrainPose()
-                                                        .getTranslation(),
-                                                intakePosition,
-                                                driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                                                driveSimulation
-                                                        .getSimulatedDriveTrainPose()
-                                                        .getRotation().rotateBy(
-                                                                new Rotation2d(Degrees.of(180))),
-                                                intakeHeight,
-                                                intakeSpeed,
-                                                arm.getArmPosition()));
+                            Distance armLength = Inches.of(18.0);
+                            Distance intakeY = Inches.of(-1.013);
+                            Distance intakeX = armLength.times(
+                                    Math.cos(arm.getArmPosition().in(Radians)));
+                            Distance intakeZFromCarriage = armLength.times(
+                                    Math.sin(arm.getArmPosition().in(Radians)));
+                            Distance intakeHeight =
+                                    elevator.getCarriagePose().getMeasureZ().plus(intakeZFromCarriage);
+                            Translation2d intakePosition = new Translation2d(intakeX, intakeY);
+                            // convert from angular to linear velocity?
+                            LinearVelocity intakeSpeed =
+                                    MetersPerSecond.of(targetSpeed.in(RadiansPerSecond) * armLength.in(Meters));
+                            SimulatedArena.getInstance()
+                                    .addGamePieceProjectile(new ReefscapeCoralOnFly(
+                                            driveSimulation
+                                                    .getSimulatedDriveTrainPose()
+                                                    .getTranslation(),
+                                            intakePosition,
+                                            driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                                            driveSimulation
+                                                    .getSimulatedDriveTrainPose()
+                                                    .getRotation()
+                                                    .rotateBy(new Rotation2d(Degrees.of(180))),
+                                            intakeHeight,
+                                            intakeSpeed,
+                                            arm.getArmPosition()));
                         }),
                         elevator,
                         arm);

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.IntakeSimulation;
@@ -18,7 +20,7 @@ public class IntakeIOSim implements IntakeIO {
     public IntakeIOSim(SwerveDriveSimulation driveSimulation, Consumer<AngularVelocity> placeCoral) {
         this.driveSimulation = driveSimulation;
         this.intakeSimulation = IntakeSimulation.OverTheBumperIntake(
-                "Coral", driveSimulation, null, null, IntakeSimulation.IntakeSide.FRONT, 1);
+                "Coral", driveSimulation, Inches.of(20), Inches.of(8), IntakeSimulation.IntakeSide.FRONT, 1);
         this.placeCoral = placeCoral;
     }
 

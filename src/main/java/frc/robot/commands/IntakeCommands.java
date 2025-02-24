@@ -15,42 +15,24 @@ public class IntakeCommands {
     private IntakeCommands() {}
 
     public static Command RunIntake(Intake intake, AngularVelocity speed) {
-        return Commands.run(
-                () -> {
-                    intake.setSpeed(speed);
-                },
-                intake);
+        return Commands.run(() -> {},intake)
+            .beforeStarting(() -> intake.setSpeed(speed));
         // .finallyDo(() -> intake.stopIntake());
     }
 
     public static Command RunIntakeTimeout(Intake intake, AngularVelocity speed, double timeoutSeconds) {
-        return Commands.run(
-                        () -> {
-                            intake.setSpeed(speed);
-                        },
-                        intake)
-                .withTimeout(timeoutSeconds);
-        // .finallyDo(() -> intake.stopIntake());
+        return RunIntake(intake, speed)
+            .withTimeout(timeoutSeconds);
     }
 
     public static Command RunIntakeTillSensed(Intake intake, AngularVelocity speed) {
-        return Commands.run(
-                        () -> {
-                            intake.setSpeed(speed);
-                        },
-                        intake)
-                .until(() -> intake.hasCoral());
-        // .finallyDo(() -> intake.stopIntake());
+        return RunIntake(intake, speed)
+            .until(() -> intake.hasCoral());
     }
 
     public static Command RunIntakeTillEmpty(Intake intake, AngularVelocity speed) {
-        return Commands.run(
-                        () -> {
-                            intake.setSpeed(speed);
-                        },
-                        intake)
-                .until(() -> !intake.hasCoral());
-        // .finallyDo(() -> intake.stopIntake());
+        return RunIntake(intake, speed)
+            .until(() -> ! intake.hasCoral());
     }
 
     public static Command StopIntake(Intake intake) {
