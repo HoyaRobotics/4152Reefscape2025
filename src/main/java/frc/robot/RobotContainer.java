@@ -26,6 +26,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -153,16 +154,19 @@ public class RobotContainer {
                         // 0 angle is horizontal?
                         // -113.5 + 90 + 15 = -8.5
                         // intake is also at a 15 degree angle from the arm
+                        // intake
                         new IntakeIOSim(driveSimulation, (targetSpeed) -> {
+                            Angle intakeAngle =
+                                    Degrees.of(((arm.getArmPosition().in(Degrees) - 113.5 - 15) * -1.0) + 90);
                             // notes: too much of an angle, not high enough
                             Distance armLength = Inches.of(18.0);
                             Distance intakeY = Inches.of(-1.013);
-                            Distance intakeX = armLength.times(
-                                    -Math.cos(arm.getArmPosition().in(Radians)));
-                            Distance intakeZFromCarriage = armLength.times(
-                                    Math.sin(arm.getArmPosition().in(Radians)));
-                            Distance intakeHeight = elevator.getPosition()
-                                    .plus(Inches.of(21.875))
+                            Distance intakeX = armLength.times(-Math.cos(intakeAngle.in(Radians)));
+                            Distance intakeZFromCarriage = armLength.times(Math.sin(intakeAngle.in(Radians)));
+                            Distance intakeHeight = elevator.getCarriagePose()
+                                    .getMeasureZ()
+                                    .minus(Inches.of(4.25 / 2))
+                                    .plus(Inches.of(16.0))
                                     .plus(intakeZFromCarriage);
                             Translation2d intakePosition = new Translation2d(intakeX, intakeY);
                             // convert from angular to linear velocity?
@@ -182,7 +186,7 @@ public class RobotContainer {
                                                     .rotateBy(new Rotation2d(Degrees.of(180))),
                                             intakeHeight,
                                             intakeSpeed,
-                                            arm.getArmPosition().minus(Degrees.of(-8.5)))); // 10
+                                            intakeAngle)); // 10
                         }),
                         elevator,
                         arm);

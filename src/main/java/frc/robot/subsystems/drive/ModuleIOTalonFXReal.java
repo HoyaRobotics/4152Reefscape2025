@@ -13,6 +13,8 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -30,8 +32,13 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
     private final Queue<Double> drivePositionQueue;
     private final Queue<Double> turnPositionQueue;
 
-    public ModuleIOTalonFXReal(SwerveModuleConstants constants) {
+    private final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
+
+    public ModuleIOTalonFXReal(
+            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
         super(constants);
+
+        this.constants = constants;
 
         this.timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
         this.drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(super.drivePosition);
@@ -45,9 +52,14 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
         // Update odometry inputs
         inputs.odometryTimestamps =
                 timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-        inputs.odometryDrivePositionsRad = drivePositionQueue.stream()
+                
+        double[] odometry_raw = drivePositionQueue.stream()
                 .mapToDouble(Units::rotationsToRadians)
                 .toArray();
+        for (int i = 0; i < odometry_raw.length; ++i) {
+            odometry_raw[i] /= this.constants.DriveMotorGearRatio;
+        }
+        inputs.odometryDrivePositionsRad = odometry_raw;
         inputs.odometryTurnPositions =
                 turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
         timestampQueue.clear();

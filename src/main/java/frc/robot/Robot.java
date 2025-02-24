@@ -19,7 +19,6 @@ import au.grapplerobotics.CanBridge;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -187,7 +186,7 @@ public class Robot extends LoggedRobot {
         // difference between angles less than 20
         // make sides field relative, doesnt work on red
         boolean isRed = DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Red;
+                && DriverStation.getAlliance().get() == Alliance.Red;
         Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
         Angle angleDiff = robotContainer
                 .driveSimulation
@@ -200,8 +199,8 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput("CoralStation/RightSidePose", rightSidePose);
         if (isRed) {
             rightSidePose = new Pose2d(
-                FieldMirroringUtils.flip(rightSidePose.getTranslation()),
-                FieldMirroringUtils.flip(rightSidePose.getRotation()));
+                    FieldMirroringUtils.flip(rightSidePose.getTranslation()),
+                    FieldMirroringUtils.flip(rightSidePose.getRotation()));
         }
         Logger.recordOutput("CoralStation/RightSidePoseAdjusted", rightSidePose);
         Transform2d poseDiff =
@@ -210,7 +209,7 @@ public class Robot extends LoggedRobot {
                 Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
 
         boolean enteredRange = difference.lt(Meters.of(0.75));
-            // && Math.abs(angleDiff.in(Degrees)) < 10.0;
+        // && Math.abs(angleDiff.in(Degrees)) < 10.0;
         if (enteredRange && !inCoralStationRange) {
             inCoralStationRange = true;
             // right side station not field relative??

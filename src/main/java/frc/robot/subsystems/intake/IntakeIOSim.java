@@ -30,9 +30,9 @@ public class IntakeIOSim implements IntakeIO {
     public void setSpeed(AngularVelocity targetSpeed) {
         if (targetSpeed == IntakeConstants.IntakeSpeeds.intaking) {
             intakeSimulation.startIntake();
-        } else if ((targetSpeed == IntakeConstants.IntakeSpeeds.placing
-                        || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough)
-                && intakeSimulation.obtainGamePieceFromIntake()) {
+        } else if (targetSpeed == IntakeConstants.IntakeSpeeds.placing
+                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough
+                        && intakeSimulation.obtainGamePieceFromIntake()) {
             placeCoral.accept(targetSpeed);
         }
     }
