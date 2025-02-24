@@ -10,13 +10,13 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class IntakeIOSim implements IntakeIO {
     private final IntakeSimulation intakeSimulation;
     private final SwerveDriveSimulation driveSimulation;
     private final Consumer<AngularVelocity> placeCoral;
-    private boolean placed = false;
 
     public IntakeIOSim(SwerveDriveSimulation driveSimulation, Consumer<AngularVelocity> placeCoral) {
         this.driveSimulation = driveSimulation;
@@ -29,21 +29,21 @@ public class IntakeIOSim implements IntakeIO {
     public void setSpeed(AngularVelocity targetSpeed) {
         if (targetSpeed == IntakeConstants.IntakeSpeeds.intaking) {
             intakeSimulation.startIntake();
-        } else if (targetSpeed == IntakeConstants.IntakeSpeeds.placing
-                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough && !placed) {
+        } else if ((targetSpeed == IntakeConstants.IntakeSpeeds.placing
+                || targetSpeed == IntakeConstants.IntakeSpeeds.placingTrough)
+                        && intakeSimulation.obtainGamePieceFromIntake()) {
             placeCoral.accept(targetSpeed);
-            placed = true;
         }
     }
 
     @Override
     public void stop() {
         intakeSimulation.stopIntake();
-        placed = false;
     }
 
     @Override
     public void updateInputs(IntakeInputs inputs) {
         inputs.hasCoral = intakeSimulation.getGamePiecesAmount() != 0;
+        Logger.recordOutput("Intake/intakePieces", intakeSimulation.getGamePiecesAmount());
     }
 }

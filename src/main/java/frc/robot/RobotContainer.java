@@ -13,12 +13,23 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -70,11 +81,6 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -146,15 +152,19 @@ public class RobotContainer {
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 // intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
                 intake = new Intake(
+                        // 0 angle is horizontal?
+                        // -113.5 + 90 + 15 = -8.5
+                        // intake is also at a 15 degree angle from the arm
                         new IntakeIOSim(driveSimulation, (targetSpeed) -> {
+                                // notes: too much of an angle, not high enough
                             Distance armLength = Inches.of(18.0);
                             Distance intakeY = Inches.of(-1.013);
                             Distance intakeX = armLength.times(
-                                    Math.cos(arm.getArmPosition().in(Radians)));
+                                    -Math.cos(arm.getArmPosition().in(Radians)));
                             Distance intakeZFromCarriage = armLength.times(
                                     Math.sin(arm.getArmPosition().in(Radians)));
                             Distance intakeHeight =
-                                    elevator.getCarriagePose().getMeasureZ().plus(intakeZFromCarriage);
+                                    elevator.getPosition().plus(Inches.of(21.875)).plus(intakeZFromCarriage);
                             Translation2d intakePosition = new Translation2d(intakeX, intakeY);
                             // convert from angular to linear velocity?
                             // wheel vs arm radius?
@@ -173,7 +183,7 @@ public class RobotContainer {
                                                     .rotateBy(new Rotation2d(Degrees.of(180))),
                                             intakeHeight,
                                             intakeSpeed,
-                                            arm.getArmPosition()));
+                                            arm.getArmPosition().minus(Degrees.of(-8.5)))); // 10
                         }),
                         elevator,
                         arm);
