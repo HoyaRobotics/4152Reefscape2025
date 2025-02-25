@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -30,17 +31,19 @@ public class PlacingCommand extends SequentialCommandGroup {
             Angle armPosition,
             Angle preArmPosition,
             BooleanSupplier placeObject,
-            AngularVelocity outakeSpeed) {
+            AngularVelocity outakeSpeed,
+            Current currentLimit) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
                 new MoveToLevel(elevator, arm, elevatorPosition, preArmPosition),
                 new MoveToLevel(elevator, arm, elevatorPosition, armPosition),
                 new WaitUntilCommand(placeObject),
-                IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PlacingTimeout),
+                IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, currentLimit, IntakeConstants.PlacingTimeout),
                 // IntakeCommands.RunIntakeTillEmpty(intake, outakeSpeed),
                 new ParallelRaceGroup(
-                        IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, IntakeConstants.PostPlacingTimeout),
+                        IntakeCommands.RunIntakeTimeout(
+                                intake, outakeSpeed, currentLimit, IntakeConstants.PostPlacingTimeout),
                         new MoveToLevel(elevator, arm, elevatorPosition, ArmConstants.l_Angles.Base)));
     }
 }

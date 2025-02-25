@@ -13,12 +13,14 @@ import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
 import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
 /** Add your docs here. */
@@ -60,7 +62,7 @@ public class IntakeIOReal implements IntakeIO {
 
     private void configureMotors() {
         TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
-        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 20;
+        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 40;
         intakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         intakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;
@@ -84,6 +86,15 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public void stop() {
         intakeMotor.stopMotor();
+    }
+
+    @Override
+    public void setCurrentLimit(Current currentLimit) {
+        CurrentLimitsConfigs currentLimitConfigs = new CurrentLimitsConfigs();
+        currentLimitConfigs.StatorCurrentLimit = currentLimit.in(Amp);
+        currentLimitConfigs.StatorCurrentLimitEnable = true;
+
+        intakeMotor.getConfigurator().apply(currentLimitConfigs);
     }
 
     @Override

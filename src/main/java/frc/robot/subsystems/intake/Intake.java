@@ -5,6 +5,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.Arm;
@@ -36,6 +37,10 @@ public class Intake extends SubsystemBase {
 
     public void setSpeed(AngularVelocity targetSpeed) {
         this.io.setSpeed(targetSpeed);
+    }
+
+    public void setCurrentLimit(Current currentLimit) {
+        this.io.setCurrentLimit(currentLimit);
     }
 
     public void setVoltage(Voltage voltage) {

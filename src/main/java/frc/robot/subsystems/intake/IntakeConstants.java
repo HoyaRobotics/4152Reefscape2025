@@ -4,19 +4,25 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 
 /** Add your docs here. */
 public class IntakeConstants {
     // 23 RPS max intake speed
-    public class IntakeSpeeds {
+    public static class IntakeSpeeds {
         public static final AngularVelocity intaking = RevolutionsPerSecond.of(15.0),
                 placing = RevolutionsPerSecond.of(-20.0),
                 placingTrough = RevolutionsPerSecond.of(-8.0),
                 holding = RevolutionsPerSecond.of(1.0),
                 empty = RevolutionsPerSecond.of(0.0);
+    }
+
+    public static class CurrentLimits {
+        public static final Current L4 = Amps.of(40), everything = Amps.of(20), receiving = Amps.of(20);
     }
 
     public static final double PlacingTimeout = 0.8;

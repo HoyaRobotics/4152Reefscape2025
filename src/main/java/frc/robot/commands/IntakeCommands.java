@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
@@ -14,21 +15,22 @@ import frc.robot.subsystems.intake.IntakeConstants;
 public class IntakeCommands {
     private IntakeCommands() {}
 
-    public static Command RunIntake(Intake intake, AngularVelocity speed) {
+    public static Command RunIntake(Intake intake, AngularVelocity speed, Current currentLimit) {
         return Commands.run(() -> {}, intake).beforeStarting(() -> intake.setSpeed(speed));
         // .finallyDo(() -> intake.stopIntake());
     }
 
-    public static Command RunIntakeTimeout(Intake intake, AngularVelocity speed, double timeoutSeconds) {
-        return RunIntake(intake, speed).withTimeout(timeoutSeconds);
+    public static Command RunIntakeTimeout(
+            Intake intake, AngularVelocity speed, Current currentLimit, double timeoutSeconds) {
+        return RunIntake(intake, speed, currentLimit).withTimeout(timeoutSeconds);
     }
 
-    public static Command RunIntakeTillSensed(Intake intake, AngularVelocity speed) {
-        return RunIntake(intake, speed).until(() -> intake.hasCoral());
+    public static Command RunIntakeTillSensed(Intake intake, AngularVelocity speed, Current currentLimit) {
+        return RunIntake(intake, speed, currentLimit).until(() -> intake.hasCoral());
     }
 
-    public static Command RunIntakeTillEmpty(Intake intake, AngularVelocity speed) {
-        return RunIntake(intake, speed).until(() -> !intake.hasCoral());
+    public static Command RunIntakeTillEmpty(Intake intake, AngularVelocity speed, Current currentLimit) {
+        return RunIntake(intake, speed, currentLimit).until(() -> !intake.hasCoral());
     }
 
     public static Command StopIntake(Intake intake) {

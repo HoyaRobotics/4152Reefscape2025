@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
-    private static final double ANGLE_KP = 1.0;
+    private static final double ANGLE_KP = 1.0 * TunerConstants.kDriveGearRatio;
     private static final double ANGLE_KD = 0.0; // 0.4
     private static final double ANGLE_MAX_VELOCITY = 10.0;
     private static final double ANGLE_MAX_ACCELERATION = 15.0;

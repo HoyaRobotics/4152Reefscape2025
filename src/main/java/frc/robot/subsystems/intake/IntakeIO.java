@@ -5,6 +5,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -21,6 +22,8 @@ public interface IntakeIO {
     default void setVoltage(Voltage voltage) {}
 
     default void stop() {}
+
+    default void setCurrentLimit(Current currentLimit) {}
 
     default void updateInputs(IntakeInputs inputs) {}
 }

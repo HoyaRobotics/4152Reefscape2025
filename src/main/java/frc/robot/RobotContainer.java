@@ -225,24 +225,48 @@ public class RobotContainer {
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
 
         NamedCommands.registerCommand(
-                "intakePlace",
-                IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 0.5)
+                "intakePlaceL4",
+                IntakeCommands.RunIntakeTimeout(
+                                intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.CurrentLimits.L4, 0.5)
                         .andThen(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4))
                         .andThen(IntakeCommands.StopIntake(intake)));
+
+        NamedCommands.registerCommand(
+                "intakePlace",
+                IntakeCommands.RunIntakeTimeout(
+                                intake,
+                                IntakeConstants.IntakeSpeeds.placing,
+                                IntakeConstants.CurrentLimits.everything,
+                                0.5)
+                        .andThen(new MoveToLevel(
+                                elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4))
+                        .andThen(IntakeCommands.StopIntake(intake)));
+
         NamedCommands.registerCommand(
                 "intakePlaceWithSensor",
-                IntakeCommands.RunIntakeTillEmpty(intake, IntakeConstants.IntakeSpeeds.placing)
+                IntakeCommands.RunIntakeTillEmpty(
+                                intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.CurrentLimits.everything)
                         // .andThen(new WaitCommand(0.25))
                         .andThen(IntakeCommands.StopIntake(intake)));
+
+        NamedCommands.registerCommand(
+                "intakePlaceWithSensorL4",
+                IntakeCommands.RunIntakeTillEmpty(
+                                intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.CurrentLimits.L4)
+                        // .andThen(new WaitCommand(0.25))
+                        .andThen(IntakeCommands.StopIntake(intake)));
+
         NamedCommands.registerCommand(
                 "intakeReceive",
-                IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)
+                IntakeCommands.RunIntake(
+                                intake, IntakeConstants.IntakeSpeeds.intaking, IntakeConstants.CurrentLimits.receiving)
                         .alongWith(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)));
         NamedCommands.registerCommand(
                 "intakeReceiveWithSensor",
-                IntakeCommands.RunIntakeTillSensed(intake, IntakeConstants.IntakeSpeeds.intaking)
+                IntakeCommands.RunIntakeTillSensed(
+                                intake, IntakeConstants.IntakeSpeeds.intaking, IntakeConstants.CurrentLimits.receiving)
                         .deadlineFor(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading))
                         .andThen(IntakeCommands.HoldIntake(intake)));
@@ -301,13 +325,19 @@ public class RobotContainer {
                 .rightTrigger(0.1)
                 .whileTrue(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
-                        .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)));
+                        .alongWith(IntakeCommands.RunIntake(
+                                intake,
+                                IntakeConstants.IntakeSpeeds.intaking,
+                                IntakeConstants.CurrentLimits.receiving)));
 
         driverController
                 .rightBumper()
                 .whileTrue(new MoveToLevel(
                                 elevator, arm, ElevatorConstants.l_Positions.L2Algae, ArmConstants.l_Angles.L2Algae)
-                        .alongWith(IntakeCommands.RunIntake(intake, IntakeConstants.IntakeSpeeds.intaking)));
+                        .alongWith(IntakeCommands.RunIntake(
+                                intake,
+                                IntakeConstants.IntakeSpeeds.intaking,
+                                IntakeConstants.CurrentLimits.receiving)));
 
         driverController
                 .y()
@@ -319,7 +349,8 @@ public class RobotContainer {
                         ArmConstants.l_Angles.L4,
                         ArmConstants.l_Angles.preL4,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placing));
+                        IntakeConstants.IntakeSpeeds.placing,
+                        IntakeConstants.CurrentLimits.L4));
         driverController
                 .x()
                 .onTrue(new PlacingCommand(
@@ -330,7 +361,8 @@ public class RobotContainer {
                         ArmConstants.l_Angles.L3,
                         ArmConstants.l_Angles.preL3,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placing));
+                        IntakeConstants.IntakeSpeeds.placing,
+                        IntakeConstants.CurrentLimits.everything));
         driverController
                 .a()
                 .onTrue(new PlacingCommand(
@@ -341,7 +373,8 @@ public class RobotContainer {
                         ArmConstants.l_Angles.L2,
                         ArmConstants.l_Angles.preL2,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placing));
+                        IntakeConstants.IntakeSpeeds.placing,
+                        IntakeConstants.CurrentLimits.everything));
         driverController
                 .b()
                 .onTrue(new PlacingCommand(
@@ -352,7 +385,8 @@ public class RobotContainer {
                         ArmConstants.l_Angles.Trough,
                         ArmConstants.l_Angles.preTrough,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placingTrough));
+                        IntakeConstants.IntakeSpeeds.placingTrough,
+                        IntakeConstants.CurrentLimits.everything));
 
         driverController
                 .povUp()
