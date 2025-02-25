@@ -239,8 +239,6 @@ public class RobotContainer {
                                 IntakeConstants.IntakeSpeeds.placing,
                                 IntakeConstants.CurrentLimits.everything,
                                 0.5)
-                        .andThen(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4))
                         .andThen(IntakeCommands.StopIntake(intake)));
 
         NamedCommands.registerCommand(

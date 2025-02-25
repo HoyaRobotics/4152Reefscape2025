@@ -62,7 +62,7 @@ public class IntakeIOReal implements IntakeIO {
 
     private void configureMotors() {
         TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
-        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 40;
+        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 20;
         intakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         intakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;

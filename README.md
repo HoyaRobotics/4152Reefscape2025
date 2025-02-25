@@ -1,6 +1,6 @@
-# FRC 4152 (To Be Named)
+# FRC 4152 Bruce - 2025 Reefscape
 
-### 2025 Robot With AdvantageKit and MapleSim Simulation
+### With AdvantageKit and MapleSim Simulation
 
 ![Robot Image](/assets/2025CAD.png)
 

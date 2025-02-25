@@ -22,7 +22,10 @@ public class IntakeConstants {
     }
 
     public static class CurrentLimits {
-        public static final Current L4 = Amps.of(40), everything = Amps.of(20), receiving = Amps.of(20);
+        public static final Current L4 = Amps.of(40), 
+            everything = Amps.of(20), 
+            receiving = Amps.of(20),
+            holding = Amps.of(20);
     }
 
     public static final double PlacingTimeout = 0.8;

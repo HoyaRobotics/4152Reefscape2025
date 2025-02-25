@@ -16,7 +16,10 @@ public class IntakeCommands {
     private IntakeCommands() {}
 
     public static Command RunIntake(Intake intake, AngularVelocity speed, Current currentLimit) {
-        return Commands.run(() -> {}, intake).beforeStarting(() -> intake.setSpeed(speed));
+        return Commands.run(() -> {}, intake).beforeStarting(() -> {
+            intake.setCurrentLimit(currentLimit);
+            intake.setSpeed(speed);
+        });
         // .finallyDo(() -> intake.stopIntake());
     }
 
@@ -38,6 +41,9 @@ public class IntakeCommands {
     }
 
     public static Command HoldIntake(Intake intake) {
-        return Commands.runOnce(() -> intake.setSpeed(IntakeConstants.IntakeSpeeds.holding), intake);
+        return Commands.runOnce(() -> {
+            intake.setCurrentLimit(IntakeConstants.CurrentLimits.holding);
+            intake.setSpeed(IntakeConstants.IntakeSpeeds.holding);
+        }, intake);
     }
 }
