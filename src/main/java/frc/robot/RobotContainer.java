@@ -270,14 +270,15 @@ public class RobotContainer {
                         .andThen(IntakeCommands.HoldIntake(intake)));
 
         NamedCommands.registerCommand(
-                "goToL4", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4));
+                "goToL4", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4)
+                .andThen(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4)));
         NamedCommands.registerCommand(
                 "goToL3", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
         NamedCommands.registerCommand(
                 "goToL2", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
         NamedCommands.registerCommand(
                 "goToTrough",
-                new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.Trough));
+                new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.preTrough));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -357,7 +358,7 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.L3,
                         ArmConstants.l_Angles.L3,
-                        ArmConstants.l_Angles.preL3,
+                        ArmConstants.l_Angles.L3,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
                         IntakeConstants.IntakeSpeeds.placing,
                         IntakeConstants.CurrentLimits.everything));
@@ -369,7 +370,7 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.L2,
                         ArmConstants.l_Angles.L2,
-                        ArmConstants.l_Angles.preL2,
+                        ArmConstants.l_Angles.L2,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
                         IntakeConstants.IntakeSpeeds.placing,
                         IntakeConstants.CurrentLimits.everything));
@@ -381,7 +382,7 @@ public class RobotContainer {
                         intake,
                         ElevatorConstants.l_Positions.Trough,
                         ArmConstants.l_Angles.Trough,
-                        ArmConstants.l_Angles.preTrough,
+                        ArmConstants.l_Angles.Trough,
                         () -> driverController.leftTrigger(0.1).getAsBoolean(),
                         IntakeConstants.IntakeSpeeds.placingTrough,
                         IntakeConstants.CurrentLimits.everything));
