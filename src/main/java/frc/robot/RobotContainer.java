@@ -156,8 +156,7 @@ public class RobotContainer {
                         // intake is also at a 15 degree angle from the arm
                         // intake
                         new IntakeIOSim(driveSimulation, (targetSpeed) -> {
-                            Angle intakeAngle =
-                                    Degrees.of(((arm.getArmPosition().in(Degrees) - 113.5 - 15) * -1.0) + 90);
+                            Angle intakeAngle = Degrees.of(arm.getArmPosition().in(Degrees) - 113.5 - 15 + 90);
                             // notes: too much of an angle, not high enough
                             Distance armLength = Inches.of(18.0);
                             Distance intakeY = Inches.of(-1.013);

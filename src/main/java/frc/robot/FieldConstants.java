@@ -39,12 +39,12 @@ public class FieldConstants {
                 return facePose.transformBy(new Transform2d(
                         1.0, // Robot length / 2
                         -Units.inchesToMeters(PIPE_FROM_REEF_CENTER_INCHES),
-                        Rotation2d.fromDegrees(180)));
+                        Rotation2d.fromDegrees(0.0)));
             } else {
                 return facePose.transformBy(new Transform2d(
                         1.0, // Robot length / 2
                         Units.inchesToMeters(PIPE_FROM_REEF_CENTER_INCHES),
-                        Rotation2d.fromDegrees(180)));
+                        Rotation2d.fromDegrees(0.0)));
             }
         }
 

@@ -29,6 +29,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "intakeReceiveWithSensor"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.2"
@@ -53,6 +59,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "intakeReceiveWithSensor"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.4"
@@ -74,6 +86,12 @@
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeReceiveWithSensor"
           }
         },
         {

@@ -78,8 +78,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                     Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
     // PathPlanner config constants
-    private static final double ROBOT_MASS_KG = 46.43126414;
-    private static final double ROBOT_MOI = 5.002;
+    private static final double ROBOT_MASS_KG = 65.317;
+    private static final double ROBOT_MOI = 6.00;
     private static final double WHEEL_COF = 1.2;
     private static final RobotConfig PP_CONFIG = new RobotConfig(
             ROBOT_MASS_KG,

@@ -13,6 +13,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -41,8 +43,8 @@ public class DriveCommands {
     private static final double DEADBAND = 0.1;
     private static final double ANGLE_KP = 1.0;
     private static final double ANGLE_KD = 0.0; // 0.4
-    private static final double ANGLE_MAX_VELOCITY = 2.0;
-    private static final double ANGLE_MAX_ACCELERATION = 5.0;
+    private static final double ANGLE_MAX_VELOCITY = 10.0;
+    private static final double ANGLE_MAX_ACCELERATION = 15.0;
     private static final double FF_START_DELAY = 2.0; // Secs
     private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
     private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -98,8 +100,8 @@ public class DriveCommands {
      */
     public static Command driveToPose(Drive drive, Supplier<Pose2d> poseSupplier) {
 
-        PIDController xController = new PIDController(3.5, 0, 0.02);
-        PIDController yController = new PIDController(3.5, 0, 0.02);
+        PIDController xController = new PIDController(0.2, 0, 0.0);
+        PIDController yController = new PIDController(0.2, 0, 0.0);
         // look into this, replace them with profiled controllers?
         ProfiledPIDController angleController = new ProfiledPIDController(
                 ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
@@ -110,16 +112,17 @@ public class DriveCommands {
                         () -> {
                             double angleSpeed = angleController.calculate(
                                     drive.getRotation().getRadians());
-                            angleSpeed = MathUtil.clamp(angleSpeed, -3.8, 3.8);
+                            // angleSpeed = MathUtil.clamp(angleSpeed, -3.8, 3.8);
                             double xSpeed = 0.0;
                             double ySpeed = 0.0;
 
                             // starts driving once almost fully turned
-                            if (Math.abs(angleController.getPositionError()) < 5) {
+                            if (Math.abs(angleController.getPositionError())
+                                    < Degrees.of(5).in(Radians)) {
                                 xSpeed = xController.calculate(drive.getPose().getX());
-                                xSpeed = MathUtil.clamp(xSpeed, -4.0, 4.0);
+                                xSpeed = MathUtil.clamp(xSpeed, -1.5, 1.5);
                                 ySpeed = yController.calculate(drive.getPose().getY());
-                                ySpeed = MathUtil.clamp(ySpeed, -4.0, 4.0);
+                                ySpeed = MathUtil.clamp(ySpeed, -1.5, 1.5);
                             }
 
                             // Convert to field relative speeds & send command
