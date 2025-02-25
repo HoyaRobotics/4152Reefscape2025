@@ -52,7 +52,7 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOReal;
-import frc.robot.subsystems.climber.ClimberIOSIm;
+import frc.robot.subsystems.climber.ClimberIOSim;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -189,7 +189,7 @@ public class RobotContainer {
                         }),
                         elevator,
                         arm);
-                climber = new Climber(new ClimberIOSIm());
+                climber = new Climber(new ClimberIOSim());
 
                 break;
 
@@ -386,14 +386,10 @@ public class RobotContainer {
                         IntakeConstants.IntakeSpeeds.placingTrough,
                         IntakeConstants.CurrentLimits.everything));
 
-        driverController
-                .povUp()
-                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage))
-                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
-        driverController
-                .povDown()
-                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage))
-                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
+        driverController.povUp().whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage)).onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
+        //driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
+        driverController.povDown().whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage)).onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
+        //driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false));
 
         driverController
                 .leftStick()

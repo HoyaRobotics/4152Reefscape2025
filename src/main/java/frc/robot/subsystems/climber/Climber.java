@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.climber;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -24,6 +25,10 @@ public class Climber extends SubsystemBase {
 
     public void setVoltage(Voltage volts) {
         io.setVoltage(volts);
+    }
+
+    public void setAngle(Angle targetAngle, boolean fast) {
+        io.setAngle(targetAngle, fast);
     }
 
     boolean isAtPosition() {

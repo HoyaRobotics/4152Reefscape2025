@@ -12,14 +12,12 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ClimberIO {
     @AutoLog
     public class ClimberInputs {
-        public Angle angle;
-        public boolean pastUpLimit;
-        public boolean pastDownLimit;
+        public Angle climberAngle;
     }
 
     default void updateInputs(ClimberInputs inputs) {}
 
-    default void setAngle(Angle targetAngle) {}
+    default void setAngle(Angle targetAngle, boolean fast) {}
 
     default void setVoltage(Voltage volts) {}
 }
