@@ -212,8 +212,23 @@ public class RobotContainer {
         }
 
         NamedCommands.registerCommand(
+                "alignToRightBranch",
+                DriveCommands.driveToPose(
+                        drive,
+                        () -> FieldConstants.Reef.offsetReefPose(
+                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
+        NamedCommands.registerCommand(
+                "alignToLeftBranch",
+                DriveCommands.driveToPose(
+                        drive,
+                        () -> FieldConstants.Reef.offsetReefPose(
+                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
+
+        NamedCommands.registerCommand(
                 "intakePlace",
                 IntakeCommands.RunIntakeTimeout(intake, IntakeConstants.IntakeSpeeds.placing, 0.5)
+                        .andThen(new MoveToLevel(
+                                elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4))
                         .andThen(IntakeCommands.StopIntake(intake)));
         NamedCommands.registerCommand(
                 "intakePlaceWithSensor",

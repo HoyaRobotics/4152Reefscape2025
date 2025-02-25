@@ -35,15 +35,18 @@ public class FieldConstants {
         }
 
         public static Pose2d offsetReefPose(Pose2d facePose, Side side) {
+            final double distanceFromReef = 0.48;
+            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 2.7;
+            final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES + 2.4;
             if (side == Side.LEFT) {
                 return facePose.transformBy(new Transform2d(
-                        1.0, // Robot length / 2
-                        -Units.inchesToMeters(PIPE_FROM_REEF_CENTER_INCHES),
+                        distanceFromReef, // Robot length / 2
+                        -Units.inchesToMeters(leftOffset),
                         Rotation2d.fromDegrees(0.0)));
             } else {
                 return facePose.transformBy(new Transform2d(
-                        1.0, // Robot length / 2
-                        Units.inchesToMeters(PIPE_FROM_REEF_CENTER_INCHES),
+                        distanceFromReef, // Robot length / 2
+                        Units.inchesToMeters(rightOffset),
                         Rotation2d.fromDegrees(0.0)));
             }
         }

@@ -64,7 +64,7 @@ public class ArmIOReal implements ArmIO {
         armConfig.Slot0.kS = 0.15;
         armConfig.Slot0.kV = 21.04111;
         armConfig.Slot0.kA = 0.0;
-        armConfig.Slot0.kP = 80;
+        armConfig.Slot0.kP = 65;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.7;
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
