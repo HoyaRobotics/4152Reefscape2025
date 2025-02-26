@@ -44,15 +44,29 @@ public class SuperStructure {
         this.arm = arm;
     }
 
+    public SuperStructurePose getCurrentPose() {
+        return currentPose;
+    }
+
+    private Angle getMovingAngle(SuperStructurePose pose) {
+        if (pose == SuperStructurePose.L2 
+            || pose == SuperStructurePose.L3
+            || pose == SuperStructurePose.L4) {
+            return Degrees.of(135);
+        } else {
+            return pose.armAngle;
+        }
+    }
+
     public Command moveToPose(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorPosition)
             .alongWith(arm.moveToAngle(pose.armAngle))
             .finallyDo(() -> { currentPose = pose; });
     }
 
-    public Command moveToPosePreAngle(SuperStructurePose pose, Angle preAngle) {
+    public Command moveToPosePreAngle(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorPosition)
-            .alongWith(arm.moveToAngle(preAngle))
+            .alongWith(arm.moveToAngle(getMovingAngle(pose)))
             .andThen(arm.moveToAngle(pose.armAngle))
             .finallyDo(() -> { currentPose = pose; });
     }

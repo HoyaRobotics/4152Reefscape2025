@@ -10,13 +10,24 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
+import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import static edu.wpi.first.units.Units.*;
 
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
+
+    public class IntakeAction {
+        public final Current currentLimit;
+        public final AngularVelocity speed;
+
+        public IntakeAction(AngularVelocity speed, Current currentLimit) {
+            this.speed = speed;
+            this.currentLimit = currentLimit;
+        }
+    }
 
     private final IntakeIO io;
     private IntakeInputsAutoLogged inputs;
@@ -39,20 +50,34 @@ public class Intake extends SubsystemBase {
         // Logger.recordOutput("IntakeCoral", coralPose);
     }
 
+    private IntakeAction actionFromPose(SuperStructurePose pose, boolean intaking) {
+        Current currentLimit = pose == SuperStructurePose.L4 ?
+            Amps.of(40) : Amps.of(20);
+        AngularVelocity speed;
+        if (intaking) {
+            speed = IntakeConstants.IntakingSpeed;
+        } else {
+            speed = pose == SuperStructurePose.TROUGH ?
+                IntakeConstants.TroughSpeed : IntakeConstants.PlacingSpeed;
+        }
+        return new IntakeAction(speed, currentLimit);
+    }
+
     // what commands do we need?
     // intake, outtake, sensed versions, for timeout we can just add decorator.
-    public Command run(IntakeAction action) {
+    public Command run(SuperStructurePose pose, boolean intaking) {
         return Commands.run(() -> {}, this)
             .beforeStarting(() -> {
+                IntakeAction action = actionFromPose(pose, intaking);
                 setSpeed(action.speed);
                 setCurrentLimit(action.currentLimit);
             });
     }
 
-    public Command runWithSensor(IntakeAction action) {
-        return run(action)
+    public Command runWithSensor(SuperStructurePose pose, boolean intaking) {
+        return run(pose, intaking)
             .until(() -> {
-                return action == IntakeAction.INTAKING ? 
+                return intaking ?
                     this.hasCoral() : ! this.hasCoral();
             });
     }

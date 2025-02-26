@@ -12,23 +12,21 @@ import edu.wpi.first.units.measure.Current;
 
 /** Add your docs here. */
 public class IntakeConstants {
-    public enum IntakeAction {
-        // speed, current limit
-        // add timeout?
-        PLACE_L4(RevolutionsPerSecond.of(-20.0), Amps.of(40)),
-        PLACE_L3(RevolutionsPerSecond.of(-20.0), Amps.of(20)),
-        PLACE_L2(RevolutionsPerSecond.of(-20.0), Amps.of(20)),
-        PLACE_TROUGH(RevolutionsPerSecond.of(-8.0), Amps.of(20)),
-        INTAKING(RevolutionsPerSecond.of(15.0), Amps.of(20));
 
-        public final AngularVelocity speed;
+    public class IntakeAction {
         public final Current currentLimit;
+        public final AngularVelocity speed;
 
-        IntakeAction(AngularVelocity speed, Current currentLimit) {
+        public IntakeAction(AngularVelocity speed, Current currentLimit) {
             this.speed = speed;
             this.currentLimit = currentLimit;
         }
     }
+
+    public static final AngularVelocity IntakingSpeed = RevolutionsPerSecond.of(15.0);
+    public static final AngularVelocity TroughSpeed = RevolutionsPerSecond.of(-8.0);
+    public static final AngularVelocity PlacingSpeed = RevolutionsPerSecond.of(-20.0);
+
     // 23 RPS max intake speed
     public static class IntakeSpeeds {
         public static final AngularVelocity intaking = RevolutionsPerSecond.of(15.0),

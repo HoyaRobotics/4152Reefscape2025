@@ -346,14 +346,11 @@ public class RobotContainer {
                                 IntakeConstants.IntakeSpeeds.intaking,
                                 IntakeConstants.CurrentLimits.receiving)));
 
-        driverController
-                .y()
+        driverController.y()
                 .onTrue(new PlacingCommand(
                         superStructure,
                         intake,
                         SuperStructurePose.L4,
-                        IntakeAction.PLACE_L4,
-                        ArmConstants.l_Angles.preL4,
                         () -> driverController.leftTrigger(0.1).getAsBoolean()));
 
         driverController

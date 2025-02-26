@@ -22,22 +22,21 @@ import frc.robot.subsystems.superstructure.arm.ArmConstants;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+
 public class PlacingCommand extends SequentialCommandGroup {
     /** Creates a new PlacingCommand. */
     public PlacingCommand(
             SuperStructure superStructure,
             Intake intake,
             SuperStructurePose pose,
-            IntakeAction action,
-            Angle preArmPosition,
             BooleanSupplier placeObject
             ) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
-                superStructure.moveToPosePreAngle(pose, preArmPosition),
+                superStructure.moveToPosePreAngle(pose),
                 new WaitUntilCommand(placeObject),
-                intake.run(action).withTimeout(IntakeConstants.PlacingTimeout + IntakeConstants.PostPlacingTimeout)
+                intake.run(pose, false).withTimeout(IntakeConstants.PlacingTimeout + IntakeConstants.PostPlacingTimeout)
                         .alongWith(superStructure.retractArm(ArmConstants.l_Angles.Base)));
     }
 }
