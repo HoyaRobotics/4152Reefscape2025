@@ -41,9 +41,11 @@ public class IntakeCommands {
     }
 
     public static Command HoldIntake(Intake intake) {
-        return Commands.runOnce(() -> {
-            intake.setCurrentLimit(IntakeConstants.CurrentLimits.holding);
-            intake.setSpeed(IntakeConstants.IntakeSpeeds.holding);
-        }, intake);
+        return Commands.runOnce(
+                () -> {
+                    intake.setCurrentLimit(IntakeConstants.CurrentLimits.holding);
+                    intake.setSpeed(IntakeConstants.IntakeSpeeds.holding);
+                },
+                intake);
     }
 }

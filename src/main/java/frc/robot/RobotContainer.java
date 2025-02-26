@@ -35,7 +35,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.FieldConstants.Reef.Side;
+import frc.constants.ArmConstants;
+import frc.constants.ClimberConstants;
+import frc.constants.Constants;
+import frc.constants.ElevatorConstants;
+import frc.constants.FieldConstants;
+import frc.constants.IntakeConstants;
+import frc.constants.VisionConstants;
+import frc.constants.FieldConstants.Reef.Side;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
@@ -43,13 +50,7 @@ import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.MoveToLevel;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmConstants;
-import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.arm.ArmIOReal;
-import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOReal;
 import frc.robot.subsystems.climber.ClimberIOSim;
@@ -60,18 +61,19 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOAdvancedSim;
-import frc.robot.subsystems.elevator.ElevatorIOReal;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmIO;
+import frc.robot.subsystems.superstructure.arm.ArmIOReal;
+import frc.robot.subsystems.superstructure.arm.ArmIOSim;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOAdvancedSim;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
@@ -270,8 +272,10 @@ public class RobotContainer {
                         .andThen(IntakeCommands.HoldIntake(intake)));
 
         NamedCommands.registerCommand(
-                "goToL4", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4)
-                .andThen(new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4)));
+                "goToL4",
+                new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4)
+                        .andThen(new MoveToLevel(
+                                elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4)));
         NamedCommands.registerCommand(
                 "goToL3", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
         NamedCommands.registerCommand(
@@ -387,10 +391,17 @@ public class RobotContainer {
                         IntakeConstants.IntakeSpeeds.placingTrough,
                         IntakeConstants.CurrentLimits.everything));
 
-        driverController.povUp().whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage)).onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
-        //driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
-        driverController.povDown().whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage)).onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
-        //driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false));
+        driverController
+                .povUp()
+                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage))
+                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
+        // driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
+        driverController
+                .povDown()
+                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage))
+                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
+        // driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle,
+        // false));
 
         driverController
                 .leftStick()

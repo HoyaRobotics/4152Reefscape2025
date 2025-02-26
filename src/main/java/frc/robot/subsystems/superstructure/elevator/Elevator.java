@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 // McT testing Git
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.superstructure.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -10,7 +10,12 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -48,6 +53,12 @@ public class Elevator extends SubsystemBase {
                 new Rotation3d());
         Logger.recordOutput("Elevator/CarriagePose", this.carriagePose);
         Logger.recordOutput("Elevator/ElevatorPose", this.stage2Pose);
+    }
+
+    public Command moveToPosition(Distance targetPosition) {
+        return Commands.run(() -> {}, this)
+            .beforeStarting(() -> setPosition(targetPosition))
+            .until(() -> isAtPosition(targetPosition));
     }
 
     public Pose3d getStage2Pose() {

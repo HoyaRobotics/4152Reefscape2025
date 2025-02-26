@@ -7,6 +7,8 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import frc.constants.IntakeConstants;
+
 import java.util.function.Consumer;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;

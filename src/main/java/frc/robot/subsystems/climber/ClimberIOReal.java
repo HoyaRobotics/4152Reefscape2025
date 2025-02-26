@@ -6,11 +6,11 @@ package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -41,9 +41,9 @@ public class ClimberIOReal implements ClimberIO {
 
     @Override
     public void setAngle(Angle targetAngle, boolean fast) {
-        if(fast) {
+        if (fast) {
             closedLoopController.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        }else{
+        } else {
             closedLoopController.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot1);
         }
     }
@@ -56,13 +56,15 @@ public class ClimberIOReal implements ClimberIO {
     private void configureMotors() {
         SparkFlexConfig climberMotorConfig = new SparkFlexConfig();
 
-        climberMotorConfig.closedLoop.maxMotion
-            .maxAcceleration(0.1, ClosedLoopSlot.kSlot0)
-            .maxVelocity(0.1, ClosedLoopSlot.kSlot0)
-            .allowedClosedLoopError(0.01, ClosedLoopSlot.kSlot0)
-            .maxAcceleration(0.1, ClosedLoopSlot.kSlot1)
-            .maxVelocity(0.1, ClosedLoopSlot.kSlot1)
-            .allowedClosedLoopError(0.01, ClosedLoopSlot.kSlot1);
+        climberMotorConfig
+                .closedLoop
+                .maxMotion
+                .maxAcceleration(0.1, ClosedLoopSlot.kSlot0)
+                .maxVelocity(0.1, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.01, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(0.1, ClosedLoopSlot.kSlot1)
+                .maxVelocity(0.1, ClosedLoopSlot.kSlot1)
+                .allowedClosedLoopError(0.01, ClosedLoopSlot.kSlot1);
         /*
         climberMotorConfig.encoder
             .positionConversionFactor(1.0 / climberRatio)
@@ -76,16 +78,17 @@ public class ClimberIOReal implements ClimberIO {
             .forwardSoftLimitEnabled(true);
             .reverseSoftLimitEnabled(true);
         */
-        climberMotorConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.0, ClosedLoopSlot.kSlot0)
-            .velocityFF(0.0, ClosedLoopSlot.kSlot0)
-            .outputRange(-1, 1);
+        climberMotorConfig
+                .closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .p(0.0, ClosedLoopSlot.kSlot0)
+                .velocityFF(0.0, ClosedLoopSlot.kSlot0)
+                .outputRange(-1, 1);
         climberMotorConfig.idleMode(IdleMode.kBrake);
         climberMotorConfig.smartCurrentLimit(60);
-        //climberMotorConfig.voltageCompensation(11);
+        // climberMotorConfig.voltageCompensation(11);
 
         climberMotor.configure(climberMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        //climberEncoder.setPosition(ClimberConstants.baseAngle.in(Rotations));
+        // climberEncoder.setPosition(ClimberConstants.baseAngle.in(Rotations));
     }
 }
