@@ -301,39 +301,31 @@ public class RobotContainer {
 
         driverController
                 .y()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .x()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .a()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .b()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
 
-        driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, false));
+        driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false));
 
         driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
 
