@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -280,7 +281,7 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX()));
 
-        elevator.setDefaultCommand(superStructure.holdPose(intake));
+        elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM

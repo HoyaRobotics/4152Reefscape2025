@@ -29,7 +29,7 @@ public class PlacingCommand extends SequentialCommandGroup {
                 intake.run(false)
                         .withTimeout(IntakeConstants.PlacingTimeout)
                         .andThen(intake.run(false)
-                                .withTimeout(IntakeConstants.PlacingTimeout)
-                                .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))));
+                                .alongWith(superStructure.retractArm(ArmConstants.baseAngle))
+                                .until(superStructure.waitTillRetracted())));
     }
 }

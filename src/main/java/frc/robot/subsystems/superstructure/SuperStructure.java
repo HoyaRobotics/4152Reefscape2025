@@ -11,6 +11,7 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 // would be nice to alway know what level we are at?
@@ -91,8 +92,8 @@ public class SuperStructure {
     // range to the desired elevator position
     public Command moveToPosePreAngle(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorPosition)
-                .alongWith(new WaitUntilCommand(() -> elevator.getPosition()
-                                .minus(pose.elevatorPosition)
+                .alongWith(new WaitUntilCommand(() -> pose.elevatorPosition
+                                .minus(elevator.getPosition())
                                 .lt(ElevatorConstants.retractingError))
                         .deadlineFor(arm.moveToAngle(getMovingAngle(pose)))
                         .andThen(arm.moveToAngle(pose.armAngle)))
@@ -100,6 +101,10 @@ public class SuperStructure {
                 .finallyDo(() -> {
                     currentPose = pose;
                 });
+    }
+
+    public BooleanSupplier waitTillRetracted() {
+        return () -> arm.getArmPosition().minus(getMovingAngle(currentPose)).lt(Degrees.of(0));
     }
 
     public Command retractArm(Angle retractAngle) {

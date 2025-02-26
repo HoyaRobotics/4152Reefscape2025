@@ -25,7 +25,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intakePlace"
+            "name": "intakePlaceWithSensor"
           }
         },
         {
@@ -61,7 +61,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intakePlace"
+            "name": "intakePlaceWithSensor"
           }
         },
         {
@@ -97,7 +97,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intakePlace"
+            "name": "intakePlaceWithSensor"
           }
         },
         {
@@ -133,7 +133,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intakePlace"
+            "name": "intakePlaceWithSensor"
           }
         }
       ]
