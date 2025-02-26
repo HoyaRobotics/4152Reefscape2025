@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoPlace;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PlacingCommand;
@@ -244,6 +243,8 @@ public class RobotContainer {
                         .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                         .andThen(() -> intake.stopIntake()));
 
+        NamedCommands.registerCommand("hold", superStructure.holdPose(intake));
+
         NamedCommands.registerCommand("goToL4", superStructure.moveToPosePreAngle(SuperStructurePose.L4));
         NamedCommands.registerCommand("goToL3", superStructure.moveToPosePreAngle(SuperStructurePose.L3));
         NamedCommands.registerCommand("goToL2", superStructure.moveToPosePreAngle(SuperStructurePose.L2));
@@ -300,24 +301,32 @@ public class RobotContainer {
 
         driverController
                 .y()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .x()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .a()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .b()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
@@ -331,34 +340,16 @@ public class RobotContainer {
         /*
         driverController
                 .leftStick()
-                .whileTrue(AutoPlace.autoAlignAndPlace(
-                        drive,
-                        superStructure,
-                        intake,
-                        Side.LEFT,
-                        () -> driverController.a().getAsBoolean()
-                                || driverController.b().getAsBoolean()
-                                || driverController.y().getAsBoolean()
-                                || driverController.x().getAsBoolean(),
-                        () -> {
-                            if (driverController.a().getAsBoolean()) {
-                                return SuperStructurePose.L2;
-                            } else if (driverController.b().getAsBoolean()) {
-                                return SuperStructurePose.TROUGH;
-                            } else if (driverController.x().getAsBoolean()) {
-                                return SuperStructurePose.L3;
-                            } else {
-                                return SuperStructurePose.L4;
-                            }
-                        }));
-        */
+                .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.LEFT));
+                */
+
         driverController
                 .leftStick()
                 .whileTrue(DriveCommands.driveToPose(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
-        
+
         driverController
                 .rightStick()
                 .whileTrue(DriveCommands.driveToPose(

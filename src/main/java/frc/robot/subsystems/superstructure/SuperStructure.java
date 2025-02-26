@@ -11,6 +11,7 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import java.util.function.Supplier;
 
 // would be nice to alway know what level we are at?
 public class SuperStructure {
@@ -42,11 +43,15 @@ public class SuperStructure {
     public final Elevator elevator;
     public final Arm arm;
     private SuperStructurePose currentPose;
-    private SuperStructurePose targetPose;
+    private SuperStructurePose targetPose = SuperStructurePose.BASE;
 
     public SuperStructure(Elevator elevator, Arm arm) {
         this.elevator = elevator;
         this.arm = arm;
+    }
+
+    public void setTargetPose(Supplier<SuperStructurePose> pose) {
+        targetPose = pose.get();
     }
 
     public SuperStructurePose getPose() {
