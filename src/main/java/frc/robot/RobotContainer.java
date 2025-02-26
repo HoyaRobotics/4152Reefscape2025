@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AutoPlace;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PlacingCommand;
@@ -327,13 +328,37 @@ public class RobotContainer {
 
         driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
 
+        /*
+        driverController
+                .leftStick()
+                .whileTrue(AutoPlace.autoAlignAndPlace(
+                        drive,
+                        superStructure,
+                        intake,
+                        Side.LEFT,
+                        () -> driverController.a().getAsBoolean()
+                                || driverController.b().getAsBoolean()
+                                || driverController.y().getAsBoolean()
+                                || driverController.x().getAsBoolean(),
+                        () -> {
+                            if (driverController.a().getAsBoolean()) {
+                                return SuperStructurePose.L2;
+                            } else if (driverController.b().getAsBoolean()) {
+                                return SuperStructurePose.TROUGH;
+                            } else if (driverController.x().getAsBoolean()) {
+                                return SuperStructurePose.L3;
+                            } else {
+                                return SuperStructurePose.L4;
+                            }
+                        }));
+        */
         driverController
                 .leftStick()
                 .whileTrue(DriveCommands.driveToPose(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
-
+        
         driverController
                 .rightStick()
                 .whileTrue(DriveCommands.driveToPose(

@@ -13,7 +13,25 @@
         {
           "type": "named",
           "data": {
+            "name": "alignToLeftBranch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "goToL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "intakePlace"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "hold"
           }
         }
       ]

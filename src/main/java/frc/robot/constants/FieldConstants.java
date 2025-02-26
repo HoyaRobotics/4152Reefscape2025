@@ -15,6 +15,14 @@ public class FieldConstants {
     public static final double fieldWidth = Units.inchesToMeters(317);
 
     public static class Reef {
+
+        public enum ReefLevel {
+            TROUGH,
+            L2,
+            L3,
+            L4;
+        }
+
         public static final Translation2d center =
                 new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
 
