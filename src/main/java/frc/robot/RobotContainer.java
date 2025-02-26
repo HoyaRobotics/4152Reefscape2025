@@ -19,7 +19,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -322,17 +321,11 @@ public class RobotContainer {
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
-        driverController
-                .povUp()
-                .onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
+        driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
 
-        driverController
-                .povDown()
-                .onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, false));
+        driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, false));
 
-        driverController
-                .povLeft()
-                .onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
+        driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
 
         driverController
                 .leftStick()

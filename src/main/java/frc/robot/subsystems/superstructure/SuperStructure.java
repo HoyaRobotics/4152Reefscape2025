@@ -5,10 +5,12 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 
 // would be nice to alway know what level we are at?
 public class SuperStructure {
@@ -80,10 +82,15 @@ public class SuperStructure {
                 });
     }
 
+    // start moving arm to actual angle once we are within a certain
+    // range to the desired elevator position
     public Command moveToPosePreAngle(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorPosition)
-                .alongWith(arm.moveToAngle(getMovingAngle(pose)))
-                .andThen(arm.moveToAngle(pose.armAngle))
+                .alongWith(new WaitUntilCommand(() -> elevator.getPosition()
+                                .minus(pose.elevatorPosition)
+                                .lt(ElevatorConstants.retractingError))
+                        .deadlineFor(arm.moveToAngle(getMovingAngle(pose)))
+                        .andThen(arm.moveToAngle(pose.armAngle)))
                 .beforeStarting(() -> targetPose = pose)
                 .finallyDo(() -> {
                     currentPose = pose;

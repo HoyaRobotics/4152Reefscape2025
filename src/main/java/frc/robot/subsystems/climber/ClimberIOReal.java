@@ -71,7 +71,7 @@ public class ClimberIOReal implements ClimberIO {
                 .p(5, ClosedLoopSlot.kSlot0)
                 .outputRange(-8 / 12.0, 8 / 12.0, ClosedLoopSlot.kSlot0)
                 .p(5, ClosedLoopSlot.kSlot1)
-                .outputRange(-12 / 12.0, 12/12.0, ClosedLoopSlot.kSlot1);
+                .outputRange(-12 / 12.0, 12 / 12.0, ClosedLoopSlot.kSlot1);
         climberMotorConfig.idleMode(IdleMode.kCoast);
         // climberMotorConfig.idleMode(IdleMode.kBrake);
         climberMotorConfig.smartCurrentLimit(60);
