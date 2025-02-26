@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
 
 /** Add your docs here. */
 public class IntakeCommands {
@@ -21,6 +23,12 @@ public class IntakeCommands {
             intake.setSpeed(speed);
         });
         // .finallyDo(() -> intake.stopIntake());
+    }
+
+    public static Command EjectCoralTimeout(Intake intake, Arm arm, AngularVelocity speed, Current currentLimit, double timeoutSeconds) {
+        return RunIntake(intake, speed, currentLimit)
+            .withTimeout(timeoutSeconds)
+            .deadlineFor(arm.moveToAngle(ArmConstants.l_Angles.Ejecting));
     }
 
     public static Command RunIntakeTimeout(

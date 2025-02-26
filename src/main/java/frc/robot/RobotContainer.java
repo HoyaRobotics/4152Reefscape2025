@@ -35,12 +35,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.constants.ArmConstants;
-import frc.constants.ClimberConstants;
 import frc.constants.Constants;
-import frc.constants.ElevatorConstants;
 import frc.constants.FieldConstants;
-import frc.constants.IntakeConstants;
 import frc.constants.VisionConstants;
 import frc.constants.FieldConstants.Reef.Side;
 import frc.robot.commands.ClimbCommands;
@@ -51,6 +47,7 @@ import frc.robot.commands.MoveToLevel;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOReal;
 import frc.robot.subsystems.climber.ClimberIOSim;
@@ -62,14 +59,20 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.arm.ArmIO;
 import frc.robot.subsystems.superstructure.arm.ArmIOReal;
 import frc.robot.subsystems.superstructure.arm.ArmIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOAdvancedSim;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
@@ -96,11 +99,12 @@ public class RobotContainer {
     private final Arm arm;
     private final Intake intake;
     private final Climber climber;
+    private final SuperStructure superStructure;
 
     public SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final CommandXboxController driverController = new CommandXboxController(0);
+    public final CommandXboxController driverController = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -212,6 +216,8 @@ public class RobotContainer {
 
                 break;
         }
+
+        superStructure = new SuperStructure(elevator, arm);
 
         NamedCommands.registerCommand(
                 "alignToRightBranch",
@@ -326,8 +332,7 @@ public class RobotContainer {
 
         driverController
                 .rightTrigger(0.1)
-                .whileTrue(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)
+                .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING)
                         .alongWith(IntakeCommands.RunIntake(
                                 intake,
                                 IntakeConstants.IntakeSpeeds.intaking,
@@ -335,8 +340,7 @@ public class RobotContainer {
 
         driverController
                 .rightBumper()
-                .whileTrue(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.L2Algae, ArmConstants.l_Angles.L2Algae)
+                .whileTrue(superStructure.moveToPose(SuperStructurePose.L2_ALGAE)
                         .alongWith(IntakeCommands.RunIntake(
                                 intake,
                                 IntakeConstants.IntakeSpeeds.intaking,
@@ -345,15 +349,13 @@ public class RobotContainer {
         driverController
                 .y()
                 .onTrue(new PlacingCommand(
-                        elevator,
-                        arm,
+                        superStructure,
                         intake,
-                        ElevatorConstants.l_Positions.L4,
-                        ArmConstants.l_Angles.L4,
+                        SuperStructurePose.L4,
+                        IntakeAction.PLACE_L4,
                         ArmConstants.l_Angles.preL4,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placing,
-                        IntakeConstants.CurrentLimits.L4));
+                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
+
         driverController
                 .x()
                 .onTrue(new PlacingCommand(

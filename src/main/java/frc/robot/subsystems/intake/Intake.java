@@ -7,9 +7,13 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
+import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -33,6 +37,24 @@ public class Intake extends SubsystemBase {
         Logger.processInputs("Intake", inputs);
         // Pose3d coralPose = new Pose3d(0, 0, 0, new Rotation3d(Degrees.of(0), arm.getArmPosition(), Degrees.of(0)));
         // Logger.recordOutput("IntakeCoral", coralPose);
+    }
+
+    // what commands do we need?
+    // intake, outtake, sensed versions, for timeout we can just add decorator.
+    public Command run(IntakeAction action) {
+        return Commands.run(() -> {}, this)
+            .beforeStarting(() -> {
+                setSpeed(action.speed);
+                setCurrentLimit(action.currentLimit);
+            });
+    }
+
+    public Command runWithSensor(IntakeAction action) {
+        return run(action)
+            .until(() -> {
+                return action == IntakeAction.INTAKING ? 
+                    this.hasCoral() : ! this.hasCoral();
+            });
     }
 
     public void setSpeed(AngularVelocity targetSpeed) {

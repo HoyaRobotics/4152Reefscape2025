@@ -4,19 +4,20 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmConstants;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-import java.util.function.BooleanSupplier;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -24,26 +25,19 @@ import java.util.function.BooleanSupplier;
 public class PlacingCommand extends SequentialCommandGroup {
     /** Creates a new PlacingCommand. */
     public PlacingCommand(
-            Elevator elevator,
-            Arm arm,
+            SuperStructure superStructure,
             Intake intake,
-            Distance elevatorPosition,
-            Angle armPosition,
+            SuperStructurePose pose,
+            IntakeAction action,
             Angle preArmPosition,
-            BooleanSupplier placeObject,
-            AngularVelocity outakeSpeed,
-            Current currentLimit) {
+            BooleanSupplier placeObject
+            ) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
-                new MoveToLevel(elevator, arm, elevatorPosition, preArmPosition),
-                new MoveToLevel(elevator, arm, elevatorPosition, armPosition),
+                superStructure.moveToPosePreAngle(pose, preArmPosition),
                 new WaitUntilCommand(placeObject),
-                IntakeCommands.RunIntakeTimeout(intake, outakeSpeed, currentLimit, IntakeConstants.PlacingTimeout),
-                // IntakeCommands.RunIntakeTillEmpty(intake, outakeSpeed),
-                new ParallelRaceGroup(
-                        IntakeCommands.RunIntakeTimeout(
-                                intake, outakeSpeed, currentLimit, IntakeConstants.PostPlacingTimeout),
-                        new MoveToLevel(elevator, arm, elevatorPosition, ArmConstants.l_Angles.Base)));
+                intake.run(action).withTimeout(IntakeConstants.PlacingTimeout + IntakeConstants.PostPlacingTimeout)
+                        .alongWith(superStructure.retractArm(ArmConstants.l_Angles.Base)));
     }
 }

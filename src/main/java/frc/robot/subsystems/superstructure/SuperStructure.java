@@ -6,9 +6,14 @@ import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import edu.wpi.first.units.measure.Angle;
 
+
+
+// would be nice to alway know what level we are at?
 public class SuperStructure {
     public enum SuperStructurePose {
         // constants call the constructor
+        
+        // Elevator position, arm angle
         TROUGH(Inches.of(9.0), Degrees.of(-35)),
         LOADING(Inches.of(20.5), Degrees.of(-21.5)),
         L2(Inches.of(3), Degrees.of(142.5)),
@@ -30,17 +35,30 @@ public class SuperStructure {
         }
     }
 
-    private final Elevator elevator;
-    private final Arm arm;
+    public final Elevator elevator;
+    public final Arm arm;
+    private SuperStructurePose currentPose;
 
-    SuperStructure(Elevator elevator, Arm arm) {
+    public SuperStructure(Elevator elevator, Arm arm) {
         this.elevator = elevator;
         this.arm = arm;
     }
 
     public Command moveToPose(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorPosition)
-            .alongWith(arm.moveToAngle(pose.armAngle));
+            .alongWith(arm.moveToAngle(pose.armAngle))
+            .finallyDo(() -> { currentPose = pose; });
+    }
+
+    public Command moveToPosePreAngle(SuperStructurePose pose, Angle preAngle) {
+        return elevator.moveToPosition(pose.elevatorPosition)
+            .alongWith(arm.moveToAngle(preAngle))
+            .andThen(arm.moveToAngle(pose.armAngle))
+            .finallyDo(() -> { currentPose = pose; });
+    }
+
+    public Command retractArm(Angle retractAngle) {
+        return arm.moveToAngle(retractAngle);
     }
 }
 

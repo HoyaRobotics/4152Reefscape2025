@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.superstructure.arm;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -9,6 +9,7 @@ public class ArmConstants {
 
     public class l_Angles {
         public static final Angle Base = Degrees.of(-25), // 51.5 horizontal, -35 safe
+                Ejecting = Base,
                 Trough = Degrees.of(-35), // 147.5
                 preTrough = Degrees.of(-35),
                 L2 = Degrees.of(142.5), // 165
