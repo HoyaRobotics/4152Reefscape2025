@@ -56,7 +56,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -212,33 +211,37 @@ public class RobotContainer {
         }
 
         superStructure = new SuperStructure(elevator, arm);
+        intake.setPoseSupplier(() -> {
+            SuperStructurePose pose = superStructure.getTargetPose();
+            System.out.println(pose.name());
+            return pose;
+        });
 
-        NamedCommands.registerCommand("alignToRightBranch",
+        NamedCommands.registerCommand(
+                "alignToRightBranch",
                 DriveCommands.driveToPose(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
-        NamedCommands.registerCommand("alignToLeftBranch",
+        NamedCommands.registerCommand(
+                "alignToLeftBranch",
                 DriveCommands.driveToPose(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
 
-        NamedCommands.registerCommand("intakePlace",
-                intake.run(superStructure.getTargetPose(), false)
-                        .withTimeout(0.5)
-                        .andThen(() -> intake.stopIntake()));
+        NamedCommands.registerCommand(
+                "intakePlace", intake.run(false).withTimeout(0.5).andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand("intakePlaceWithSensor",
-                intake.runWithSensor(superStructure.getTargetPose(), false)
-                        .andThen(() -> intake.stopIntake()));
+        NamedCommands.registerCommand(
+                "intakePlaceWithSensor", intake.runWithSensor(false).andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand("intakeReceive",
-                intake.run(superStructure.getTargetPose(), true)
-                        .alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)));
+        NamedCommands.registerCommand(
+                "intakeReceive", intake.run(true).alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
-        NamedCommands.registerCommand("intakeReceiveWithSensor",
-                intake.runWithSensor(superStructure.getTargetPose(), true)
+        NamedCommands.registerCommand(
+                "intakeReceiveWithSensor",
+                intake.runWithSensor(true)
                         .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                         .andThen(() -> intake.stopIntake()));
 
@@ -289,15 +292,12 @@ public class RobotContainer {
 
         driverController
                 .rightTrigger(0.1)
-                .whileTrue(superStructure
-                        .moveToPose(SuperStructurePose.LOADING)
-                        .alongWith(intake.run(SuperStructurePose.LOADING, true)));
+                .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(true)));
 
         driverController
                 .rightBumper()
-                .whileTrue(superStructure
-                        .moveToPose(SuperStructurePose.L2_ALGAE)
-                        .alongWith(intake.run(SuperStructurePose.L2_ALGAE, true)));
+                .whileTrue(
+                        superStructure.moveToPose(SuperStructurePose.L2_ALGAE).alongWith(intake.run(true)));
 
         driverController
                 .y()

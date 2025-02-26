@@ -65,30 +65,26 @@ public class SuperStructure {
 
     public Command holdPose(Intake intake) {
         boolean holding = intake.hasCoral();
-        return moveToPose(holding ?
-                SuperStructurePose.HOLD : SuperStructurePose.BASE)
-            .alongWith(intake.runRaw(
-                holding ? 
-                    IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0),
-                Amps.of(20)
-            ));
+        return moveToPose(holding ? SuperStructurePose.HOLD : SuperStructurePose.BASE)
+                .alongWith(intake.runRaw(
+                        holding ? IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0), Amps.of(20)));
     }
 
     // make one function? we always want to pre angle...
     public Command moveToPose(SuperStructurePose pose) {
-        targetPose = pose;
         return elevator.moveToPosition(pose.elevatorPosition)
                 .alongWith(arm.moveToAngle(pose.armAngle))
+                .beforeStarting(() -> targetPose = pose)
                 .finallyDo(() -> {
                     currentPose = pose;
                 });
     }
 
     public Command moveToPosePreAngle(SuperStructurePose pose) {
-        targetPose = pose;
         return elevator.moveToPosition(pose.elevatorPosition)
                 .alongWith(arm.moveToAngle(getMovingAngle(pose)))
                 .andThen(arm.moveToAngle(pose.armAngle))
+                .beforeStarting(() -> targetPose = pose)
                 .finallyDo(() -> {
                     currentPose = pose;
                 });

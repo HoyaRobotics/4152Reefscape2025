@@ -26,8 +26,10 @@ public class PlacingCommand extends SequentialCommandGroup {
         addCommands(
                 superStructure.moveToPosePreAngle(pose),
                 new WaitUntilCommand(placeObject),
-                intake.run(pose, false)
-                        .withTimeout(IntakeConstants.PlacingTimeout + IntakeConstants.PostPlacingTimeout)
-                        .alongWith(superStructure.retractArm(ArmConstants.l_Angles.Base)));
+                intake.run(false)
+                        .withTimeout(IntakeConstants.PlacingTimeout)
+                        .andThen(intake.run(false)
+                                .withTimeout(IntakeConstants.PlacingTimeout)
+                                .deadlineFor(superStructure.retractArm(ArmConstants.l_Angles.Base))));
     }
 }

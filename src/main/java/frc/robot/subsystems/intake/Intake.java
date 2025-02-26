@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -30,6 +31,7 @@ public class Intake extends SubsystemBase {
     }
 
     private final IntakeIO io;
+    private Supplier<SuperStructurePose> poseSupplier;
     private IntakeInputsAutoLogged inputs;
     private Elevator elevator;
     private Arm arm;
@@ -39,6 +41,10 @@ public class Intake extends SubsystemBase {
         this.elevator = elevator;
         this.arm = arm;
         inputs = new IntakeInputsAutoLogged();
+    }
+
+    public void setPoseSupplier(Supplier<SuperStructurePose> poseSupplier) {
+        this.poseSupplier = poseSupplier;
     }
 
     @Override
@@ -64,9 +70,9 @@ public class Intake extends SubsystemBase {
 
     // what commands do we need?
     // intake, outtake, sensed versions, for timeout we can just add decorator.
-    public Command run(SuperStructurePose pose, boolean intaking) {
+    public Command run(boolean intaking) {
         return Commands.run(() -> {}, this).beforeStarting(() -> {
-            IntakeAction action = actionFromPose(pose, intaking);
+            IntakeAction action = actionFromPose(poseSupplier.get(), intaking);
             setSpeed(action.speed);
             setCurrentLimit(action.currentLimit);
         });
@@ -79,8 +85,8 @@ public class Intake extends SubsystemBase {
         });
     }
 
-    public Command runWithSensor(SuperStructurePose pose, boolean intaking) {
-        return run(pose, intaking).until(() -> {
+    public Command runWithSensor(boolean intaking) {
+        return run(intaking).until(() -> {
             return intaking ? this.hasCoral() : !this.hasCoral();
         });
     }
