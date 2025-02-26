@@ -26,6 +26,7 @@ public class IntakeConstants {
     public static final AngularVelocity IntakingSpeed = RevolutionsPerSecond.of(15.0);
     public static final AngularVelocity TroughSpeed = RevolutionsPerSecond.of(-8.0);
     public static final AngularVelocity PlacingSpeed = RevolutionsPerSecond.of(-20.0);
+    public static final AngularVelocity HoldingSpeed = RevolutionsPerSecond.of(1.0);
 
     // 23 RPS max intake speed
     public static class IntakeSpeeds {

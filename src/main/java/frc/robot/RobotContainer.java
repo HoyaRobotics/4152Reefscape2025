@@ -37,13 +37,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.constants.Constants;
 import frc.constants.FieldConstants;
-import frc.constants.VisionConstants;
 import frc.constants.FieldConstants.Reef.Side;
+import frc.constants.VisionConstants;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.HoldPosition;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.MoveToLevel;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climber.Climber;
@@ -60,19 +57,16 @@ import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
-import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.arm.ArmIO;
 import frc.robot.subsystems.superstructure.arm.ArmIOReal;
 import frc.robot.subsystems.superstructure.arm.ArmIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOAdvancedSim;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
@@ -219,76 +213,39 @@ public class RobotContainer {
 
         superStructure = new SuperStructure(elevator, arm);
 
-        NamedCommands.registerCommand(
-                "alignToRightBranch",
+        NamedCommands.registerCommand("alignToRightBranch",
                 DriveCommands.driveToPose(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
-        NamedCommands.registerCommand(
-                "alignToLeftBranch",
+        NamedCommands.registerCommand("alignToLeftBranch",
                 DriveCommands.driveToPose(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
 
-        NamedCommands.registerCommand(
-                "intakePlaceL4",
-                IntakeCommands.RunIntakeTimeout(
-                                intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.CurrentLimits.L4, 0.5)
-                        .andThen(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4))
-                        .andThen(IntakeCommands.StopIntake(intake)));
+        NamedCommands.registerCommand("intakePlace",
+                intake.run(superStructure.getTargetPose(), false)
+                        .withTimeout(0.5)
+                        .andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand(
-                "intakePlace",
-                IntakeCommands.RunIntakeTimeout(
-                                intake,
-                                IntakeConstants.IntakeSpeeds.placing,
-                                IntakeConstants.CurrentLimits.everything,
-                                0.5)
-                        .andThen(IntakeCommands.StopIntake(intake)));
+        NamedCommands.registerCommand("intakePlaceWithSensor",
+                intake.runWithSensor(superStructure.getTargetPose(), false)
+                        .andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand(
-                "intakePlaceWithSensor",
-                IntakeCommands.RunIntakeTillEmpty(
-                                intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.CurrentLimits.everything)
-                        // .andThen(new WaitCommand(0.25))
-                        .andThen(IntakeCommands.StopIntake(intake)));
+        NamedCommands.registerCommand("intakeReceive",
+                intake.run(superStructure.getTargetPose(), true)
+                        .alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
-        NamedCommands.registerCommand(
-                "intakePlaceWithSensorL4",
-                IntakeCommands.RunIntakeTillEmpty(
-                                intake, IntakeConstants.IntakeSpeeds.placing, IntakeConstants.CurrentLimits.L4)
-                        // .andThen(new WaitCommand(0.25))
-                        .andThen(IntakeCommands.StopIntake(intake)));
+        NamedCommands.registerCommand("intakeReceiveWithSensor",
+                intake.runWithSensor(superStructure.getTargetPose(), true)
+                        .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
+                        .andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand(
-                "intakeReceive",
-                IntakeCommands.RunIntake(
-                                intake, IntakeConstants.IntakeSpeeds.intaking, IntakeConstants.CurrentLimits.receiving)
-                        .alongWith(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading)));
-        NamedCommands.registerCommand(
-                "intakeReceiveWithSensor",
-                IntakeCommands.RunIntakeTillSensed(
-                                intake, IntakeConstants.IntakeSpeeds.intaking, IntakeConstants.CurrentLimits.receiving)
-                        .deadlineFor(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.Loading, ArmConstants.l_Angles.Loading))
-                        .andThen(IntakeCommands.HoldIntake(intake)));
-
-        NamedCommands.registerCommand(
-                "goToL4",
-                new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.preL4)
-                        .andThen(new MoveToLevel(
-                                elevator, arm, ElevatorConstants.l_Positions.L4, ArmConstants.l_Angles.L4)));
-        NamedCommands.registerCommand(
-                "goToL3", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L3, ArmConstants.l_Angles.L3));
-        NamedCommands.registerCommand(
-                "goToL2", new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.L2, ArmConstants.l_Angles.L2));
-        NamedCommands.registerCommand(
-                "goToTrough",
-                new MoveToLevel(elevator, arm, ElevatorConstants.l_Positions.Trough, ArmConstants.l_Angles.preTrough));
+        NamedCommands.registerCommand("goToL4", superStructure.moveToPosePreAngle(SuperStructurePose.L4));
+        NamedCommands.registerCommand("goToL3", superStructure.moveToPosePreAngle(SuperStructurePose.L3));
+        NamedCommands.registerCommand("goToL2", superStructure.moveToPosePreAngle(SuperStructurePose.L2));
+        NamedCommands.registerCommand("goToTrough", superStructure.moveToPosePreAngle(SuperStructurePose.TROUGH));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -320,7 +277,7 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX()));
 
-        elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake));
+        elevator.setDefaultCommand(superStructure.holdPose(intake));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
@@ -332,75 +289,49 @@ public class RobotContainer {
 
         driverController
                 .rightTrigger(0.1)
-                .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING)
-                        .alongWith(IntakeCommands.RunIntake(
-                                intake,
-                                IntakeConstants.IntakeSpeeds.intaking,
-                                IntakeConstants.CurrentLimits.receiving)));
+                .whileTrue(superStructure
+                        .moveToPose(SuperStructurePose.LOADING)
+                        .alongWith(intake.run(SuperStructurePose.LOADING, true)));
 
         driverController
                 .rightBumper()
-                .whileTrue(superStructure.moveToPose(SuperStructurePose.L2_ALGAE)
-                        .alongWith(IntakeCommands.RunIntake(
-                                intake,
-                                IntakeConstants.IntakeSpeeds.intaking,
-                                IntakeConstants.CurrentLimits.receiving)));
+                .whileTrue(superStructure
+                        .moveToPose(SuperStructurePose.L2_ALGAE)
+                        .alongWith(intake.run(SuperStructurePose.L2_ALGAE, true)));
 
-        driverController.y()
-                .onTrue(new PlacingCommand(
-                        superStructure,
-                        intake,
-                        SuperStructurePose.L4,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean()));
+        driverController
+                .y()
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, () -> driverController
+                        .leftTrigger(0.1)
+                        .getAsBoolean()));
 
         driverController
                 .x()
-                .onTrue(new PlacingCommand(
-                        elevator,
-                        arm,
-                        intake,
-                        ElevatorConstants.l_Positions.L3,
-                        ArmConstants.l_Angles.L3,
-                        ArmConstants.l_Angles.L3,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placing,
-                        IntakeConstants.CurrentLimits.everything));
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, () -> driverController
+                        .leftTrigger(0.1)
+                        .getAsBoolean()));
+
         driverController
                 .a()
-                .onTrue(new PlacingCommand(
-                        elevator,
-                        arm,
-                        intake,
-                        ElevatorConstants.l_Positions.L2,
-                        ArmConstants.l_Angles.L2,
-                        ArmConstants.l_Angles.L2,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placing,
-                        IntakeConstants.CurrentLimits.everything));
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, () -> driverController
+                        .leftTrigger(0.1)
+                        .getAsBoolean()));
+
         driverController
                 .b()
-                .onTrue(new PlacingCommand(
-                        elevator,
-                        arm,
-                        intake,
-                        ElevatorConstants.l_Positions.Trough,
-                        ArmConstants.l_Angles.Trough,
-                        ArmConstants.l_Angles.Trough,
-                        () -> driverController.leftTrigger(0.1).getAsBoolean(),
-                        IntakeConstants.IntakeSpeeds.placingTrough,
-                        IntakeConstants.CurrentLimits.everything));
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, () -> driverController
+                        .leftTrigger(0.1)
+                        .getAsBoolean()));
 
         driverController
                 .povUp()
                 .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage))
                 .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
-        // driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
+
         driverController
                 .povDown()
                 .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage))
                 .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
-        // driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle,
-        // false));
 
         driverController
                 .leftStick()

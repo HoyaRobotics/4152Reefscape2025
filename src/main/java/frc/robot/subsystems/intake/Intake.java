@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -13,8 +15,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import static edu.wpi.first.units.Units.*;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -50,15 +50,14 @@ public class Intake extends SubsystemBase {
         // Logger.recordOutput("IntakeCoral", coralPose);
     }
 
+    // make pose a supplier?
     private IntakeAction actionFromPose(SuperStructurePose pose, boolean intaking) {
-        Current currentLimit = pose == SuperStructurePose.L4 ?
-            Amps.of(40) : Amps.of(20);
+        Current currentLimit = pose == SuperStructurePose.L4 ? Amps.of(40) : Amps.of(20);
         AngularVelocity speed;
         if (intaking) {
             speed = IntakeConstants.IntakingSpeed;
         } else {
-            speed = pose == SuperStructurePose.TROUGH ?
-                IntakeConstants.TroughSpeed : IntakeConstants.PlacingSpeed;
+            speed = pose == SuperStructurePose.TROUGH ? IntakeConstants.TroughSpeed : IntakeConstants.PlacingSpeed;
         }
         return new IntakeAction(speed, currentLimit);
     }
@@ -66,20 +65,24 @@ public class Intake extends SubsystemBase {
     // what commands do we need?
     // intake, outtake, sensed versions, for timeout we can just add decorator.
     public Command run(SuperStructurePose pose, boolean intaking) {
-        return Commands.run(() -> {}, this)
-            .beforeStarting(() -> {
-                IntakeAction action = actionFromPose(pose, intaking);
-                setSpeed(action.speed);
-                setCurrentLimit(action.currentLimit);
-            });
+        return Commands.run(() -> {}, this).beforeStarting(() -> {
+            IntakeAction action = actionFromPose(pose, intaking);
+            setSpeed(action.speed);
+            setCurrentLimit(action.currentLimit);
+        });
+    }
+
+    public Command runRaw(AngularVelocity speed, Current currentLimit) {
+        return Commands.run(() -> {}, this).beforeStarting(() -> {
+            setSpeed(speed);
+            setCurrentLimit(currentLimit);
+        });
     }
 
     public Command runWithSensor(SuperStructurePose pose, boolean intaking) {
-        return run(pose, intaking)
-            .until(() -> {
-                return intaking ?
-                    this.hasCoral() : ! this.hasCoral();
-            });
+        return run(pose, intaking).until(() -> {
+            return intaking ? this.hasCoral() : !this.hasCoral();
+        });
     }
 
     public void setSpeed(AngularVelocity targetSpeed) {

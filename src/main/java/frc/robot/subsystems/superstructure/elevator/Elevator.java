@@ -13,9 +13,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.constants.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorInputsAutoLogged;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -57,8 +54,8 @@ public class Elevator extends SubsystemBase {
 
     public Command moveToPosition(Distance targetPosition) {
         return Commands.run(() -> {}, this)
-            .beforeStarting(() -> setPosition(targetPosition))
-            .until(() -> isAtPosition(targetPosition));
+                .beforeStarting(() -> setPosition(targetPosition))
+                .until(() -> isAtPosition(targetPosition));
     }
 
     public Pose3d getStage2Pose() {

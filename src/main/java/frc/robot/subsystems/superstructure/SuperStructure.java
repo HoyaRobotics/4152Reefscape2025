@@ -1,18 +1,20 @@
 package frc.robot.subsystems.superstructure;
+
 import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import edu.wpi.first.units.measure.Angle;
-
-
 
 // would be nice to alway know what level we are at?
 public class SuperStructure {
     public enum SuperStructurePose {
         // constants call the constructor
-        
+
         // Elevator position, arm angle
         TROUGH(Inches.of(9.0), Degrees.of(-35)),
         LOADING(Inches.of(20.5), Degrees.of(-21.5)),
@@ -23,8 +25,8 @@ public class SuperStructure {
         L2_ALGAE(Inches.of(10), Degrees.of(165)),
         L3_ALGAE(Inches.of(20), Degrees.of(165)),
 
-        HOLD(Inches.of(0.0), Degrees.of(110));
-
+        HOLD(Inches.of(0.0), Degrees.of(110)),
+        BASE(Inches.of(0.5), Degrees.of(-25));
 
         public final Distance elevatorPosition;
         public final Angle armAngle;
@@ -38,41 +40,61 @@ public class SuperStructure {
     public final Elevator elevator;
     public final Arm arm;
     private SuperStructurePose currentPose;
+    private SuperStructurePose targetPose;
 
     public SuperStructure(Elevator elevator, Arm arm) {
         this.elevator = elevator;
         this.arm = arm;
     }
 
-    public SuperStructurePose getCurrentPose() {
+    public SuperStructurePose getPose() {
         return currentPose;
     }
 
+    public SuperStructurePose getTargetPose() {
+        return targetPose;
+    }
+
     private Angle getMovingAngle(SuperStructurePose pose) {
-        if (pose == SuperStructurePose.L2 
-            || pose == SuperStructurePose.L3
-            || pose == SuperStructurePose.L4) {
+        if (pose == SuperStructurePose.L2 || pose == SuperStructurePose.L3 || pose == SuperStructurePose.L4) {
             return Degrees.of(135);
         } else {
             return pose.armAngle;
         }
     }
 
+    public Command holdPose(Intake intake) {
+        boolean holding = intake.hasCoral();
+        return moveToPose(holding ?
+                SuperStructurePose.HOLD : SuperStructurePose.BASE)
+            .alongWith(intake.runRaw(
+                holding ? 
+                    IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0),
+                Amps.of(20)
+            ));
+    }
+
+    // make one function? we always want to pre angle...
     public Command moveToPose(SuperStructurePose pose) {
+        targetPose = pose;
         return elevator.moveToPosition(pose.elevatorPosition)
-            .alongWith(arm.moveToAngle(pose.armAngle))
-            .finallyDo(() -> { currentPose = pose; });
+                .alongWith(arm.moveToAngle(pose.armAngle))
+                .finallyDo(() -> {
+                    currentPose = pose;
+                });
     }
 
     public Command moveToPosePreAngle(SuperStructurePose pose) {
+        targetPose = pose;
         return elevator.moveToPosition(pose.elevatorPosition)
-            .alongWith(arm.moveToAngle(getMovingAngle(pose)))
-            .andThen(arm.moveToAngle(pose.armAngle))
-            .finallyDo(() -> { currentPose = pose; });
+                .alongWith(arm.moveToAngle(getMovingAngle(pose)))
+                .andThen(arm.moveToAngle(pose.armAngle))
+                .finallyDo(() -> {
+                    currentPose = pose;
+                });
     }
 
     public Command retractArm(Angle retractAngle) {
         return arm.moveToAngle(retractAngle);
     }
 }
-
