@@ -24,12 +24,12 @@ public class ArmIOSim implements ArmIO {
                 185.7143,
                 0.16931712,
                 0.28778209,
-                ArmConstants.l_Angles.Base.in(Radians),
+                ArmConstants.baseAngle.in(Radians),
                 Units.degreesToRadians(180.0),
                 false,
-                ArmConstants.l_Angles.Starting.in(Radians));
+                ArmConstants.startingAngle.in(Radians));
         armController.setTolerance(2.0);
-        setPosition(ArmConstants.l_Angles.Starting);
+        setPosition(ArmConstants.startingAngle);
     }
 
     @Override

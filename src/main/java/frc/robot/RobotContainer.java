@@ -153,7 +153,6 @@ public class RobotContainer {
                         // 0 angle is horizontal?
                         // -113.5 + 90 + 15 = -8.5
                         // intake is also at a 15 degree angle from the arm
-                        // intake
                         new IntakeIOSim(driveSimulation, (targetSpeed) -> {
                             Angle intakeAngle = Degrees.of(arm.getArmPosition().in(Degrees) - 113.5 - 15 + 90);
                             // notes: too much of an angle, not high enough
@@ -325,13 +324,15 @@ public class RobotContainer {
 
         driverController
                 .povUp()
-                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbUpVoltage))
-                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0.0)));
+                .onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
 
         driverController
                 .povDown()
-                .whileTrue(ClimbCommands.moveClimber(climber, ClimberConstants.climbDownVoltage))
-                .onFalse(ClimbCommands.moveClimber(climber, Volts.of(0)));
+                .onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, false));
+
+        driverController
+                .povLeft()
+                .onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
 
         driverController
                 .leftStick()

@@ -57,8 +57,9 @@ public class Intake extends SubsystemBase {
     }
 
     // make pose a supplier?
+    // move these into constants
     private IntakeAction actionFromPose(SuperStructurePose pose, boolean intaking) {
-        Current currentLimit = pose == SuperStructurePose.L4 ? Amps.of(40) : Amps.of(20);
+        Current currentLimit = pose == SuperStructurePose.L4 ? Amps.of(25) : Amps.of(20);
         AngularVelocity speed;
         if (intaking) {
             speed = IntakeConstants.IntakingSpeed;

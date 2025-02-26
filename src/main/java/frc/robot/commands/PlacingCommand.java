@@ -30,6 +30,6 @@ public class PlacingCommand extends SequentialCommandGroup {
                         .withTimeout(IntakeConstants.PlacingTimeout)
                         .andThen(intake.run(false)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
-                                .deadlineFor(superStructure.retractArm(ArmConstants.l_Angles.Base))));
+                                .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))));
     }
 }

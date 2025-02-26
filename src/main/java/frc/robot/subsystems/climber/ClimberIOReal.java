@@ -26,7 +26,7 @@ public class ClimberIOReal implements ClimberIO {
     SparkFlex climberMotor = new SparkFlex(36, MotorType.kBrushless);
     SparkClosedLoopController closedLoopController;
     RelativeEncoder climberEncoder;
-    private double climberRatio = 5.0 * 5.0 * (68.0 / 18.0) * (32.0 / 12.0);
+    private double climberRatio = 5.0 * 5.0 * 4.0 * (68.0 / 18.0) * (32.0 / 12.0);
 
     public ClimberIOReal() {
         configureMotors();
@@ -36,15 +36,17 @@ public class ClimberIOReal implements ClimberIO {
 
     @Override
     public void updateInputs(ClimberInputs inputs) {
-        inputs.climberAngle = Rotations.of(climberEncoder.getPosition());
+        inputs.climberAngle = Rotations.of(climberEncoder.getPosition() / climberRatio);
     }
 
     @Override
     public void setAngle(Angle targetAngle, boolean fast) {
         if (fast) {
-            closedLoopController.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+            closedLoopController.setReference(
+                    targetAngle.in(Rotations) * climberRatio, ControlType.kPosition, ClosedLoopSlot.kSlot1);
         } else {
-            closedLoopController.setReference(targetAngle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot1);
+            closedLoopController.setReference(
+                    targetAngle.in(Rotations) * climberRatio, ControlType.kPosition, ClosedLoopSlot.kSlot0);
         }
     }
 
@@ -57,36 +59,23 @@ public class ClimberIOReal implements ClimberIO {
         SparkFlexConfig climberMotorConfig = new SparkFlexConfig();
 
         climberMotorConfig
-                .closedLoop
-                .maxMotion
-                .maxAcceleration(0.1, ClosedLoopSlot.kSlot0)
-                .maxVelocity(0.1, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.01, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(0.1, ClosedLoopSlot.kSlot1)
-                .maxVelocity(0.1, ClosedLoopSlot.kSlot1)
-                .allowedClosedLoopError(0.01, ClosedLoopSlot.kSlot1);
-        /*
-        climberMotorConfig.encoder
-            .positionConversionFactor(1.0 / climberRatio)
-            .velocityConversionFactor(1.0 / climberRatio)
-            .inverted(false);
-        */
-        /*
-        climberMotorConfig.softLimit
-            .forwardSoftLimit(0.3);
-            .reverseSoftLimit(-0.26);
-            .forwardSoftLimitEnabled(true);
-            .reverseSoftLimitEnabled(true);
-        */
+                .softLimit
+                .forwardSoftLimit(.3 * climberRatio)
+                .reverseSoftLimit(-0.005 * climberRatio)
+                .forwardSoftLimitEnabled(true)
+                .reverseSoftLimitEnabled(true);
+
         climberMotorConfig
                 .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.0, ClosedLoopSlot.kSlot0)
-                .velocityFF(0.0, ClosedLoopSlot.kSlot0)
-                .outputRange(-1, 1);
-        climberMotorConfig.idleMode(IdleMode.kBrake);
+                .p(5, ClosedLoopSlot.kSlot0)
+                .outputRange(-8 / 12.0, 8 / 12.0, ClosedLoopSlot.kSlot0)
+                .p(5, ClosedLoopSlot.kSlot1)
+                .outputRange(-12 / 12.0, 12/12.0, ClosedLoopSlot.kSlot1);
+        climberMotorConfig.idleMode(IdleMode.kCoast);
+        // climberMotorConfig.idleMode(IdleMode.kBrake);
         climberMotorConfig.smartCurrentLimit(60);
-        // climberMotorConfig.voltageCompensation(11);
+        climberMotorConfig.inverted(false);
 
         climberMotor.configure(climberMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         // climberEncoder.setPosition(ClimberConstants.baseAngle.in(Rotations));

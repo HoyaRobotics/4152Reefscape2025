@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.AutoLog;
 /** Add your docs here. */
 public interface ClimberIO {
     @AutoLog
-    public class ClimberInputs {
+    class ClimberInputs {
         public Angle climberAngle;
     }
 
