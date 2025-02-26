@@ -19,13 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "goToL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakePlaceWithSensor"
+            "name": "placeL4"
           }
         },
         {
@@ -55,13 +49,7 @@
         {
           "type": "named",
           "data": {
-            "name": "goToL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakePlaceWithSensor"
+            "name": "placeL4"
           }
         },
         {
@@ -91,13 +79,7 @@
         {
           "type": "named",
           "data": {
-            "name": "goToL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakePlaceWithSensor"
+            "name": "placeL4"
           }
         },
         {
@@ -127,13 +109,7 @@
         {
           "type": "named",
           "data": {
-            "name": "goToL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakePlaceWithSensor"
+            "name": "placeL4"
           }
         }
       ]

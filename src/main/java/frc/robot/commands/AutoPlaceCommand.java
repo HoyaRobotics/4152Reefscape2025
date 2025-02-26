@@ -5,30 +5,22 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
-import java.util.function.BooleanSupplier;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-
-public class PlacingCommand extends SequentialCommandGroup {
-    /** Creates a new PlacingCommand. */
-    public PlacingCommand(
-            SuperStructure superStructure, Intake intake, SuperStructurePose pose, BooleanSupplier placeObject) {
+/** Add your docs here. */
+public class AutoPlaceCommand extends SequentialCommandGroup {
+    public AutoPlaceCommand(SuperStructure superStructure, Intake intake, SuperStructurePose pose) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
                 superStructure.moveToPose(pose),
-                new WaitUntilCommand(placeObject),
                 intake.run(false)
                         .withTimeout(IntakeConstants.PlacingTimeout)
-                        .andThen(intake.run(false)
+                        .andThen(intake.runWithSensor(false)
                                 .alongWith(superStructure.retractArm(ArmConstants.baseAngle))
                                 .until(superStructure.waitTillRetracted())));
     }

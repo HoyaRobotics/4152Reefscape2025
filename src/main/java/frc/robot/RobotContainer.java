@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AutoPlaceCommand;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
@@ -229,6 +230,12 @@ public class RobotContainer {
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
 
+        NamedCommands.registerCommand("placeL4", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L4));
+        NamedCommands.registerCommand("placeL3", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L3));
+        NamedCommands.registerCommand("placeL2", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L2));
+        NamedCommands.registerCommand(
+                "placeTrough", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.TROUGH));
+
         NamedCommands.registerCommand(
                 "intakePlace", intake.run(false).withTimeout(0.5).andThen(() -> intake.stopIntake()));
 
@@ -246,10 +253,10 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("hold", superStructure.holdPose(intake));
 
-        NamedCommands.registerCommand("goToL4", superStructure.moveToPosePreAngle(SuperStructurePose.L4));
-        NamedCommands.registerCommand("goToL3", superStructure.moveToPosePreAngle(SuperStructurePose.L3));
-        NamedCommands.registerCommand("goToL2", superStructure.moveToPosePreAngle(SuperStructurePose.L2));
-        NamedCommands.registerCommand("goToTrough", superStructure.moveToPosePreAngle(SuperStructurePose.TROUGH));
+        NamedCommands.registerCommand("goToL4", superStructure.moveToPose(SuperStructurePose.L4));
+        NamedCommands.registerCommand("goToL3", superStructure.moveToPose(SuperStructurePose.L3));
+        NamedCommands.registerCommand("goToL2", superStructure.moveToPose(SuperStructurePose.L2));
+        NamedCommands.registerCommand("goToTrough", superStructure.moveToPose(SuperStructurePose.TROUGH));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

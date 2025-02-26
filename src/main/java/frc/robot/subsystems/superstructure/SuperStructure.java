@@ -78,19 +78,9 @@ public class SuperStructure {
                         holding ? IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0), Amps.of(20)));
     }
 
-    // make one function? we always want to pre angle...
-    public Command moveToPose(SuperStructurePose pose) {
-        return elevator.moveToPosition(pose.elevatorPosition)
-                .alongWith(arm.moveToAngle(pose.armAngle))
-                .beforeStarting(() -> targetPose = pose)
-                .finallyDo(() -> {
-                    currentPose = pose;
-                });
-    }
-
     // start moving arm to actual angle once we are within a certain
     // range to the desired elevator position
-    public Command moveToPosePreAngle(SuperStructurePose pose) {
+    public Command moveToPose(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorPosition)
                 .alongWith(new WaitUntilCommand(() -> pose.elevatorPosition
                                 .minus(elevator.getPosition())
