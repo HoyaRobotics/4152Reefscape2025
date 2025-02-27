@@ -43,6 +43,12 @@
         {
           "type": "named",
           "data": {
+            "name": "alignToCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "intakeReceiveWithSensor"
           }
         },
@@ -85,6 +91,12 @@
         {
           "type": "named",
           "data": {
+            "name": "alignToCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "intakeReceiveWithSensor"
           }
         },
@@ -122,6 +134,12 @@
           "type": "named",
           "data": {
             "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToCoralStation"
           }
         },
         {

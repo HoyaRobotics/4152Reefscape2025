@@ -9,10 +9,26 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
+import org.ironmaple.utils.FieldMirroringUtils;
 
 public class FieldConstants {
     public static final double fieldLength = Units.inchesToMeters(690.876);
     public static final double fieldWidth = Units.inchesToMeters(317);
+
+    public static class CoralStation {
+        public static Pose2d getCoralStationPose() {
+            boolean isRed = DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red;
+            Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
+            if (isRed) {
+                rightSidePose = new Pose2d(
+                        FieldMirroringUtils.flip(rightSidePose.getTranslation()),
+                        FieldMirroringUtils.flip(rightSidePose.getRotation()));
+            }
+            rightSidePose = rightSidePose.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(180)));
+            return rightSidePose;
+        }
+    }
 
     public static class Reef {
 

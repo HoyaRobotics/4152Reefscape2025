@@ -42,6 +42,7 @@ import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef.Side;
 import frc.robot.constants.VisionConstants;
 import frc.robot.generated.TunerConstants;
@@ -231,6 +232,8 @@ public class RobotContainer {
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
 
+        NamedCommands.registerCommand(
+                "alignToCoralStation", DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose()));
         NamedCommands.registerCommand("placeL4", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L4));
         NamedCommands.registerCommand("placeL3", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L3));
         NamedCommands.registerCommand("placeL2", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L2));
