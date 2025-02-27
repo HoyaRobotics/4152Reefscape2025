@@ -40,7 +40,7 @@ public class IntakeConstants {
     public static class CurrentLimits {
         public static final Current L4 = Amps.of(40),
                 everything = Amps.of(20),
-                receiving = Amps.of(20),
+                receiving = Amps.of(25),
                 holding = Amps.of(20);
     }
 
