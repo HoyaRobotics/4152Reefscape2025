@@ -355,7 +355,7 @@ public class RobotContainer {
         driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false));
 
         driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
-/*
+
         driverController
                 .leftStick()
                 .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.LEFT));
@@ -363,8 +363,8 @@ public class RobotContainer {
         driverController
                 .rightStick()
                 .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.RIGHT));
-*/
-        
+
+        /*
                 driverController
                         .leftStick()
                         .whileTrue(DriveCommands.driveToPose(
@@ -378,7 +378,7 @@ public class RobotContainer {
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
-                                
+                          */      
     }
 
     /**

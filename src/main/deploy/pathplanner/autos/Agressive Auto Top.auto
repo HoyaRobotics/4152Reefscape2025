@@ -1,0 +1,181 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToRightBranch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToLeftCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeReceiveWithSensor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToLeftBranch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToLeftCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeReceiveWithSensor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToRightBranch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignLeftCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeReceiveWithSensor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Top Agressive Auto.6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToLeftBranch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": true
+}

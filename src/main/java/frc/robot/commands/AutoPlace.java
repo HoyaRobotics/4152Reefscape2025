@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 public class AutoPlace {
     private static final Distance StartSuperStructureRange = Inches.of(20);
 
+    // if player lets go of back buttons finish moving to pose but dont outtake
     public static Command autoAlignAndPlace(
             CommandXboxController driverController,
             Drive drive,
