@@ -3,35 +3,29 @@
 // if one of the level buttons is pressed before its ready it will take
 // that into account and place with no delay
 
-/*
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.FieldConstants.Side;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
+import frc.robot.util.ButtonWatcher;
+import frc.robot.util.PoseUtils;
+import java.util.function.Supplier;
 
 public class AutoPlace {
-    public static final Distance StartSuperStructureRange = Inches.of(12);
-
-    // how do we know if a button has been pressed and what pose to use
-    // need a way to know when one of the buttons has been pressed, not trigger the normal
-    // move to level commands and save which pose we are going to move to
-
-    // labelled driver mapping would be nice
-    // and we will need to make sure neither of the align buttons are down
-    // when triggering normal superstructure move commands
-
-    // seperate singleton class that will return the last pose indicated by level buttons?
-    private SuperStructurePose poser(){
-        return SuperStructurePose.L4;
-    }
-    private Command SelectPoseCommand(SuperStructure superStructure) {
-        return new SelectCommand<>(
-        Map.ofEntries(
-                Map.entry(SuperStructurePose.BASE, superStructure.moveToPosePreAngle(SuperStructurePose.L2)),
-                Map.entry
-        ), this::poser);
-    }
-}
-
+    private static final Distance StartSuperStructureRange = Inches.of(20);
 
     public static Command autoAlignAndPlace(
             CommandXboxController driverController,
@@ -48,9 +42,7 @@ public class AutoPlace {
                         buttonWatcher.WaitSelectPose(),
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoPlace.StartSuperStructureRange)),
-                        // figure out which pose to get
-                        Commands.runOnce(() -> superStructure.setTargetPose(buttonWatcher::getSelectedPose)),
-                        superStructure.moveToPosePreAngle(),
+                        superStructure.moveToPose(buttonWatcher::getSelectedPose),
                         intake.run(false)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
                                 .andThen(intake.run(false)
@@ -58,5 +50,3 @@ public class AutoPlace {
                                         .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle)))));
     }
 }
-
-*/

@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AutoPlace;
 import frc.robot.commands.AutoPlaceCommand;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
@@ -319,24 +320,32 @@ public class RobotContainer {
 
         driverController
                 .y()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .x()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .a()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
         driverController
                 .b()
+                .and(driverController.leftStick().negate())
+                .and(driverController.rightStick().negate())
                 .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, () -> driverController
                         .leftTrigger(0.1)
                         .getAsBoolean()));
@@ -346,19 +355,22 @@ public class RobotContainer {
         driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false));
 
         driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
-
-        /*
+/*
         driverController
                 .leftStick()
                 .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.LEFT));
-                */
 
         driverController
-                .leftStick()
-                .whileTrue(DriveCommands.driveToPose(
-                        drive,
-                        () -> FieldConstants.Reef.offsetReefPose(
-                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
+                .rightStick()
+                .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.RIGHT));
+*/
+        
+                driverController
+                        .leftStick()
+                        .whileTrue(DriveCommands.driveToPose(
+                                drive,
+                                () -> FieldConstants.Reef.offsetReefPose(
+                                        drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
 
         driverController
                 .rightStick()
@@ -366,6 +378,7 @@ public class RobotContainer {
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
+                                
     }
 
     /**
