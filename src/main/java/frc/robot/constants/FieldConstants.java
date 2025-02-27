@@ -15,18 +15,25 @@ public class FieldConstants {
     public static final double fieldLength = Units.inchesToMeters(690.876);
     public static final double fieldWidth = Units.inchesToMeters(317);
 
+    public enum Side {
+        LEFT,
+        RIGHT
+    };
+
     public static class CoralStation {
-        public static Pose2d getCoralStationPose() {
+        public static final Pose2d RightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
+        public static final Pose2d LeftSidePose = new Pose2d(0.89, 7.32, Rotation2d.fromDegrees(-54));
+
+        public static Pose2d getCoralStationPose(Side side) {
             boolean isRed = DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red;
-            Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
+            Pose2d coralStation = side == Side.RIGHT ? RightSidePose : LeftSidePose;
             if (isRed) {
-                rightSidePose = new Pose2d(
-                        FieldMirroringUtils.flip(rightSidePose.getTranslation()),
-                        FieldMirroringUtils.flip(rightSidePose.getRotation()));
+                coralStation = new Pose2d(
+                        FieldMirroringUtils.flip(coralStation.getTranslation()),
+                        FieldMirroringUtils.flip(coralStation.getRotation()));
             }
-            rightSidePose = rightSidePose.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(180)));
-            return rightSidePose;
+            return coralStation.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(180)));
         }
     }
 
@@ -46,11 +53,6 @@ public class FieldConstants {
                 6.469; // taken from FieldConstants adjustY for reef y offset
         public static final Pose2d[] blueCenterFaces = new Pose2d[6];
         public static final Pose2d[] redCenterFaces = new Pose2d[6];
-
-        public enum Side {
-            LEFT,
-            RIGHT
-        };
 
         public static List<Pose2d> getAllianceReefList() {
             boolean isRed = DriverStation.getAlliance().isPresent()

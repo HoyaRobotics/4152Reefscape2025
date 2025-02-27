@@ -43,7 +43,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToCoralStation"
+            "name": "alignToRightCoralStation"
           }
         },
         {
@@ -91,7 +91,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToCoralStation"
+            "name": "alignToRightCoralstation"
           }
         },
         {
@@ -139,7 +139,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToCoralStation"
+            "name": "alignToRightCoralStation"
           }
         },
         {
