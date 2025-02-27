@@ -19,13 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "goToL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakePlace"
+            "name": "placeL4"
           }
         },
         {

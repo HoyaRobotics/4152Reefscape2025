@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoPlace;
 import frc.robot.commands.AutoPlaceCommand;
 import frc.robot.commands.ClimbCommands;
@@ -313,10 +314,15 @@ public class RobotContainer {
                 .rightTrigger(0.1)
                 .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(true)));
 
+        /*
         driverController
                 .rightBumper()
                 .whileTrue(
                         superStructure.moveToPose(SuperStructurePose.L2_ALGAE).alongWith(intake.run(true)));
+                        */
+
+        driverController.leftBumper().whileTrue(AlgaeCommands.whackAlgae(drive, superStructure, intake, true));
+        driverController.rightBumper().whileTrue(AlgaeCommands.whackAlgae(drive, superStructure, intake, false));
 
         driverController
                 .y()
@@ -363,22 +369,6 @@ public class RobotContainer {
         driverController
                 .rightStick()
                 .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.RIGHT));
-
-        /*
-                driverController
-                        .leftStick()
-                        .whileTrue(DriveCommands.driveToPose(
-                                drive,
-                                () -> FieldConstants.Reef.offsetReefPose(
-                                        drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
-
-        driverController
-                .rightStick()
-                .whileTrue(DriveCommands.driveToPose(
-                        drive,
-                        () -> FieldConstants.Reef.offsetReefPose(
-                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
-                          */
     }
 
     /**

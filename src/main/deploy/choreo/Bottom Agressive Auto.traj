@@ -360,8 +360,8 @@
    {"name":"Marker", "from":{"target":4, "targetTimestamp":2.98138, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"hold"}}},
    {"name":"Marker", "from":{"target":6, "targetTimestamp":5.99017, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"hold"}}},
    {"name":"Marker", "from":{"target":8, "targetTimestamp":8.88925, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"hold"}}},
-   {"name":"Marker", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.6 s", "val":0.6}}, "event":{"type":"named", "data":{"name":"goToL4"}}},
-   {"name":"Marker", "from":{"target":4, "targetTimestamp":2.98138, "offset":{"exp":"0.9 s", "val":0.9}}, "event":{"type":"named", "data":{"name":"goToL4"}}},
-   {"name":"Marker", "from":{"target":6, "targetTimestamp":5.99017, "offset":{"exp":"0.9 s", "val":0.9}}, "event":{"type":"named", "data":{"name":"goToL4"}}},
-   {"name":"Marker", "from":{"target":8, "targetTimestamp":8.88925, "offset":{"exp":"0.9 s", "val":0.9}}, "event":{"type":"named", "data":{"name":"goToL4"}}}]
+   {"name":"Marker", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.4 s", "val":0.4}}, "event":{"type":"named", "data":{"name":"goToL4"}}},
+   {"name":"Marker", "from":{"target":4, "targetTimestamp":2.98138, "offset":{"exp":"0.7 s", "val":0.7}}, "event":{"type":"named", "data":{"name":"goToL4"}}},
+   {"name":"Marker", "from":{"target":6, "targetTimestamp":5.99017, "offset":{"exp":"0.7 s", "val":0.7}}, "event":{"type":"named", "data":{"name":"goToL4"}}},
+   {"name":"Marker", "from":{"target":8, "targetTimestamp":8.88925, "offset":{"exp":"0.7 s", "val":0.7}}, "event":{"type":"named", "data":{"name":"goToL4"}}}]
 }
