@@ -139,7 +139,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignLeftCoralStation"
+            "name": "alignToLeftCoralStation"
           }
         },
         {

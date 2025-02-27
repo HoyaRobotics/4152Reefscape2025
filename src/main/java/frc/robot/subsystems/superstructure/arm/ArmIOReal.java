@@ -50,7 +50,7 @@ public class ArmIOReal implements ArmIO {
         armEncoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         armEncoder.getConfigurator().apply(armEncoderConfig);
         TalonFXConfiguration armConfig = new TalonFXConfiguration();
-        armConfig.CurrentLimits.StatorCurrentLimit = 60;
+        armConfig.CurrentLimits.StatorCurrentLimit = 30; // 60
         armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         armConfig.Feedback.FeedbackRemoteSensorID = 33;
         armConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;

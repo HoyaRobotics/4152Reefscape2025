@@ -378,7 +378,7 @@ public class RobotContainer {
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
-                          */      
+                          */
     }
 
     /**

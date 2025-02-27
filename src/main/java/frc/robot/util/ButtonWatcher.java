@@ -22,8 +22,6 @@ public class ButtonWatcher {
         return new WaitUntilCommand(() -> {
             if (controller.a().getAsBoolean()) {
                 selectedPose = SuperStructurePose.L2;
-            } else if (controller.b().getAsBoolean()) {
-                selectedPose = SuperStructurePose.TROUGH;
             } else if (controller.x().getAsBoolean()) {
                 selectedPose = SuperStructurePose.L3;
             } else if (controller.y().getAsBoolean()) {

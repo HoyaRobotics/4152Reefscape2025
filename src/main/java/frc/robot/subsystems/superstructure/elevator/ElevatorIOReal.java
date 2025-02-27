@@ -47,7 +47,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     private void configureMotors() {
         TalonFXConfiguration elevatorMotorConfig = new TalonFXConfiguration();
-        elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
+        elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 35; // 60
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistanceRatio;
         elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 2.5;
