@@ -20,7 +20,8 @@ public class AutoPlaceCommand extends SequentialCommandGroup {
                 superStructure.moveToPose(pose),
                 intake.run(false)
                         .withTimeout(IntakeConstants.PlacingTimeout)
-                        .andThen(intake.runWithSensor(false)
+                        .andThen(intake.run(false)
+                                .withTimeout(IntakeConstants.PostPlacingTimeout)
                                 .alongWith(superStructure.retractArm(ArmConstants.baseAngle))
                                 .until(superStructure.waitTillRetracted())));
     }

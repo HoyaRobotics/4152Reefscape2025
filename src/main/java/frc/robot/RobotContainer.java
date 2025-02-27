@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AutoPlaceCommand;
@@ -251,12 +252,13 @@ public class RobotContainer {
                         .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                         .andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand("hold", superStructure.holdPose(intake));
+        NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake));
 
         NamedCommands.registerCommand("goToL4", superStructure.moveToPose(SuperStructurePose.L4));
         NamedCommands.registerCommand("goToL3", superStructure.moveToPose(SuperStructurePose.L3));
         NamedCommands.registerCommand("goToL2", superStructure.moveToPose(SuperStructurePose.L2));
         NamedCommands.registerCommand("goToTrough", superStructure.moveToPose(SuperStructurePose.TROUGH));
+        NamedCommands.registerCommand("StopDrive", new InstantCommand(() -> drive.stop(), drive));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

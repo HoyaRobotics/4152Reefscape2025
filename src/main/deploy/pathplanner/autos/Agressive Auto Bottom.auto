@@ -19,6 +19,12 @@
         {
           "type": "named",
           "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "placeL4"
           }
         },
@@ -26,6 +32,12 @@
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
           }
         },
         {
@@ -49,6 +61,12 @@
         {
           "type": "named",
           "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "placeL4"
           }
         },
@@ -56,6 +74,12 @@
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
           }
         },
         {
@@ -79,6 +103,12 @@
         {
           "type": "named",
           "data": {
+            "name": "StopDrive"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "placeL4"
           }
         },
@@ -86,6 +116,12 @@
           "type": "path",
           "data": {
             "pathName": "Bottom Agressive Auto.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
           }
         },
         {
@@ -104,6 +140,12 @@
           "type": "named",
           "data": {
             "name": "alignToRightBranch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopDrive"
           }
         },
         {

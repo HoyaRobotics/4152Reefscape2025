@@ -3,9 +3,11 @@
 // if one of the level buttons is pressed before its ready it will take
 // that into account and place with no delay
 
+/*
 package frc.robot.commands;
 
-/*
+import edu.wpi.first.wpilibj2.command.Command;
+
 public class AutoPlace {
     public static final Distance StartSuperStructureRange = Inches.of(12);
 
@@ -18,14 +20,17 @@ public class AutoPlace {
     // when triggering normal superstructure move commands
 
     // seperate singleton class that will return the last pose indicated by level buttons?
-    /*
+    private SuperStructurePose poser(){
+        return SuperStructurePose.L4;
+    }
     private Command SelectPoseCommand(SuperStructure superStructure) {
         return new SelectCommand<>(
         Map.ofEntries(
                 Map.entry(SuperStructurePose.BASE, superStructure.moveToPosePreAngle(SuperStructurePose.L2)),
                 Map.entry
-        )
+        ), this::poser);
     }
+}
 
 
     public static Command autoAlignAndPlace(

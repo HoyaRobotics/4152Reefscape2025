@@ -54,7 +54,7 @@ public class IntakeIOReal implements IntakeIO {
         try {
             lasercan.setRangingMode(RangingMode.SHORT);
             lasercan.setRegionOfInterest(new RegionOfInterest(4, 4, 8, 8));
-            lasercan.setTimingBudget(TimingBudget.TIMING_BUDGET_100MS);
+            lasercan.setTimingBudget(TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         }

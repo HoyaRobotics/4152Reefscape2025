@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import java.util.function.BooleanSupplier;
@@ -94,7 +95,7 @@ public class SuperStructure {
     }
 
     public BooleanSupplier waitTillRetracted() {
-        return () -> arm.getArmPosition().minus(getMovingAngle(currentPose)).lt(Degrees.of(0));
+        return () -> arm.getArmPosition().minus(ArmConstants.safeRetractAngle).lt(Degrees.of(0));
     }
 
     public Command retractArm(Angle retractAngle) {

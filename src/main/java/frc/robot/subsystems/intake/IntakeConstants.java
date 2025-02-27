@@ -44,6 +44,6 @@ public class IntakeConstants {
                 holding = Amps.of(20);
     }
 
-    public static final double PlacingTimeout = 0.8;
-    public static final double PostPlacingTimeout = 0.5;
+    public static final double PlacingTimeout = 0.35;
+    public static final double PostPlacingTimeout = 0.35;
 }
