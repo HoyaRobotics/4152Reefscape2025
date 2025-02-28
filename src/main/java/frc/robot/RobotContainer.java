@@ -321,8 +321,8 @@ public class RobotContainer {
                         superStructure.moveToPose(SuperStructurePose.L2_ALGAE).alongWith(intake.run(true)));
                         */
 
-        driverController.leftBumper().whileTrue(AlgaeCommands.whackAlgae(drive, superStructure, intake, true));
-        driverController.rightBumper().whileTrue(AlgaeCommands.whackAlgae(drive, superStructure, intake, false));
+        driverController.leftBumper().onTrue(AlgaeCommands.removeL2Algae(superStructure, intake));
+        // driverController.rightBumper().onTrue(AlgaeCommands.whackAlgae(superStructure, intake, false));
 
         driverController
                 .y()

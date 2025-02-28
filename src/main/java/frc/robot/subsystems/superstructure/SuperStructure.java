@@ -28,8 +28,8 @@ public class SuperStructure {
         L3(Inches.of(19), Degrees.of(142.5)),
         L4(Inches.of(53.0), Degrees.of(170)),
 
-        L2_ALGAE(Inches.of(10), Degrees.of(165)),
-        L3_ALGAE(Inches.of(20), Degrees.of(165)),
+        L2_ALGAE(Inches.of(0), Degrees.of(155)),
+        L3_ALGAE(Inches.of(24), Degrees.of(155)),
 
         HOLD(Inches.of(0.0), Degrees.of(110)),
         BASE(Inches.of(0.5), Degrees.of(-25));
