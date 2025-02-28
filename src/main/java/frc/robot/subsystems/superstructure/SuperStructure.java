@@ -31,8 +31,8 @@ public class SuperStructure {
         L2_ALGAE(Inches.of(0), Degrees.of(155)),
         L3_ALGAE(Inches.of(24), Degrees.of(155)),
 
-        HOLD(Inches.of(0.0), Degrees.of(110)),
-        BASE(Inches.of(0.5), Degrees.of(-25));
+        HOLD(Inches.of(3.0), Degrees.of(110)),
+        BASE(Inches.of(18.0), Degrees.of(-25)); // 3.0, -25
 
         public final Distance elevatorPosition;
         public final Angle armAngle;
