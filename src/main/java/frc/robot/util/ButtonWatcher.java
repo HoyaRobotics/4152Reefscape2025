@@ -34,7 +34,6 @@ public class ButtonWatcher {
     }
 
     public SuperStructurePose getSelectedPose() {
-        System.out.println("Selected for auto place -> " + selectedPose.name());
         return selectedPose;
     }
 }

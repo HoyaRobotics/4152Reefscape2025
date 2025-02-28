@@ -217,7 +217,6 @@ public class RobotContainer {
         superStructure = new SuperStructure(elevator, arm);
         intake.setPoseSupplier(() -> {
             SuperStructurePose pose = superStructure.getTargetPose();
-            System.out.println(pose.name());
             return pose;
         });
 

@@ -141,9 +141,9 @@ public class DriveCommands {
                     xController.reset();
                     yController.reset();
                     xController.setSetpoint(endPose.getX());
-                    xController.setTolerance(Units.inchesToMeters(2.0));
+                    xController.setTolerance(Units.inchesToMeters(0.5));
                     yController.setSetpoint(endPose.getY());
-                    yController.setTolerance(Units.inchesToMeters(2.0));
+                    yController.setTolerance(Units.inchesToMeters(0.5));
                     angleController.setGoal(endPose.getRotation().getRadians());
                     angleController.setTolerance(Math.PI / 90);
                 })
