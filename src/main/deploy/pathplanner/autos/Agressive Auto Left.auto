@@ -41,15 +41,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "alignToLeftCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeReceiveWithSensor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeReceiveWithSensor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "alignToLeftCoralStation"
+                }
+              }
+            ]
           }
         },
         {
@@ -89,15 +96,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "alignToLeftCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeReceiveWithSensor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeReceiveWithSensor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "alignToLeftCoralStation"
+                }
+              }
+            ]
           }
         },
         {
@@ -137,15 +151,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "alignToLeftCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeReceiveWithSensor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeReceiveWithSensor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "alignToLeftCoralStation"
+                }
+              }
+            ]
           }
         },
         {

@@ -41,15 +41,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "alignToRightCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeReceiveWithSensor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeReceiveWithSensor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "alignToRightCoralStation"
+                }
+              }
+            ]
           }
         },
         {
@@ -89,15 +96,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "alignToRightCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeReceiveWithSensor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeReceiveWithSensor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "alignToRightCoralStation"
+                }
+              }
+            ]
           }
         },
         {
@@ -137,15 +151,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "alignToRightCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeReceiveWithSensor"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeReceiveWithSensor"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "alignToRightCoralStation"
+                }
+              }
+            ]
           }
         },
         {

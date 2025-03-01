@@ -34,7 +34,8 @@ public class FieldConstants {
                         FieldMirroringUtils.flip(coralStation.getTranslation()),
                         FieldMirroringUtils.flip(coralStation.getRotation()));
             }
-            return coralStation.transformBy(new Transform2d(0.37, 0.0, Rotation2d.fromDegrees(180))); // 0.48
+            return coralStation.transformBy(
+                    new Transform2d(0.41, Units.inchesToMeters(2.5), Rotation2d.fromDegrees(180))); // 0.48
         }
     }
 
