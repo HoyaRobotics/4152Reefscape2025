@@ -20,8 +20,10 @@ public class IntakeIOSim implements IntakeIO {
 
     public IntakeIOSim(SwerveDriveSimulation driveSimulation, Consumer<AngularVelocity> placeCoral) {
         this.driveSimulation = driveSimulation;
-        this.intakeSimulation = IntakeSimulation.OverTheBumperIntake(
-                "Coral", driveSimulation, Inches.of(20), Inches.of(8), IntakeSimulation.IntakeSide.FRONT, 1);
+        // this.intakeSimulation = IntakeSimulation.OverTheBumperIntake("Coral", driveSimulation, Inches.of(20),
+        // Inches.of(0.5), IntakeSimulation.IntakeSide.FRONT, 1);
+        this.intakeSimulation = IntakeSimulation.InTheFrameIntake(
+                "Coral", driveSimulation, Inches.of(20), IntakeSimulation.IntakeSide.FRONT, 1);
         this.intakeSimulation.addGamePieceToIntake();
         this.placeCoral = placeCoral;
     }
