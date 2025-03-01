@@ -19,6 +19,8 @@ public interface IntakeIO {
 
     default void setSpeed(AngularVelocity targetSpeed) {}
 
+    default void addSimulatedGamePiece() {}
+
     default void setVoltage(Voltage voltage) {}
 
     default void stop() {}

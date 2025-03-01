@@ -56,6 +56,10 @@ public class Intake extends SubsystemBase {
         // Logger.recordOutput("IntakeCoral", coralPose);
     }
 
+    public void addSimulatedGamePiece() {
+        this.io.addSimulatedGamePiece();
+    }
+
     // make pose a supplier?
     // move these into constants
     private IntakeAction actionFromPose(SuperStructurePose pose, boolean intaking) {

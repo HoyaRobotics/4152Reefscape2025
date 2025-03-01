@@ -24,16 +24,19 @@ public class IntakeIOSim implements IntakeIO {
         // Inches.of(0.5), IntakeSimulation.IntakeSide.FRONT, 1);
         this.intakeSimulation = IntakeSimulation.InTheFrameIntake(
                 "Coral", driveSimulation, Inches.of(20), IntakeSimulation.IntakeSide.FRONT, 1);
-        this.intakeSimulation.addGamePieceToIntake();
         this.placeCoral = placeCoral;
+    }
+
+    public void addSimulatedGamePiece() {
+        this.intakeSimulation.addGamePieceToIntake();
     }
 
     @Override
     public void setSpeed(AngularVelocity targetSpeed) {
         if (targetSpeed == IntakeConstants.IntakingSpeed) {
             intakeSimulation.startIntake();
-        } else if (targetSpeed == IntakeConstants.PlacingSpeed
-                || targetSpeed == IntakeConstants.TroughSpeed && intakeSimulation.obtainGamePieceFromIntake()) {
+        } else if ((targetSpeed == IntakeConstants.PlacingSpeed || targetSpeed == IntakeConstants.TroughSpeed)
+                && intakeSimulation.obtainGamePieceFromIntake()) {
             placeCoral.accept(targetSpeed);
         }
     }

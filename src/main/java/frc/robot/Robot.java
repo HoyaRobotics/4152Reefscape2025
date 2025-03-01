@@ -209,7 +209,7 @@ public class Robot extends LoggedRobot {
         Distance difference =
                 Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
 
-        boolean enteredRange = difference.lt(Meters.of(0.75));
+        boolean enteredRange = difference.lt(Meters.of(1.25));
         // && Math.abs(angleDiff.in(Degrees)) < 10.0;
         if (enteredRange && !inCoralStationRange) {
             inCoralStationRange = true;
@@ -219,7 +219,7 @@ public class Robot extends LoggedRobot {
                             CoralStationsSide.RIGHT_STATION,
                             DriverStation.getAlliance().get(),
                             false));
-        } else if (difference.gt(Meters.of(1.0))) {
+        } else if (difference.gt(Meters.of(1.25))) {
             inCoralStationRange = false;
         }
         robotContainer.displaySimFieldToAdvantageScope();

@@ -398,6 +398,7 @@ public class RobotContainer {
         if (Constants.currentMode != Constants.Mode.SIM) return;
 
         driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+        intake.addSimulatedGamePiece();
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 
