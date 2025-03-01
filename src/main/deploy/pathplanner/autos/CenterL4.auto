@@ -23,6 +23,37 @@
           }
         },
         {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "hold"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignToReefCenter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "removeAlgae"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "hold"

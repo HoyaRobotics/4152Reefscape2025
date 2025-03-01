@@ -17,8 +17,9 @@ public class FieldConstants {
 
     public enum Side {
         LEFT,
+        CENTER,
         RIGHT
-    };
+    }
 
     public static class CoralStation {
         public static final Pose2d RightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
@@ -33,7 +34,7 @@ public class FieldConstants {
                         FieldMirroringUtils.flip(coralStation.getTranslation()),
                         FieldMirroringUtils.flip(coralStation.getRotation()));
             }
-            return coralStation.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(180)));
+            return coralStation.transformBy(new Transform2d(0.37, 0.0, Rotation2d.fromDegrees(180))); // 0.48
         }
     }
 
@@ -62,17 +63,22 @@ public class FieldConstants {
 
         public static Pose2d offsetReefPose(Pose2d facePose, Side side) {
             final double distanceFromReef = 0.48;
-            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 2.7;
+            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 1.7; // 2.7
             final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES + 2.7; // 2.4
             if (side == Side.LEFT) {
                 return facePose.transformBy(new Transform2d(
                         distanceFromReef, // Robot length / 2
                         -Units.inchesToMeters(leftOffset),
                         Rotation2d.fromDegrees(0.0)));
-            } else {
+            } else if (side == Side.RIGHT) {
                 return facePose.transformBy(new Transform2d(
                         distanceFromReef, // Robot length / 2
                         Units.inchesToMeters(rightOffset),
+                        Rotation2d.fromDegrees(0.0)));
+            } else {
+                return facePose.transformBy(new Transform2d(
+                        distanceFromReef, // Robot length / 2
+                        0.0,
                         Rotation2d.fromDegrees(0.0)));
             }
         }

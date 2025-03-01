@@ -45,6 +45,7 @@ import frc.robot.commands.PlacingCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.CoralStation;
+import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.constants.VisionConstants;
 import frc.robot.generated.TunerConstants;
@@ -269,6 +270,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("goToTrough", superStructure.moveToPose(SuperStructurePose.TROUGH));
         NamedCommands.registerCommand("StopDrive", new InstantCommand(() -> drive.stop(), drive));
 
+        NamedCommands.registerCommand(
+                "alignToReefCenter",
+                DriveCommands.driveToPose(
+                        drive,
+                        () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), Side.CENTER)));
+
+        NamedCommands.registerCommand("removeAlgae", AlgaeCommands.removeL2Algae(superStructure, intake));
+
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -355,9 +364,15 @@ public class RobotContainer {
                         .leftTrigger(0.1)
                         .getAsBoolean()));
 
-        driverController.povUp().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true));
+        driverController
+                .povUp()
+                .onTrue(Commands.repeatingSequence(superStructure.moveToPose(SuperStructurePose.CLIMB_STOW))
+                        .alongWith(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true)));
 
-        driverController.povDown().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false));
+        driverController
+                .povDown()
+                .onTrue(Commands.repeatingSequence(superStructure.moveToPose(SuperStructurePose.CLIMB_STOW))
+                        .alongWith(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false)));
 
         driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
 
