@@ -51,9 +51,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "alignToLeftCoralStation"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "alignToLeftCoralStation"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "driveForward"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -106,9 +119,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "alignToLeftCoralStation"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "alignToLeftCoralStation"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "driveForward"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -161,9 +187,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "alignToLeftCoralStation"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "alignToLeftCoralStation"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "driveForward"
+                      }
+                    }
+                  ]
                 }
               }
             ]

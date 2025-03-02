@@ -4,6 +4,7 @@
 // McT testing Git
 package frc.robot.subsystems.superstructure.elevator;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -81,5 +82,15 @@ public class Elevator extends SubsystemBase {
 
     public void setPosition(Distance targetPosition) {
         this.io.setPosition(targetPosition);
+    }
+
+    public Command zeroPosition() {
+        return Commands.run(() -> this.io.setVoltage(Volts.of(-1.0)))
+                .beforeStarting(() -> this.io.changeSoftLimits(false))
+                .until(() -> this.io.getCurrent().gt(Amps.of(20.0)))
+                .finallyDo(() -> {
+                    this.io.zeroEncoder();
+                    this.io.changeSoftLimits(true);
+                });
     }
 }

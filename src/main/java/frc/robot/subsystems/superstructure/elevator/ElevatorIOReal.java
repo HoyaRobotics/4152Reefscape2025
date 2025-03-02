@@ -4,16 +4,20 @@
 
 package frc.robot.subsystems.superstructure.elevator;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
 
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ElevatorIOReal implements ElevatorIO {
     final TalonFX frontElevatorMotor = new TalonFX(30, "rio");
@@ -24,6 +28,23 @@ public class ElevatorIOReal implements ElevatorIO {
 
     public ElevatorIOReal() {
         configureMotors();
+    }
+
+    @Override
+    public void zeroEncoder() {
+        frontElevatorMotor.setPosition(0.0);
+        backElevatorMotor.setPosition(0.0);
+    }
+
+    @Override
+    public void setVoltage(Voltage voltage) {
+        frontElevatorMotor.setControl(new VoltageOut(voltage));
+        backElevatorMotor.setControl(new VoltageOut(voltage));
+    }
+
+    @Override
+    public Current getCurrent() {
+        return frontElevatorMotor.getStatorCurrent().getValue();
     }
 
     @Override
@@ -43,6 +64,18 @@ public class ElevatorIOReal implements ElevatorIO {
     @Override
     public void updateInputs(ElevatorInputs inputs) {
         inputs.position = Meters.of(frontElevatorMotor.getPosition(true).getValueAsDouble());
+    }
+
+    @Override
+    public void changeSoftLimits(boolean enable) {
+        SoftwareLimitSwitchConfigs limitSwitchConfig = new SoftwareLimitSwitchConfigs();
+        limitSwitchConfig.ForwardSoftLimitEnable = enable;
+        limitSwitchConfig.ReverseSoftLimitEnable = enable;
+        limitSwitchConfig.ForwardSoftLimitThreshold = Units.inchesToMeters(53.5);
+        limitSwitchConfig.ReverseSoftLimitThreshold = 0.0;
+
+        frontElevatorMotor.getConfigurator().apply(limitSwitchConfig);
+        backElevatorMotor.getConfigurator().apply(limitSwitchConfig);
     }
 
     private void configureMotors() {

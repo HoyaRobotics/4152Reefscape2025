@@ -25,6 +25,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -241,6 +242,9 @@ public class RobotContainer {
                 "alignToLeftCoralStation",
                 DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT)));
 
+        NamedCommands.registerCommand(
+                "driveForward", Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0, 0)), drive));
+
         NamedCommands.registerCommand("placeL4", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L4));
         NamedCommands.registerCommand("placeL3", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L3));
         NamedCommands.registerCommand("placeL2", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L2));
@@ -317,6 +321,7 @@ public class RobotContainer {
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d()); // zero gyro
         driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        driverController.back().onTrue(elevator.zeroPosition());
 
         driverController
                 .rightTrigger(0.1)

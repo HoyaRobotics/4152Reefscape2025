@@ -4,7 +4,11 @@
 
 package frc.robot.subsystems.superstructure.elevator;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -15,7 +19,17 @@ public interface ElevatorIO {
 
     default void setPosition(Distance targetPosition) {}
 
+    default void setVoltage(Voltage voltage) {}
+
+    default Current getCurrent() {
+        return Amps.of(0.0);
+    }
+
     default void stop() {}
 
     default void updateInputs(ElevatorInputs inputs) {}
+
+    default void zeroEncoder() {}
+
+    default void changeSoftLimits(boolean enable) {}
 }
