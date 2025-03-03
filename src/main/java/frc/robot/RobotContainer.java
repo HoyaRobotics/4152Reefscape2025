@@ -228,9 +228,24 @@ public class RobotContainer {
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
+
+        NamedCommands.registerCommand(
+                "alignToRightBranchContinuous",
+                DriveCommands.driveToPoseContinuous(
+                        drive,
+                        () -> FieldConstants.Reef.offsetReefPose(
+                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
+
         NamedCommands.registerCommand(
                 "alignToLeftBranch",
                 DriveCommands.driveToPose(
+                        drive,
+                        () -> FieldConstants.Reef.offsetReefPose(
+                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
+
+        NamedCommands.registerCommand(
+                "alignToLeftBranchContinuous",
+                DriveCommands.driveToPoseContinuous(
                         drive,
                         () -> FieldConstants.Reef.offsetReefPose(
                                 drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
@@ -324,7 +339,7 @@ public class RobotContainer {
         driverController.back().onTrue(elevator.zeroPosition());
 
         driverController
-                .rightTrigger(0.1)
+                .rightTrigger(0.3)
                 .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(true)));
 
         /*

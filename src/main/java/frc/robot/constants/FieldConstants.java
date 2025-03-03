@@ -64,8 +64,8 @@ public class FieldConstants {
 
         public static Pose2d offsetReefPose(Pose2d facePose, Side side) {
             final double distanceFromReef = 0.48;
-            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 1.7; // 2.7
-            final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES + 2.7; // 2.4
+            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 1.2; // 2.7
+            final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES + 1.45; // 2.7
             if (side == Side.LEFT) {
                 return facePose.transformBy(new Transform2d(
                         distanceFromReef, // Robot length / 2

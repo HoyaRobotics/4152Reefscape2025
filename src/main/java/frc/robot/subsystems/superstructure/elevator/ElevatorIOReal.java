@@ -92,7 +92,7 @@ public class ElevatorIOReal implements ElevatorIO {
         elevatorMotorConfig.Slot0.kS = 0.28;
         elevatorMotorConfig.Slot0.kV = 5.97;
         elevatorMotorConfig.Slot0.kA = 0.592;
-        elevatorMotorConfig.Slot0.kP = 30;
+        elevatorMotorConfig.Slot0.kP = 45;
         elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.inchesToMeters(53.5);
         elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;

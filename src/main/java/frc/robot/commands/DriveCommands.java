@@ -157,6 +157,64 @@ public class DriveCommands {
                 });
     }
 
+    /*
+     * Drives to provided field relative pose, rotating first if necessary
+     */
+    public static Command driveToPoseContinuous(Drive drive, Supplier<Pose2d> poseSupplier) {
+
+        PIDController xController = new PIDController(0.2 * TunerConstants.kDriveGearRatio, 0, 0.0);
+        PIDController yController = new PIDController(0.2 * TunerConstants.kDriveGearRatio, 0, 0.0);
+        // look into this, replace them with profiled controllers?
+        ProfiledPIDController angleController = new ProfiledPIDController(
+                ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+        angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+        // Construct command
+        return Commands.run(
+                        () -> {
+                            double angleSpeed = angleController.calculate(
+                                    drive.getRotation().getRadians());
+                            // angleSpeed = MathUtil.clamp(angleSpeed, -3.8, 3.8);
+                            double xSpeed = 0.0;
+                            double ySpeed = 0.0;
+
+                            // starts driving once almost fully turned
+                            if (Math.abs(angleController.getPositionError())
+                                    < Degrees.of(5).in(Radians)) {
+                                xSpeed = xController.calculate(drive.getPose().getX());
+                                xSpeed = MathUtil.clamp(xSpeed, -1.5, 1.5);
+                                ySpeed = yController.calculate(drive.getPose().getY());
+                                ySpeed = MathUtil.clamp(ySpeed, -1.5, 1.5);
+                            }
+
+                            // Convert to field relative speeds & send command
+                            ChassisSpeeds speeds = new ChassisSpeeds(
+                                    xSpeed * drive.getMaxLinearSpeedMetersPerSec(),
+                                    ySpeed * drive.getMaxLinearSpeedMetersPerSec(),
+                                    angleSpeed);
+                            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+                        },
+                        drive)
+                // Reset PID controller when command starts
+                .beforeStarting(() -> {
+                    Pose2d endPose = poseSupplier.get();
+                    angleController.reset(drive.getRotation().getRadians());
+                    xController.reset();
+                    yController.reset();
+                    xController.setSetpoint(endPose.getX());
+                    xController.setTolerance(Units.inchesToMeters(0.5));
+                    yController.setSetpoint(endPose.getY());
+                    yController.setTolerance(Units.inchesToMeters(0.5));
+                    angleController.setGoal(endPose.getRotation().getRadians());
+                    angleController.setTolerance(Math.PI / 90);
+                })
+                .finallyDo(() -> {
+                    xController.reset();
+                    yController.reset();
+                    drive.stop();
+                });
+    }
+
     /**
      * Field relative drive command using joystick for linear control and PID for angular control. Possible use cases
      * include snapping to an angle, aiming at a vision target, or controlling absolute rotation with a joystick.
