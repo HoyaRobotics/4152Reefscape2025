@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+    public static final IntakeVersion intakeVersion = IntakeVersion.V2;
 
     public static enum Mode {
         /** Running on a real robot. */
@@ -32,5 +33,13 @@ public final class Constants {
 
         /** Replaying from a log file. */
         REPLAY
+    }
+
+    public static enum IntakeVersion {
+        /** V1 Coral Intake */
+        V1,
+
+        /** V2 Coral And Algae Intake */
+        V2
     }
 }

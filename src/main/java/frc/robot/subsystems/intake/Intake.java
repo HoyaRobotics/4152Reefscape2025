@@ -12,6 +12,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -63,7 +64,16 @@ public class Intake extends SubsystemBase {
     // make pose a supplier?
     // move these into constants
     private IntakeAction actionFromPose(SuperStructurePose pose, boolean intaking) {
-        Current currentLimit = pose == SuperStructurePose.L4 ? Amps.of(25) : Amps.of(20);
+        Current currentLimit;
+        switch (Constants.intakeVersion) {
+            case V1:
+                currentLimit = pose == SuperStructurePose.L4 ? Amps.of(25) : Amps.of(20);
+                break;
+
+            default:
+                currentLimit = pose == SuperStructurePose.L4 ? Amps.of(20) : Amps.of(20);
+                break;
+        }
         AngularVelocity speed;
         if (intaking) {
             speed = IntakeConstants.IntakingSpeed;

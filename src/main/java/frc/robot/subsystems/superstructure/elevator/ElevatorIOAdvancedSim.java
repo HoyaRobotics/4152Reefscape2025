@@ -30,7 +30,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
     public ElevatorIOAdvancedSim() {
         configureMotors();
         elevatorSim = new ElevatorSim(
-                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.25), true, 0.0);
+                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.5), true, 0.0);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
 
     private void configureMotors() {
         TalonFXConfiguration elevatorMotorConfig = new TalonFXConfiguration();
-        elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
+        elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 35;
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistanceRatio;
         elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 2.5;
@@ -82,7 +82,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
         elevatorMotorConfig.Slot0.kS = 0.28;
         elevatorMotorConfig.Slot0.kV = 5.97;
         elevatorMotorConfig.Slot0.kA = 0.592;
-        elevatorMotorConfig.Slot0.kP = 30;
+        elevatorMotorConfig.Slot0.kP = 45;
         elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         elevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.inchesToMeters(53.5);
         elevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;

@@ -50,6 +50,10 @@ import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.constants.VisionConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeIO;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeIOReal;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeIOSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -64,7 +68,8 @@ import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeIOReal;
+import frc.robot.subsystems.intake.IntakeIORealV1;
+import frc.robot.subsystems.intake.IntakeIORealV2;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
@@ -98,6 +103,7 @@ public class RobotContainer {
     private final Elevator elevator;
     private final Arm arm;
     private final Intake intake;
+    private final AlgaeIntake algaeIntake;
     private final Climber climber;
     private final SuperStructure superStructure;
 
@@ -123,7 +129,16 @@ public class RobotContainer {
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIOReal());
                 arm = new Arm(new ArmIOReal(), elevator);
-                intake = new Intake(new IntakeIOReal(), elevator, arm);
+                switch (Constants.intakeVersion) {
+                    case V1:
+                        intake = new Intake(new IntakeIORealV1(), elevator, arm);
+                        break;
+
+                    default:
+                        intake = new Intake(new IntakeIORealV2(), elevator, arm);
+                        break;
+                }
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOReal());
                 climber = new Climber(new ClimberIOReal());
 
                 vision = new Vision(drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
@@ -194,6 +209,7 @@ public class RobotContainer {
                         }),
                         elevator,
                         arm);
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim());
                 climber = new Climber(new ClimberIOSim());
 
                 break;
@@ -211,6 +227,7 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorIO() {});
                 arm = new Arm(new ArmIO() {}, elevator);
                 intake = new Intake(new IntakeIO() {}, elevator, arm);
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIO() {});
                 climber = new Climber(new ClimberIO() {});
 
                 break;
@@ -295,7 +312,7 @@ public class RobotContainer {
                         drive,
                         () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), Side.CENTER)));
 
-        NamedCommands.registerCommand("removeAlgae", AlgaeCommands.removeL2Algae(superStructure, intake));
+        NamedCommands.registerCommand("removeAlgae", AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -342,15 +359,9 @@ public class RobotContainer {
                 .rightTrigger(0.3)
                 .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(true)));
 
-        /*
-        driverController
-                .rightBumper()
-                .whileTrue(
-                        superStructure.moveToPose(SuperStructurePose.L2_ALGAE).alongWith(intake.run(true)));
-                        */
-
-        driverController.leftBumper().onTrue(AlgaeCommands.removeL2Algae(superStructure, intake));
-        // driverController.rightBumper().onTrue(AlgaeCommands.whackAlgae(superStructure, intake, false));
+        // driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
+        driverController.leftBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
+        driverController.rightBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
 
         driverController
                 .y()

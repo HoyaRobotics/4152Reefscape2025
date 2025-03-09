@@ -24,7 +24,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
 /** Add your docs here. */
-public class IntakeIOReal implements IntakeIO {
+public class IntakeIORealV1 implements IntakeIO {
     private final TalonFX intakeMotor = new TalonFX(34, "rio");
     private final LaserCan lasercan = new LaserCan(35);
     double intakeRatio = 60.0 / 14;
@@ -32,7 +32,7 @@ public class IntakeIOReal implements IntakeIO {
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
     private VoltageOut voltageRequest = new VoltageOut(0.0);
 
-    public IntakeIOReal() {
+    public IntakeIORealV1() {
         configureMotors();
         configureLaserCan();
     }

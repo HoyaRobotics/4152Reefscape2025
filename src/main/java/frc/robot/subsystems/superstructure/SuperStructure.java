@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 // would be nice to alway know what level we are at?
 public class SuperStructure {
-    public enum SuperStructurePose {
+    /*public enum SuperStructurePose {
         // constants call the constructor
 
         // Elevator position, arm angle
@@ -34,6 +34,36 @@ public class SuperStructure {
         HOLD(Inches.of(3.0), Degrees.of(110)),
         CLIMB_STOW(Inches.of(0.5), Degrees.of(-25)),
         BASE(Inches.of(18.0), Degrees.of(-25)); // 3.0, -25
+
+        public final Distance elevatorPosition;
+        public final Angle armAngle;
+
+        SuperStructurePose(Distance elevatorPosition, Angle armAngle) {
+            this.elevatorPosition = elevatorPosition;
+            this.armAngle = armAngle;
+        }
+    }*/
+
+    public enum SuperStructurePose {
+        // constants call the constructor
+
+        // Elevator position, arm angle
+        TROUGH(Inches.of(9.0), Degrees.of(-60)),
+        LOADING(Inches.of(18.0), Degrees.of(-45)),
+        L2(Inches.of(9.0), Degrees.of(130.0)),
+        L3(Inches.of(25.0), Degrees.of(130.0)),
+        L4(Inches.of(52.75), Degrees.of(140.0)),
+
+        L2_ALGAE(Inches.of(0), Degrees.of(170)),
+        L2_ALGAE_GRAB(Inches.of(10), Degree.of(170)),
+        L2_ALGAE_REMOVE(Inches.of(10), Degree.of(103)),
+        L3_ALGAE(Inches.of(24), Degrees.of(170)),
+        L3_ALGAE_GRAB(Inches.of(34), Degrees.of(170)),
+        L3_ALGAE_REMOVE(Inches.of(34), Degrees.of(103)),
+
+        HOLD(Inches.of(3.0), Degrees.of(103)),
+        CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),
+        BASE(Inches.of(18.0), Degrees.of(-45)); // 3.0, -25
 
         public final Distance elevatorPosition;
         public final Angle armAngle;
@@ -68,7 +98,7 @@ public class SuperStructure {
 
     private Angle getMovingAngle(SuperStructurePose pose) {
         if (pose == SuperStructurePose.L2 || pose == SuperStructurePose.L3 || pose == SuperStructurePose.L4) {
-            return Degrees.of(135);
+            return Degrees.of(103);
         } else {
             return pose.armAngle;
         }
@@ -78,7 +108,7 @@ public class SuperStructure {
         boolean holding = intake.hasCoral();
         return moveToPose(holding ? SuperStructurePose.HOLD : SuperStructurePose.BASE)
                 .alongWith(intake.runRaw(
-                        holding ? IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0), Amps.of(20)));
+                        holding ? IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0), Amps.of(10)));
     }
 
     // start moving arm to actual angle once we are within a certain

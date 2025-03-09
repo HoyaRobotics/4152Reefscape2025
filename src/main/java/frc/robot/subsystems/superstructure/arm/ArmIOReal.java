@@ -46,7 +46,8 @@ public class ArmIOReal implements ArmIO {
     private void configureArmMotor() {
         CANcoderConfiguration armEncoderConfig = new CANcoderConfiguration();
         armEncoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.8;
-        armEncoderConfig.MagnetSensor.MagnetOffset = 0.117;
+        // armEncoderConfig.MagnetSensor.MagnetOffset = 0.117;
+        armEncoderConfig.MagnetSensor.MagnetOffset = 0.075439;
         armEncoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         armEncoder.getConfigurator().apply(armEncoderConfig);
         TalonFXConfiguration armConfig = new TalonFXConfiguration();
@@ -68,7 +69,8 @@ public class ArmIOReal implements ArmIO {
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.7;
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.12;
+        // armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.12;
+        armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.15;
         armConfig.Voltage.PeakForwardVoltage = 10.0;
         armConfig.Voltage.PeakReverseVoltage = 10.0;
 
