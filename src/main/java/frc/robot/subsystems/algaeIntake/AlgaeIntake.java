@@ -39,9 +39,10 @@ public class AlgaeIntake extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public Command runIntake(boolean intaking) {
-        return Commands.run(() -> setSpeed(AlgaeIntakeConstants.IntakingSpeed), this)
-                .finallyDo(() -> stopIntake());
+    public Command run(AngularVelocity velocity) {
+        return Commands.run(() -> {}, this).beforeStarting(() -> {
+            setSpeed(velocity);
+        });
     }
 
     public void setSpeed(AngularVelocity targetSpeed) {
@@ -60,7 +61,7 @@ public class AlgaeIntake extends SubsystemBase {
         this.io.stop();
     }
 
-    public boolean hasCoral() {
+    public boolean hasAlgae() {
         return inputs.hasAlgae;
     }
 }

@@ -298,7 +298,7 @@ public class RobotContainer {
                         .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                         .andThen(() -> intake.stopIntake()));
 
-        NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake));
+        NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
 
         NamedCommands.registerCommand("goToL4", superStructure.moveToPose(SuperStructurePose.L4));
         NamedCommands.registerCommand("goToL3", superStructure.moveToPose(SuperStructurePose.L3));
@@ -344,7 +344,7 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX()));
 
-        elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake));
+        elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake, algaeIntake));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
@@ -360,8 +360,12 @@ public class RobotContainer {
                 .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(true)));
 
         // driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
-        driverController.leftBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
-        driverController.rightBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
+        // driverController.rightBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
+        driverController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL2(drive, superStructure, algaeIntake));
+        // driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
+        // driverController.leftBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure, algaeIntake));
+
+        driverController.leftBumper().whileTrue(AutoPlace.autoScoreBarge(drive, superStructure, algaeIntake));
 
         driverController
                 .y()

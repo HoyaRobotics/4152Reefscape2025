@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
@@ -23,7 +24,7 @@ public class AlgaeCommands {
                 .moveToPose(SuperStructurePose.L2_ALGAE)
                 .andThen(superStructure.moveToPose(SuperStructurePose.L2_ALGAE_GRAB))
                 .andThen(superStructure.moveToPose(SuperStructurePose.L2_ALGAE_REMOVE))
-                .deadlineFor(algaeIntake.runIntake(true));
+                .deadlineFor(algaeIntake.run(() -> algaeIntake.setSpeed(AlgaeIntakeConstants.IntakingSpeed)));
     }
 
     public static Command removeL3AlgaeV2(SuperStructure superStructure, AlgaeIntake algaeIntake) {
@@ -31,6 +32,14 @@ public class AlgaeCommands {
                 .moveToPose(SuperStructurePose.L3_ALGAE)
                 .andThen(superStructure.moveToPose(SuperStructurePose.L3_ALGAE_GRAB))
                 .andThen(superStructure.moveToPose(SuperStructurePose.L3_ALGAE_REMOVE))
-                .deadlineFor(algaeIntake.runIntake(true));
+                .deadlineFor(algaeIntake.run(() -> algaeIntake.setSpeed(AlgaeIntakeConstants.IntakingSpeed)));
+    }
+
+    public static Command scoreAlgaeInNet(SuperStructure superStructure, AlgaeIntake algaeIntake) {
+        return superStructure
+                .moveToPose(SuperStructurePose.ALGAE_NET)
+                .andThen(algaeIntake
+                        .run(AlgaeIntakeConstants.NetSpeed)
+                        .withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 }

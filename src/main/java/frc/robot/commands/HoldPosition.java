@@ -4,9 +4,9 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
@@ -15,15 +15,17 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class HoldPosition extends Command {
-    Elevator elevator;
-    Arm arm;
-    Intake intake;
+    private final Elevator elevator;
+    private final Arm arm;
+    private final Intake intake;
+    private final AlgaeIntake algaeIntake;
     /** Creates a new HoldPosition. */
-    public HoldPosition(Elevator elevator, Arm arm, Intake intake) {
+    public HoldPosition(Elevator elevator, Arm arm, Intake intake, AlgaeIntake algaeIntake) {
         this.elevator = elevator;
         this.arm = arm;
         this.intake = intake;
-        addRequirements(elevator, arm, intake);
+        this.algaeIntake = algaeIntake;
+        addRequirements(elevator, arm, intake, algaeIntake);
         // Use addRequirements() here to declare subsystem dependencies.
     }
 
@@ -34,15 +36,28 @@ public class HoldPosition extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (intake.hasCoral()) {
+        boolean hasCoral = intake.hasCoral();
+        boolean hasAlgae = algaeIntake.hasAlgae();
+        if (hasCoral && hasAlgae) {
             elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
             intake.setSpeed(IntakeConstants.HoldingSpeed);
-        } else if (!intake.hasCoral()) {
+            algaeIntake.setSpeed(AlgaeIntakeConstants.HoldingSpeed);
+        } else if (hasCoral && !hasAlgae) {
+            elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
+            arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
+            intake.setSpeed(IntakeConstants.HoldingSpeed);
+            algaeIntake.setSpeed(AlgaeIntakeConstants.EmptySpeed);
+        } else if (!hasCoral && hasAlgae) {
+            elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
+            arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
+            intake.setSpeed(IntakeConstants.EmptySpeed);
+            algaeIntake.setSpeed(AlgaeIntakeConstants.HoldingSpeed);
+        } else if (!hasCoral && !hasAlgae) {
             elevator.setPosition(SuperStructurePose.BASE.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.BASE.armAngle);
-            // empty speed
-            intake.setSpeed(RevolutionsPerSecond.of(0));
+            intake.setSpeed(IntakeConstants.EmptySpeed);
+            algaeIntake.setSpeed(AlgaeIntakeConstants.EmptySpeed);
         }
     }
 

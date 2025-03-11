@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 
 /** Add your docs here. */
@@ -67,10 +68,10 @@ public class ArmIOReal implements ArmIO {
         armConfig.Slot0.kA = 0.0;
         armConfig.Slot0.kP = 45;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.7;
+        armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(180.0);
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         // armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.12;
-        armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.15;
+        armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(-65.0);
         armConfig.Voltage.PeakForwardVoltage = 10.0;
         armConfig.Voltage.PeakReverseVoltage = 10.0;
 

@@ -13,6 +13,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -20,27 +21,30 @@ import edu.wpi.first.units.measure.Voltage;
 /** Add your docs here. */
 public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     private final TalonFX algaeIntakeMotor = new TalonFX(37, "rio");
-    double intakeRatio = 30.0 / 11;
+    double intakeRatio = 48.0 / 11;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
     private VoltageOut voltageRequest = new VoltageOut(0.0);
+
+    LinearFilter filter = LinearFilter.movingAverage(1);
 
     public AlgaeIntakeIOReal() {
         configureMotors();
     }
 
     public boolean hasAlgae() {
-        return false;
+        double current = filter.calculate(algaeIntakeMotor.getStatorCurrent().getValueAsDouble());
+        return current >= 5.0;
     }
 
     private void configureMotors() {
         TalonFXConfiguration algaeIntakeMotorConfig = new TalonFXConfiguration();
-        algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimit = 40;
+        algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         algaeIntakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         algaeIntakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;
         algaeIntakeMotorConfig.Voltage.PeakReverseVoltage = -11.0;
-        algaeIntakeMotorConfig.Slot0.kV = 0.295;
+        algaeIntakeMotorConfig.Slot0.kV = 0.472; // 0.295 for a 30/11 gear ratio
         algaeIntakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         algaeIntakeMotor.getConfigurator().apply(algaeIntakeMotorConfig);

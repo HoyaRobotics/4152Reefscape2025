@@ -1,10 +1,13 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
@@ -105,6 +108,24 @@ public class FieldConstants {
                 redCenterFaces[i] =
                         new Pose2d(blueFace.getX() + allianceReefCenterDiff, blueFace.getY(), blueFace.getRotation());
             }
+        }
+    }
+
+    public static class Net {
+        public static final Distance xOffset = Inches.of(303.5);
+        public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(0.0);
+
+        public static Pose2d getNetPose(Pose2d drivePose) {
+            boolean isRed = DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red;
+            Translation2d translation = new Translation2d(xOffset, drivePose.getMeasureY());
+            Rotation2d rotation = rotationOffset;
+            if (isRed) {
+                translation = FieldMirroringUtils.flip(translation);
+                rotation = FieldMirroringUtils.flip(rotation);
+                translation = new Translation2d(translation.getMeasureX(), drivePose.getMeasureY());
+            }
+            return new Pose2d(translation, rotation);
         }
     }
 }

@@ -51,15 +51,17 @@ public class SuperStructure {
         TROUGH(Inches.of(9.0), Degrees.of(-60)),
         LOADING(Inches.of(18.0), Degrees.of(-45)),
         L2(Inches.of(9.0), Degrees.of(130.0)),
-        L3(Inches.of(25.0), Degrees.of(130.0)),
+        L3(Inches.of(25.0), Degrees.of(130.0)), // 15.75 more than L2
         L4(Inches.of(52.75), Degrees.of(140.0)),
 
-        L2_ALGAE(Inches.of(0), Degrees.of(170)),
+        L2_ALGAE(Inches.of(5), Degrees.of(170)),
         L2_ALGAE_GRAB(Inches.of(10), Degree.of(170)),
-        L2_ALGAE_REMOVE(Inches.of(10), Degree.of(103)),
-        L3_ALGAE(Inches.of(24), Degrees.of(170)),
-        L3_ALGAE_GRAB(Inches.of(34), Degrees.of(170)),
-        L3_ALGAE_REMOVE(Inches.of(34), Degrees.of(103)),
+        L2_ALGAE_REMOVE(Inches.of(5), Degree.of(103)),
+        L3_ALGAE(Inches.of(20.75), Degrees.of(170)), // 15.75 more than L2
+        L3_ALGAE_GRAB(Inches.of(25.75), Degrees.of(170)), // 15.75 more than L2
+        L3_ALGAE_REMOVE(Inches.of(20.75), Degrees.of(103)), // 15.75 more than L2
+
+        ALGAE_NET(Inches.of(52.75), Degrees.of(83)),
 
         HOLD(Inches.of(3.0), Degrees.of(103)),
         CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),

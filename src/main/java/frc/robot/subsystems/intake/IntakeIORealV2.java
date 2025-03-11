@@ -64,7 +64,7 @@ public class IntakeIORealV2 implements IntakeIO {
     private void configureMotors() {
         TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
         intakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 20;
+        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 16;
         intakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         intakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;
@@ -96,7 +96,7 @@ public class IntakeIORealV2 implements IntakeIO {
         currentLimitConfigs.StatorCurrentLimit = currentLimit.in(Amp);
         currentLimitConfigs.StatorCurrentLimitEnable = true;
 
-        intakeMotor.getConfigurator().apply(currentLimitConfigs);
+        // intakeMotor.getConfigurator().apply(currentLimitConfigs);
     }
 
     @Override

@@ -24,7 +24,8 @@ public class AlgaeIntakeConstants {
     public static final AngularVelocity IntakingSpeed = RevolutionsPerSecond.of(15.0);
     public static final AngularVelocity ProcessorSpeed = RevolutionsPerSecond.of(-8.0);
     public static final AngularVelocity NetSpeed = RevolutionsPerSecond.of(-20.0);
-    public static final AngularVelocity HoldingSpeed = RevolutionsPerSecond.of(1.0);
+    public static final AngularVelocity HoldingSpeed = RevolutionsPerSecond.of(15.0);
+    public static final AngularVelocity EmptySpeed = RevolutionsPerSecond.of(2.0);
 
     public static final double PlacingTimeout = 0.35; // 0.30
     public static final double PostPlacingTimeout = 0.35;
