@@ -173,21 +173,30 @@ public class FieldConstants {
     }
 
     public static class Net {
+        // distance from robot bumper to center -> 0.48 meters?
         public static final Distance xOffset = Inches.of(303.5);
-        public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(0.0);
+        // distance from arena wall to net
+        public static final Distance yOffset = Inches.of(6.243 - 0.83);
+        public static final Distance netWidth = Inches.of(148.130);
+        public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(180);
 
         public static Pose2d getNetPose(Pose2d drivePose) {
             boolean isRed = DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red;
-            Translation2d translation = new Translation2d(xOffset, drivePose.getMeasureY());
-            Rotation2d rotation = rotationOffset;
 
-            if (isRed) {
-                translation = FieldMirroringUtils.flip(translation);
-                rotation = FieldMirroringUtils.flip(rotation);
-            }
+            Distance netEnd = Meters.of(fieldWidth).minus(yOffset.plus(netWidth).minus(Meters.of(0.48)));
+            netEnd = isRed ? FieldMirroringUtils.flip(new Translation2d(Meters.of(0), netEnd)).getMeasureY()
+                : netEnd;
 
-            return new Pose2d(translation, rotation);
+            Distance absoluteXOffset = isRed ? Meters.of(fieldLength).minus(xOffset) : xOffset;
+
+            // clamp pose
+            Distance yDistance = isRed ? Meters.of(Math.min(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)))
+                : Meters.of(Math.max(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)));
+
+            return new Pose2d(
+                    new Translation2d(absoluteXOffset, yDistance),
+                    isRed ? FieldMirroringUtils.flip(rotationOffset) : rotationOffset);
         }
     }
 }

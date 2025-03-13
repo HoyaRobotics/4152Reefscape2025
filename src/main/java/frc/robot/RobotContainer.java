@@ -365,8 +365,7 @@ public class RobotContainer {
                         .xboxController
                         .rightBumper()
                         .whileTrue(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
-                // driveController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure,
-                // algaeIntake));
+
                 driveController
                         .xboxController
                         .leftBumper()
