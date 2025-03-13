@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
@@ -18,9 +19,9 @@ public class AutoPlaceCommand extends SequentialCommandGroup {
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
                 superStructure.moveToPose(pose),
-                intake.run(false)
+                intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)
-                        .andThen(intake.run(false)
+                        .andThen(intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PostPlacingTimeout)
                                 .alongWith(superStructure.retractArm(ArmConstants.baseAngle))
                                 .until(superStructure.waitTillRetracted())));

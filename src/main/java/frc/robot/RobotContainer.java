@@ -67,6 +67,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIORealV1;
 import frc.robot.subsystems.intake.IntakeIORealV2;
@@ -284,17 +285,19 @@ public class RobotContainer {
                 "placeTrough", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.TROUGH));
 
         NamedCommands.registerCommand(
-                "intakePlace", intake.run(false).withTimeout(0.5).andThen(() -> intake.stopIntake()));
+                "intakePlace", intake.run(IntakeAction.PLACING).withTimeout(0.5).andThen(() -> intake.stopIntake()));
 
         NamedCommands.registerCommand(
-                "intakePlaceWithSensor", intake.runWithSensor(false).andThen(() -> intake.stopIntake()));
+                "intakePlaceWithSensor",
+                intake.runWithSensor(IntakeAction.PLACING).andThen(() -> intake.stopIntake()));
 
         NamedCommands.registerCommand(
-                "intakeReceive", intake.run(true).alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)));
+                "intakeReceive",
+                intake.run(IntakeAction.INTAKING).alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
         NamedCommands.registerCommand(
                 "intakeReceiveWithSensor",
-                intake.runWithSensor(true)
+                intake.runWithSensor(IntakeAction.INTAKING)
                         .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                         .andThen(() -> intake.stopIntake()));
 
@@ -357,15 +360,26 @@ public class RobotContainer {
 
         driverController
                 .rightTrigger(0.3)
-                .whileTrue(superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(true)));
+                .whileTrue(superStructure
+                        .moveToPose(SuperStructurePose.LOADING)
+                        .alongWith(intake.run(IntakeAction.INTAKING)));
 
-        // driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
-        // driverController.rightBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
-        driverController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL2(drive, superStructure, algaeIntake));
-        // driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
-        // driverController.leftBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure, algaeIntake));
+        switch (Constants.intakeVersion) {
+            case V1:
+                driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
+                break;
 
-        driverController.leftBumper().whileTrue(AutoPlace.autoScoreBarge(drive, superStructure, algaeIntake));
+            default:
+                // driverController.rightBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
+                // driverController.rightBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
+                driverController
+                        .rightBumper()
+                        .whileTrue(AutoPlace.autoAlignAndPickAlgaeL2(drive, superStructure, algaeIntake));
+                // driverController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure,
+                // algaeIntake));
+                driverController.leftBumper().whileTrue(AutoPlace.autoScoreBarge(drive, superStructure, algaeIntake));
+                break;
+        }
 
         driverController
                 .y()

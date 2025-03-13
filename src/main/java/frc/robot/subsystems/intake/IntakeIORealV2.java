@@ -67,8 +67,8 @@ public class IntakeIORealV2 implements IntakeIO {
         intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 16;
         intakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
-        intakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;
-        intakeMotorConfig.Voltage.PeakReverseVoltage = -11.0;
+        intakeMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+        intakeMotorConfig.Voltage.PeakReverseVoltage = -12.0;
         intakeMotorConfig.Slot0.kV = 0.5025;
         intakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -96,7 +96,7 @@ public class IntakeIORealV2 implements IntakeIO {
         currentLimitConfigs.StatorCurrentLimit = currentLimit.in(Amp);
         currentLimitConfigs.StatorCurrentLimitEnable = true;
 
-        // intakeMotor.getConfigurator().apply(currentLimitConfigs);
+        intakeMotor.getConfigurator().apply(currentLimitConfigs);
     }
 
     @Override

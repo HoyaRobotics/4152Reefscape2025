@@ -7,8 +7,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -48,24 +46,25 @@ public class SuperStructure {
         // constants call the constructor
 
         // Elevator position, arm angle
-        TROUGH(Inches.of(9.0), Degrees.of(-60)),
-        LOADING(Inches.of(18.0), Degrees.of(-45)),
-        L2(Inches.of(9.0), Degrees.of(130.0)),
-        L3(Inches.of(25.0), Degrees.of(130.0)), // 15.75 more than L2
+        TROUGH(Inches.of(7.0), Degrees.of(-60)),
+        LOADING(Inches.of(16.0), Degrees.of(-35)),
+        L2(Inches.of(13.0), Degrees.of(135.0)),
+        L3(Inches.of(28.75), Degrees.of(135.0)), // 15.75 more than L2
         L4(Inches.of(52.75), Degrees.of(140.0)),
 
-        L2_ALGAE(Inches.of(5), Degrees.of(170)),
-        L2_ALGAE_GRAB(Inches.of(10), Degree.of(170)),
-        L2_ALGAE_REMOVE(Inches.of(5), Degree.of(103)),
-        L3_ALGAE(Inches.of(20.75), Degrees.of(170)), // 15.75 more than L2
-        L3_ALGAE_GRAB(Inches.of(25.75), Degrees.of(170)), // 15.75 more than L2
-        L3_ALGAE_REMOVE(Inches.of(20.75), Degrees.of(103)), // 15.75 more than L2
+        L2_ALGAE(Inches.of(3.5), Degrees.of(170)),
+        L2_ALGAE_GRAB(Inches.of(7.5), Degree.of(170)),
+        L2_ALGAE_REMOVE(Inches.of(0.0), Degree.of(103)),
+        L3_ALGAE(Inches.of(19.25), Degrees.of(170)), // 15.75 more than L2 20.75
+        L3_ALGAE_GRAB(Inches.of(24.25), Degrees.of(170)), // 15.75 more than L2 25.75
+        L3_ALGAE_REMOVE(Inches.of(9.25), Degrees.of(103)), // 15.75 more than L2 10.75
 
+        ALGAE_PRE_NET(Inches.of(52.75), Degrees.of(103)),
         ALGAE_NET(Inches.of(52.75), Degrees.of(83)),
 
         HOLD(Inches.of(3.0), Degrees.of(103)),
         CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),
-        BASE(Inches.of(18.0), Degrees.of(-45)); // 3.0, -25
+        BASE(Inches.of(16.0), Degrees.of(-35)); // 3.0, -25
 
         public final Distance elevatorPosition;
         public final Angle armAngle;
@@ -104,13 +103,6 @@ public class SuperStructure {
         } else {
             return pose.armAngle;
         }
-    }
-
-    public Command holdPose(Intake intake) {
-        boolean holding = intake.hasCoral();
-        return moveToPose(holding ? SuperStructurePose.HOLD : SuperStructurePose.BASE)
-                .alongWith(intake.runRaw(
-                        holding ? IntakeConstants.HoldingSpeed : RevolutionsPerSecond.of(0.0), Amps.of(10)));
     }
 
     // start moving arm to actual angle once we are within a certain

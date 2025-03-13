@@ -11,22 +11,22 @@ import edu.wpi.first.units.measure.Current;
 
 /** Add your docs here. */
 public class AlgaeIntakeConstants {
-    public class IntakeAction {
+    public enum AlgaeIntakeAction {
+        HOLDING(Amps.of(40), RevolutionsPerSecond.of(15.0)),
+        INTAKING(Amps.of(40), RevolutionsPerSecond.of(15.0)),
+        PROCESSOR(Amps.of(10), RevolutionsPerSecond.of(-8.0)),
+        NET(Amps.of(40), RevolutionsPerSecond.of(-22.0)),
+        EMPTY(Amps.of(10), RevolutionsPerSecond.of(2.0));
+
         public final Current currentLimit;
         public final AngularVelocity speed;
 
-        public IntakeAction(AngularVelocity speed, Current currentLimit) {
-            this.speed = speed;
+        AlgaeIntakeAction(Current currentLimit, AngularVelocity speed) {
             this.currentLimit = currentLimit;
+            this.speed = speed;
         }
     }
 
-    public static final AngularVelocity IntakingSpeed = RevolutionsPerSecond.of(15.0);
-    public static final AngularVelocity ProcessorSpeed = RevolutionsPerSecond.of(-8.0);
-    public static final AngularVelocity NetSpeed = RevolutionsPerSecond.of(-20.0);
-    public static final AngularVelocity HoldingSpeed = RevolutionsPerSecond.of(15.0);
-    public static final AngularVelocity EmptySpeed = RevolutionsPerSecond.of(2.0);
-
-    public static final double PlacingTimeout = 0.35; // 0.30
+    public static final double PlacingTimeout = 0.5; // 0.30
     public static final double PostPlacingTimeout = 0.35;
 }

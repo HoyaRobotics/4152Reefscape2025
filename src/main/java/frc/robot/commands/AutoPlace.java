@@ -17,9 +17,11 @@ import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
@@ -48,9 +50,9 @@ public class AutoPlace {
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoPlace.StartSuperStructureRange)),
                         superStructure.moveToPose(buttonWatcher::getSelectedPose),
-                        intake.run(false)
+                        intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
-                                .andThen(intake.run(false)
+                                .andThen(intake.run(IntakeAction.PLACING)
                                         .withTimeout(IntakeConstants.PlacingTimeout)
                                         .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle)))));
     }
@@ -77,16 +79,15 @@ public class AutoPlace {
                 .alongWith(new SequentialCommandGroup(
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoPlace.StartSuperStructureRangeAlgae)),
-                        superStructure.moveToPose(SuperStructurePose.L2_ALGAE),
+                        superStructure.moveToPose(SuperStructurePose.L3_ALGAE),
                         AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake)));
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose());
         return DriveCommands.driveToPose(drive, drivePose)
+                .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_PRE_NET))
                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET))
-                .andThen(algaeIntake
-                        .run(AlgaeIntakeConstants.NetSpeed)
-                        .withTimeout(AlgaeIntakeConstants.PlacingTimeout));
+                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 }

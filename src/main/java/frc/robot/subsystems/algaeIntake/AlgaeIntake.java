@@ -4,25 +4,15 @@
 
 package frc.robot.subsystems.algaeIntake;
 
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import org.littletonrobotics.junction.Logger;
 
 public class AlgaeIntake extends SubsystemBase {
-
-    public class IntakeAction {
-        public final Current currentLimit;
-        public final AngularVelocity speed;
-
-        public IntakeAction(AngularVelocity speed, Current currentLimit) {
-            this.speed = speed;
-            this.currentLimit = currentLimit;
-        }
-    }
 
     private final AlgaeIntakeIO io;
     private AlgaeIntakeInputsAutoLogged inputs;
@@ -39,22 +29,22 @@ public class AlgaeIntake extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public Command run(AngularVelocity velocity) {
+    public Command run(AlgaeIntakeAction intaking) {
         return Commands.run(() -> {}, this).beforeStarting(() -> {
-            setSpeed(velocity);
+            io.setCurrentLimit(intaking.currentLimit);
+            io.setSpeed(intaking.speed);
         });
     }
 
-    public void setSpeed(AngularVelocity targetSpeed) {
-        this.io.setSpeed(targetSpeed);
+    public void runIntake(AlgaeIntakeAction intaking) {
+        io.setCurrentLimit(intaking.currentLimit);
+        io.setSpeed(intaking.speed);
     }
 
-    public void setCurrentLimit(Current currentLimit) {
-        this.io.setCurrentLimit(currentLimit);
-    }
-
-    public void setVoltage(Voltage voltage) {
-        this.io.setVoltage(voltage);
+    public Command runWithSensor(AlgaeIntakeAction algaeIntakeAction) {
+        return run(algaeIntakeAction).until(() -> {
+            return algaeIntakeAction.speed.in(RevolutionsPerSecond) >= 0 ? this.hasAlgae() : !this.hasAlgae();
+        });
     }
 
     public void stopIntake() {

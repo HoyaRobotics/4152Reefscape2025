@@ -6,7 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
-import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
@@ -41,23 +41,23 @@ public class HoldPosition extends Command {
         if (hasCoral && hasAlgae) {
             elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
-            intake.setSpeed(IntakeConstants.HoldingSpeed);
-            algaeIntake.setSpeed(AlgaeIntakeConstants.HoldingSpeed);
+            intake.runIntake(IntakeConstants.IntakeAction.HOLDING);
+            algaeIntake.runIntake(AlgaeIntakeAction.HOLDING);
         } else if (hasCoral && !hasAlgae) {
             elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
-            intake.setSpeed(IntakeConstants.HoldingSpeed);
-            algaeIntake.setSpeed(AlgaeIntakeConstants.EmptySpeed);
+            intake.runIntake(IntakeConstants.IntakeAction.HOLDING);
+            algaeIntake.runIntake(AlgaeIntakeAction.EMPTY);
         } else if (!hasCoral && hasAlgae) {
             elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
-            intake.setSpeed(IntakeConstants.EmptySpeed);
-            algaeIntake.setSpeed(AlgaeIntakeConstants.HoldingSpeed);
+            intake.runIntake(IntakeConstants.IntakeAction.EMPTY);
+            algaeIntake.runIntake(AlgaeIntakeAction.HOLDING);
         } else if (!hasCoral && !hasAlgae) {
             elevator.setPosition(SuperStructurePose.BASE.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.BASE.armAngle);
-            intake.setSpeed(IntakeConstants.EmptySpeed);
-            algaeIntake.setSpeed(AlgaeIntakeConstants.EmptySpeed);
+            intake.runIntake(IntakeConstants.IntakeAction.EMPTY);
+            algaeIntake.runIntake(AlgaeIntakeAction.EMPTY);
         }
     }
 

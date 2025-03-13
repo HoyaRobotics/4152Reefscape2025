@@ -42,8 +42,8 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         algaeIntakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
-        algaeIntakeMotorConfig.Voltage.PeakForwardVoltage = 11.0;
-        algaeIntakeMotorConfig.Voltage.PeakReverseVoltage = -11.0;
+        algaeIntakeMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+        algaeIntakeMotorConfig.Voltage.PeakReverseVoltage = -12.0;
         algaeIntakeMotorConfig.Slot0.kV = 0.472; // 0.295 for a 30/11 gear ratio
         algaeIntakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
@@ -26,9 +27,9 @@ public class PlacingCommand extends SequentialCommandGroup {
         addCommands(
                 superStructure.moveToPose(pose),
                 new WaitUntilCommand(placeObject),
-                intake.run(false)
+                intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)
-                        .andThen(intake.run(false)
+                        .andThen(intake.run(IntakeAction.PLACING)
                                 .alongWith(superStructure.retractArm(ArmConstants.baseAngle))
                                 .until(superStructure.waitTillRetracted())));
     }
