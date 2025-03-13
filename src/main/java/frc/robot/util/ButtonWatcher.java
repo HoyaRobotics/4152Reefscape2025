@@ -20,11 +20,11 @@ public class ButtonWatcher {
 
     public Command WaitSelectPose() {
         return new WaitUntilCommand(() -> {
-            if (controller.moveToL2().getAsBoolean()) {
+            if (controller.moveToL2(true).getAsBoolean()) {
                 selectedPose = SuperStructurePose.L2;
-            } else if (controller.moveToL3().getAsBoolean()) {
+            } else if (controller.moveToL3(true).getAsBoolean()) {
                 selectedPose = SuperStructurePose.L3;
-            } else if (controller.moveToL4().getAsBoolean()) {
+            } else if (controller.moveToL4(true).getAsBoolean()) {
                 selectedPose = SuperStructurePose.L4;
             } else {
                 return false;

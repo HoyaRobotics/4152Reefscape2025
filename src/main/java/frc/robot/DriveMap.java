@@ -15,13 +15,13 @@ public interface DriveMap {
 
     Trigger resetClimber();
 
-    Trigger moveToTrough();
+    Trigger moveToTrough(boolean aligning);
 
-    Trigger moveToL2();
+    Trigger moveToL2(boolean aligning);
 
-    Trigger moveToL3();
+    Trigger moveToL3(boolean aligning);
 
-    Trigger moveToL4();
+    Trigger moveToL4(boolean aligning);
 
     Trigger runIntake();
 
@@ -63,23 +63,23 @@ class DriverXbox implements DriveMap {
     }
 
     @Override
-    public Trigger moveToTrough() {
-        return xboxController.b().and(notAligning());
+    public Trigger moveToTrough(boolean aligning) {
+        return aligning ? xboxController.b() : xboxController.b().and(notAligning());
     }
 
     @Override
-    public Trigger moveToL2() {
-        return xboxController.a().and(notAligning());
+    public Trigger moveToL2(boolean aligning) {
+        return aligning ? xboxController.a() : xboxController.a().and(notAligning());
     }
 
     @Override
-    public Trigger moveToL3() {
-        return xboxController.x().and(notAligning());
+    public Trigger moveToL3(boolean aligning) {
+        return aligning ? xboxController.x() : xboxController.x().and(notAligning());
     }
 
     @Override
-    public Trigger moveToL4() {
-        return xboxController.y().and(notAligning());
+    public Trigger moveToL4(boolean aligning) {
+        return aligning ? xboxController.y() : xboxController.y().and(notAligning());
     }
 
     @Override

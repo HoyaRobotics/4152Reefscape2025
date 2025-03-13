@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
@@ -15,12 +14,9 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
-import frc.robot.subsystems.superstructure.SuperStructure.AlgaeLevel;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class AlgaeCommands {
@@ -34,16 +30,19 @@ public class AlgaeCommands {
 
     public static Command removeAlgaeV2(SuperStructure superStructure, AlgaeIntake algaeIntake, Drive drive) {
 
-        return new DeferredCommand(() -> {
-            List<SuperStructurePose> algaePoses = SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
+        return new DeferredCommand(
+                () -> {
+                    List<SuperStructurePose> algaePoses =
+                            SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
 
-            // is this correct?
-            return superStructure
-                    .moveToPose(algaePoses.get(0))
-                    .andThen(superStructure.moveToPose(algaePoses.get(1)))
-                    .andThen(superStructure.moveToPose(algaePoses.get(2)))
-                    .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
-        }, Set.of(superStructure.arm, superStructure.elevator));
+                    // is this correct?
+                    return superStructure
+                            .moveToPose(algaePoses.get(0))
+                            .andThen(superStructure.moveToPose(algaePoses.get(1)))
+                            .andThen(superStructure.moveToPose(algaePoses.get(2)))
+                            .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
+                },
+                Set.of(superStructure.arm, superStructure.elevator));
     }
 
     public static Command scoreAlgaeInNet(SuperStructure superStructure, AlgaeIntake algaeIntake) {
