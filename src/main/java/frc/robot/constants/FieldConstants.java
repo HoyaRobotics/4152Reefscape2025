@@ -13,6 +13,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.superstructure.SuperStructure.AlgaeLevel;
 import java.util.Arrays;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
@@ -106,6 +108,17 @@ public class FieldConstants {
                 6.469; // taken from FieldConstants adjustY for reef y offset
         public static final Pose2d[] blueCenterFaces = new Pose2d[6];
         public static final Pose2d[] redCenterFaces = new Pose2d[6];
+
+        public static AlgaeLevel getNearestAlgaePoses(Drive drive) {
+            Pose2d centerFace = drive.getPose().nearest(getAllianceReefList());
+            int faceIndex = getAllianceReefList().indexOf(centerFace);
+
+            return faceIndex % 2 == 0 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
+        }
+
+        public static Pose2d getClosestBranchPose(Drive drive, Side side) {
+            return offsetReefPose(drive.getPose().nearest(getAllianceReefList()), side);
+        }
 
         public static List<Pose2d> getAllianceReefList() {
             boolean isRed = DriverStation.getAlliance().isPresent()

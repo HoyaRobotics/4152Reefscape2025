@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
@@ -36,8 +37,7 @@ public class AutoAlign {
     // if player lets go of back buttons finish moving to pose but dont outtake
     public static Command autoAlignAndPlace(
             DriveMap driveController, Drive drive, SuperStructure superStructure, Intake intake, Side side) {
-        Supplier<Pose2d> drivePose = () -> FieldConstants.Reef.offsetReefPose(
-                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), side);
+        Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return DriveCommands.driveToPose(drive, () -> drivePose.get())
@@ -53,30 +53,12 @@ public class AutoAlign {
                                         .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle)))));
     }
 
-    public static Command autoAlignAndPickAlgaeL2(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
-        Supplier<Pose2d> drivePose = () -> FieldConstants.Reef.offsetReefPose(
-                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.CENTER);
-        // ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
-        // drive to reef, once level is selected
+    public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+        Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, Side.CENTER);
         return DriveCommands.driveToPose(drive, () -> drivePose.get())
-                .alongWith(new SequentialCommandGroup(
-                        new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                .lt(AutoAlign.StartSuperStructureRangeAlgae)),
-                        superStructure.moveToPose(SuperStructurePose.L2_ALGAE),
-                        AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake)));
-    }
-
-    public static Command autoAlignAndPickAlgaeL3(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
-        Supplier<Pose2d> drivePose = () -> FieldConstants.Reef.offsetReefPose(
-                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.CENTER);
-        // ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
-        // drive to reef, once level is selected
-        return DriveCommands.driveToPose(drive, () -> drivePose.get())
-                .alongWith(new SequentialCommandGroup(
-                        new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                .lt(AutoAlign.StartSuperStructureRangeAlgae)),
-                        superStructure.moveToPose(SuperStructurePose.L3_ALGAE),
-                        AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake)));
+                .alongWith(new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
+                                .lt(AutoAlign.StartSuperStructureRangeAlgae))
+                        .andThen(AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)));
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
@@ -44,7 +43,6 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
@@ -244,31 +242,19 @@ public class RobotContainer {
 
         NamedCommands.registerCommand(
                 "alignToRightBranch",
-                DriveCommands.driveToPose(
-                        drive,
-                        () -> FieldConstants.Reef.offsetReefPose(
-                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
+                DriveCommands.driveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.RIGHT)));
 
         NamedCommands.registerCommand(
                 "alignToRightBranchContinuous",
-                DriveCommands.driveToPoseContinuous(
-                        drive,
-                        () -> FieldConstants.Reef.offsetReefPose(
-                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.RIGHT)));
+                DriveCommands.driveToPoseContinuous(drive, () -> Reef.getClosestBranchPose(drive, Side.RIGHT)));
 
         NamedCommands.registerCommand(
                 "alignToLeftBranch",
-                DriveCommands.driveToPose(
-                        drive,
-                        () -> FieldConstants.Reef.offsetReefPose(
-                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
+                DriveCommands.driveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.LEFT)));
 
         NamedCommands.registerCommand(
                 "alignToLeftBranchContinuous",
-                DriveCommands.driveToPoseContinuous(
-                        drive,
-                        () -> FieldConstants.Reef.offsetReefPose(
-                                drive.getPose().nearest(FieldConstants.Reef.getAllianceReefList()), Side.LEFT)));
+                DriveCommands.driveToPoseContinuous(drive, () -> Reef.getClosestBranchPose(drive, Side.LEFT)));
 
         NamedCommands.registerCommand(
                 "alignToRightCoralStation",
@@ -368,30 +354,42 @@ public class RobotContainer {
 
         switch (Constants.intakeVersion) {
             case V1:
-                driveController.xboxController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
+                driveController
+                        .xboxController
+                        .leftBumper()
+                        .onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
                 break;
 
             default:
-                // driveController.rightBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
-                // driveController.rightBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
                 driveController
                         .xboxController
                         .rightBumper()
-                        .whileTrue(AutoAlign.autoAlignAndPickAlgaeL2(drive, superStructure, algaeIntake));
+                        .whileTrue(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
                 // driveController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure,
                 // algaeIntake));
-                driveController.xboxController.leftBumper().whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
+                driveController
+                        .xboxController
+                        .leftBumper()
+                        .whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
                 break;
         }
 
-        driveController.moveToL4()
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, driveController.ejectCoral()));
-        driveController.moveToL3()
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, driveController.ejectCoral()));
-        driveController.moveToL2()
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, driveController.ejectCoral()));
-        driveController.moveToTrough()
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, driveController.ejectCoral()));
+        driveController
+                .moveToL4()
+                .onTrue(new PlacingCommand(
+                        superStructure, intake, SuperStructurePose.L4, driveController.ejectCoral()));
+        driveController
+                .moveToL3()
+                .onTrue(new PlacingCommand(
+                        superStructure, intake, SuperStructurePose.L3, driveController.ejectCoral()));
+        driveController
+                .moveToL2()
+                .onTrue(new PlacingCommand(
+                        superStructure, intake, SuperStructurePose.L2, driveController.ejectCoral()));
+        driveController
+                .moveToTrough()
+                .onTrue(new PlacingCommand(
+                        superStructure, intake, SuperStructurePose.TROUGH, driveController.ejectCoral()));
 
         driveController
                 .deployClimber()

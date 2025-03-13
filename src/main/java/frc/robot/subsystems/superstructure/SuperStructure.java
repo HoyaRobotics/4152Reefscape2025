@@ -11,6 +11,8 @@ import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -41,6 +43,10 @@ public class SuperStructure {
             this.armAngle = armAngle;
         }
     }*/
+    public enum AlgaeLevel {
+        ALGAE_L2,
+        ALGAE_L3
+    }
 
     public enum SuperStructurePose {
         // constants call the constructor
@@ -72,6 +78,23 @@ public class SuperStructure {
         SuperStructurePose(Distance elevatorPosition, Angle armAngle) {
             this.elevatorPosition = elevatorPosition;
             this.armAngle = armAngle;
+        }
+    }
+
+    public static List<SuperStructurePose> getAlgaePoses(AlgaeLevel algaeLevel) {
+        switch (algaeLevel) {
+            case ALGAE_L2:
+                return List.of(
+                        SuperStructurePose.L2_ALGAE,
+                        SuperStructurePose.L2_ALGAE_GRAB,
+                        SuperStructurePose.L2_ALGAE_REMOVE);
+            case ALGAE_L3:
+                return List.of(
+                        SuperStructurePose.L3_ALGAE,
+                        SuperStructurePose.L3_ALGAE_GRAB,
+                        SuperStructurePose.L3_ALGAE_REMOVE);
+            default:
+                return Collections.emptyList();
         }
     }
 

@@ -88,13 +88,13 @@ class DriverXbox implements DriveMap {
     }
 
     @Override
-    public Trigger runIntake() {
-        return xboxController.rightTrigger(0.3);
+    public Trigger alignLeftBranch() {
+        return xboxController.leftStick();
     }
 
     @Override
-    public Trigger alignLeftBranch() {
-        return xboxController.leftStick();
+    public Trigger runIntake() {
+        return xboxController.rightTrigger(0.3);
     }
 
     @Override
