@@ -6,25 +6,25 @@ package frc.robot.util;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.DriveMap;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 
 /** Add your docs here. */
 public class ButtonWatcher {
-    private final CommandXboxController controller;
+    private final DriveMap controller;
     public SuperStructurePose selectedPose = SuperStructurePose.BASE;
 
-    public ButtonWatcher(CommandXboxController controller) {
+    public ButtonWatcher(DriveMap controller) {
         this.controller = controller;
     }
 
     public Command WaitSelectPose() {
         return new WaitUntilCommand(() -> {
-            if (controller.a().getAsBoolean()) {
+            if (controller.moveToL2().getAsBoolean()) {
                 selectedPose = SuperStructurePose.L2;
-            } else if (controller.x().getAsBoolean()) {
+            } else if (controller.moveToL3().getAsBoolean()) {
                 selectedPose = SuperStructurePose.L3;
-            } else if (controller.y().getAsBoolean()) {
+            } else if (controller.moveToL4().getAsBoolean()) {
                 selectedPose = SuperStructurePose.L4;
             } else {
                 return false;

@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
-import frc.robot.commands.AutoPlace;
+import frc.robot.commands.AutoAlign;
 import frc.robot.commands.AutoPlaceCommand;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
@@ -108,10 +108,12 @@ public class RobotContainer {
     private final Climber climber;
     private final SuperStructure superStructure;
 
+    public final DriverXbox driveController = new DriverXbox(0);
+
     public SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    public final CommandXboxController driverController = new CommandXboxController(0);
+    // public final CommandXboxController driveController = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -343,9 +345,9 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX()));
+                () -> -driveController.xboxController.getLeftY(),
+                () -> -driveController.xboxController.getLeftX(),
+                () -> -driveController.xboxController.getRightX()));
 
         elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake, algaeIntake));
 
@@ -355,83 +357,61 @@ public class RobotContainer {
                         driveSimulation
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d()); // zero gyro
-        driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        driverController.back().onTrue(elevator.zeroPosition());
+        driveController.resetGyro().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        driveController.zeroElevator().onTrue(elevator.zeroPosition());
 
-        driverController
-                .rightTrigger(0.3)
+        driveController
+                .runIntake()
                 .whileTrue(superStructure
                         .moveToPose(SuperStructurePose.LOADING)
                         .alongWith(intake.run(IntakeAction.INTAKING)));
 
         switch (Constants.intakeVersion) {
             case V1:
-                driverController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
+                driveController.xboxController.leftBumper().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
                 break;
 
             default:
-                // driverController.rightBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
-                // driverController.rightBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
-                driverController
+                // driveController.rightBumper().onTrue(AlgaeCommands.removeL3AlgaeV2(superStructure, algaeIntake));
+                // driveController.rightBumper().onTrue(AlgaeCommands.removeL2AlgaeV2(superStructure, algaeIntake));
+                driveController
+                        .xboxController
                         .rightBumper()
-                        .whileTrue(AutoPlace.autoAlignAndPickAlgaeL2(drive, superStructure, algaeIntake));
-                // driverController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure,
+                        .whileTrue(AutoAlign.autoAlignAndPickAlgaeL2(drive, superStructure, algaeIntake));
+                // driveController.rightBumper().whileTrue(AutoPlace.autoAlignAndPickAlgaeL3(drive, superStructure,
                 // algaeIntake));
-                driverController.leftBumper().whileTrue(AutoPlace.autoScoreBarge(drive, superStructure, algaeIntake));
+                driveController.xboxController.leftBumper().whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
                 break;
         }
 
-        driverController
-                .y()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, () -> driverController
-                        .leftTrigger(0.1)
-                        .getAsBoolean()));
+        driveController.moveToL4()
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L4, driveController.ejectCoral()));
+        driveController.moveToL3()
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, driveController.ejectCoral()));
+        driveController.moveToL2()
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, driveController.ejectCoral()));
+        driveController.moveToTrough()
+                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, driveController.ejectCoral()));
 
-        driverController
-                .x()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L3, () -> driverController
-                        .leftTrigger(0.1)
-                        .getAsBoolean()));
-
-        driverController
-                .a()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.L2, () -> driverController
-                        .leftTrigger(0.1)
-                        .getAsBoolean()));
-
-        driverController
-                .b()
-                .and(driverController.leftStick().negate())
-                .and(driverController.rightStick().negate())
-                .onTrue(new PlacingCommand(superStructure, intake, SuperStructurePose.TROUGH, () -> driverController
-                        .leftTrigger(0.1)
-                        .getAsBoolean()));
-
-        driverController
-                .povUp()
+        driveController
+                .deployClimber()
                 .onTrue(Commands.repeatingSequence(superStructure.moveToPose(SuperStructurePose.CLIMB_STOW))
                         .alongWith(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true)));
 
-        driverController
-                .povDown()
+        driveController
+                .climbCage()
                 .onTrue(Commands.repeatingSequence(superStructure.moveToPose(SuperStructurePose.CLIMB_STOW))
                         .alongWith(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false)));
 
-        driverController.povLeft().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
+        driveController.resetClimber().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
 
-        driverController
-                .leftStick()
-                .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.LEFT));
+        driveController
+                .alignLeftBranch()
+                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.LEFT));
 
-        driverController
-                .rightStick()
-                .whileTrue(AutoPlace.autoAlignAndPlace(driverController, drive, superStructure, intake, Side.RIGHT));
+        driveController
+                .alignRightBranch()
+                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.RIGHT));
     }
 
     /**
