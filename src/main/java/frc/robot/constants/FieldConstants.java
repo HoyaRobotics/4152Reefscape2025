@@ -181,11 +181,12 @@ public class FieldConstants {
                     && DriverStation.getAlliance().get() == Alliance.Red;
             Translation2d translation = new Translation2d(xOffset, drivePose.getMeasureY());
             Rotation2d rotation = rotationOffset;
+
             if (isRed) {
                 translation = FieldMirroringUtils.flip(translation);
                 rotation = FieldMirroringUtils.flip(rotation);
-                translation = new Translation2d(translation.getMeasureX(), drivePose.getMeasureY());
             }
+
             return new Pose2d(translation, rotation);
         }
     }

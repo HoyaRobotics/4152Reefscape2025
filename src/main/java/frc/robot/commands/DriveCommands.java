@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -50,6 +51,8 @@ public class DriveCommands {
     private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
     private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
     private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+    private static final Angle ANGLE_TOLERANCE = Degrees.of(5.0);
 
     private DriveCommands() {}
 
@@ -99,7 +102,12 @@ public class DriveCommands {
     /*
      * Drives to provided field relative pose, rotating first if necessary
      */
+
     public static Command driveToPose(Drive drive, Supplier<Pose2d> poseSupplier) {
+        return driveToPose(drive, poseSupplier, ANGLE_TOLERANCE);
+    }
+
+    public static Command driveToPose(Drive drive, Supplier<Pose2d> poseSupplier, Angle angleDeltaTolerance) {
 
         PIDController xController = new PIDController(0.2 * TunerConstants.kDriveGearRatio, 0, 0.0);
         PIDController yController = new PIDController(0.2 * TunerConstants.kDriveGearRatio, 0, 0.0);
@@ -118,8 +126,7 @@ public class DriveCommands {
                             double ySpeed = 0.0;
 
                             // starts driving once almost fully turned
-                            if (Math.abs(angleController.getPositionError())
-                                    < Degrees.of(5).in(Radians)) {
+                            if (Math.abs(angleController.getPositionError()) < angleDeltaTolerance.in(Radians)) {
                                 xSpeed = xController.calculate(drive.getPose().getX());
                                 xSpeed = MathUtil.clamp(xSpeed, -1.5, 1.5);
                                 ySpeed = yController.calculate(drive.getPose().getY());
