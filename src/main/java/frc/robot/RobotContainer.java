@@ -235,10 +235,7 @@ public class RobotContainer {
         }
 
         superStructure = new SuperStructure(elevator, arm);
-        intake.setPoseSupplier(() -> {
-            SuperStructurePose pose = superStructure.getTargetPose();
-            return pose;
-        });
+        intake.setPoseSupplier(superStructure::getTargetPose);
 
         NamedCommands.registerCommand(
                 "alignToRightBranch",

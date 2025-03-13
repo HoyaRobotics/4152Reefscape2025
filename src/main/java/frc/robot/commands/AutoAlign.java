@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
@@ -28,6 +29,7 @@ import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.PoseUtils;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class AutoAlign {
@@ -45,7 +47,9 @@ public class AutoAlign {
                         buttonWatcher.WaitSelectPose(),
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRange)),
-                        superStructure.moveToPose(buttonWatcher::getSelectedPose),
+                        new DeferredCommand(
+                                () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
+                                Set.of(superStructure.arm, superStructure.elevator)),
                         intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
                                 .andThen(intake.run(IntakeAction.PLACING)

@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
@@ -141,25 +140,6 @@ public class SuperStructure {
                 .finallyDo(() -> {
                     currentPose = pose;
                 });
-    }
-
-    public Command moveToPose(Supplier<SuperStructurePose> poseSupplier) {
-        return Commands.run(() -> {}, elevator)
-                .beforeStarting(() -> elevator.setPosition(poseSupplier.get().elevatorPosition))
-                .until(() -> elevator.isAtPosition(poseSupplier.get().elevatorPosition))
-                .alongWith(new WaitUntilCommand(() -> poseSupplier
-                                .get()
-                                .elevatorPosition
-                                .minus(elevator.getPosition())
-                                .lt(ElevatorConstants.retractingError))
-                        .deadlineFor(Commands.run(() -> {}, arm)
-                                .beforeStarting(() -> arm.setArmPosition(getMovingAngle(poseSupplier.get())))
-                                .until(() -> arm.isArmAtPosition(getMovingAngle(poseSupplier.get()))))
-                        .andThen(Commands.run(() -> {}, arm)
-                                .beforeStarting(() -> arm.setArmPosition(poseSupplier.get().armAngle)))
-                        .until(() -> arm.isArmAtPosition(poseSupplier.get().armAngle)))
-                .beforeStarting(() -> targetPose = poseSupplier.get())
-                .finallyDo(() -> currentPose = poseSupplier.get());
     }
 
     public BooleanSupplier waitTillRetracted() {

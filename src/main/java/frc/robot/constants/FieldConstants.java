@@ -185,14 +185,19 @@ public class FieldConstants {
                     && DriverStation.getAlliance().get() == Alliance.Red;
 
             Distance netEnd = Meters.of(fieldWidth).minus(yOffset.plus(netWidth).minus(Meters.of(0.48)));
-            netEnd = isRed ? FieldMirroringUtils.flip(new Translation2d(Meters.of(0), netEnd)).getMeasureY()
-                : netEnd;
+            netEnd = isRed
+                    ? FieldMirroringUtils.flip(new Translation2d(Meters.of(0), netEnd))
+                            .getMeasureY()
+                    : netEnd;
 
             Distance absoluteXOffset = isRed ? Meters.of(fieldLength).minus(xOffset) : xOffset;
 
             // clamp pose
-            Distance yDistance = isRed ? Meters.of(Math.min(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)))
-                : Meters.of(Math.max(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)));
+            Distance yDistance = isRed
+                    ? Meters.of(
+                            Math.min(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)))
+                    : Meters.of(
+                            Math.max(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)));
 
             return new Pose2d(
                     new Translation2d(absoluteXOffset, yDistance),
