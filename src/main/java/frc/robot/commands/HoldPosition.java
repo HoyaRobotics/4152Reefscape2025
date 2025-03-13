@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -38,27 +38,20 @@ public class HoldPosition extends Command {
     public void execute() {
         boolean hasCoral = intake.hasCoral();
         boolean hasAlgae = algaeIntake.hasAlgae();
-        if (hasCoral && hasAlgae) {
+
+        final IntakeAction coralIntakeAction = hasCoral ? IntakeAction.HOLDING : IntakeAction.EMPTY;
+        final AlgaeIntakeAction algaeIntakeAction = hasAlgae ? AlgaeIntakeAction.HOLDING : AlgaeIntakeAction.EMPTY;
+
+        if (hasCoral || hasAlgae) {
             elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
-            intake.runIntake(IntakeConstants.IntakeAction.HOLDING);
-            algaeIntake.runIntake(AlgaeIntakeAction.HOLDING);
-        } else if (hasCoral && !hasAlgae) {
-            elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
-            arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
-            intake.runIntake(IntakeConstants.IntakeAction.HOLDING);
-            algaeIntake.runIntake(AlgaeIntakeAction.EMPTY);
-        } else if (!hasCoral && hasAlgae) {
-            elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
-            arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
-            intake.runIntake(IntakeConstants.IntakeAction.EMPTY);
-            algaeIntake.runIntake(AlgaeIntakeAction.HOLDING);
-        } else if (!hasCoral && !hasAlgae) {
+        } else {
             elevator.setPosition(SuperStructurePose.BASE.elevatorPosition);
             arm.setArmPosition(SuperStructurePose.BASE.armAngle);
-            intake.runIntake(IntakeConstants.IntakeAction.EMPTY);
-            algaeIntake.runIntake(AlgaeIntakeAction.EMPTY);
         }
+
+        intake.runIntake(coralIntakeAction);
+        algaeIntake.runIntake(algaeIntakeAction);
     }
 
     // Called once the command ends or is interrupted.

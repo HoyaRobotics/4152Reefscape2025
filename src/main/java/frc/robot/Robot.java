@@ -16,21 +16,12 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import au.grapplerobotics.CanBridge;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants.CoralStation;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly.CoralStationsSide;
-import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -180,48 +171,7 @@ public class Robot extends LoggedRobot {
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
 
-        // coral station logic
-        // check if we are in a certain distance, drop once and wait until
-        // we leave and come back within that distance to drop again
-        // also wait for the robot to be facing it
-        // difference between angles less than 20
-        // make sides field relative, doesnt work on red
-        boolean isRed = DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Red;
-        Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
-        Angle angleDiff = robotContainer
-                .driveSimulation
-                .getSimulatedDriveTrainPose()
-                .getRotation()
-                .minus(Rotation2d.fromDegrees(54))
-                .getMeasure()
-                .plus(Degrees.of(180));
-        Pose2d robotPose = robotContainer.driveSimulation.getSimulatedDriveTrainPose();
-        Logger.recordOutput("CoralStation/RightSidePose", rightSidePose);
-        if (isRed) {
-            rightSidePose = new Pose2d(
-                    FieldMirroringUtils.flip(rightSidePose.getTranslation()),
-                    FieldMirroringUtils.flip(rightSidePose.getRotation()));
-        }
-        Logger.recordOutput("CoralStation/RightSidePoseAdjusted", rightSidePose);
-        Transform2d poseDiff =
-                robotContainer.driveSimulation.getSimulatedDriveTrainPose().minus(rightSidePose);
-        Distance difference =
-                Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
-
-        boolean enteredRange = difference.lt(Meters.of(1.25));
-        // && Math.abs(angleDiff.in(Degrees)) < 10.0;
-        if (enteredRange && !inCoralStationRange) {
-            inCoralStationRange = true;
-            // right side station not field relative??
-            SimulatedArena.getInstance()
-                    .addGamePieceProjectile(ReefscapeCoralOnFly.DropFromCoralStation(
-                            CoralStationsSide.RIGHT_STATION,
-                            DriverStation.getAlliance().get(),
-                            false));
-        } else if (difference.gt(Meters.of(1.25))) {
-            inCoralStationRange = false;
-        }
+        CoralStation.simulateHumanPlayer(robotContainer);
         robotContainer.displaySimFieldToAdvantageScope();
     }
 }

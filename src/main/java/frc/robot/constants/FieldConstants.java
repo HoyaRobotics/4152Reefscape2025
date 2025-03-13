@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -7,12 +8,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.RobotContainer;
 import java.util.Arrays;
 import java.util.List;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly.CoralStationsSide;
 import org.ironmaple.utils.FieldMirroringUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class FieldConstants {
     public static final double fieldLength = Units.inchesToMeters(690.876);
@@ -28,6 +35,8 @@ public class FieldConstants {
         public static final Pose2d RightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
         public static final Pose2d LeftSidePose = new Pose2d(0.89, 7.32, Rotation2d.fromDegrees(-54));
 
+        private static boolean inCoralStationRange = false;
+
         public static Pose2d getCoralStationPose(Side side) {
             boolean isRed = DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red;
@@ -39,6 +48,45 @@ public class FieldConstants {
             }
             return coralStation.transformBy(
                     new Transform2d(0.36, Units.inchesToMeters(2.5), Rotation2d.fromDegrees(180))); // 0.48
+        }
+
+        public static void simulateHumanPlayer(RobotContainer robotContainer) {
+            boolean isRed = DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red;
+            Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
+            Angle angleDiff = robotContainer
+                    .driveSimulation
+                    .getSimulatedDriveTrainPose()
+                    .getRotation()
+                    .minus(Rotation2d.fromDegrees(54))
+                    .getMeasure()
+                    .plus(Degrees.of(180));
+            Pose2d robotPose = robotContainer.driveSimulation.getSimulatedDriveTrainPose();
+            Logger.recordOutput("CoralStation/RightSidePose", rightSidePose);
+            if (isRed) {
+                rightSidePose = new Pose2d(
+                        FieldMirroringUtils.flip(rightSidePose.getTranslation()),
+                        FieldMirroringUtils.flip(rightSidePose.getRotation()));
+            }
+            Logger.recordOutput("CoralStation/RightSidePoseAdjusted", rightSidePose);
+            Transform2d poseDiff =
+                    robotContainer.driveSimulation.getSimulatedDriveTrainPose().minus(rightSidePose);
+            Distance difference =
+                    Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
+
+            boolean enteredRange = difference.lt(Meters.of(1.25));
+            // && Math.abs(angleDiff.in(Degrees)) < 10.0;
+            if (enteredRange && !inCoralStationRange) {
+                inCoralStationRange = true;
+                // right side station not field relative??
+                SimulatedArena.getInstance()
+                        .addGamePieceProjectile(ReefscapeCoralOnFly.DropFromCoralStation(
+                                CoralStationsSide.RIGHT_STATION,
+                                DriverStation.getAlliance().get(),
+                                false));
+            } else if (difference.gt(Meters.of(1.25))) {
+                inCoralStationRange = false;
+            }
         }
     }
 
