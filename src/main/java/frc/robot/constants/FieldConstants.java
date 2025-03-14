@@ -178,7 +178,7 @@ public class FieldConstants {
         // distance from arena wall to net
         public static final Distance yOffset = Inches.of(6.243 - 0.83);
         public static final Distance netWidth = Inches.of(148.130);
-        public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(180);
+        public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(0);
 
         public static Pose2d getNetPose(Pose2d drivePose) {
             boolean isRed = DriverStation.getAlliance().isPresent()

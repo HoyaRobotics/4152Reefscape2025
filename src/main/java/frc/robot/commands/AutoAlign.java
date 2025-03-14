@@ -42,7 +42,7 @@ public class AutoAlign {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
-        return DriveCommands.driveToPose(drive, drivePose::get, Degrees.of(360))
+        return DriveCommands.driveToPose(drive, drivePose::get, Degrees.of(50))
                 .alongWith(new SequentialCommandGroup(
                         buttonWatcher.WaitSelectPose(),
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
@@ -67,7 +67,7 @@ public class AutoAlign {
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose());
-        return DriveCommands.driveToPose(drive, drivePose::get)
+        return DriveCommands.driveToPose(drive, drivePose::get, Degrees.of(360))
                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_PRE_NET))
                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET))
                 .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
