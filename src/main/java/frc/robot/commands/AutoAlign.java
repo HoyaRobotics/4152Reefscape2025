@@ -49,12 +49,12 @@ public class AutoAlign {
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         new DeferredCommand(
                                 () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
-                                Set.of(superStructure.arm, superStructure.elevator)),
-                        intake.run(IntakeAction.PLACING)
+                                Set.of(superStructure.arm, superStructure.elevator))))
+                .andThen(intake.run(IntakeAction.PLACING)
+                        .withTimeout(IntakeConstants.PlacingTimeout)
+                        .andThen(intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
-                                .andThen(intake.run(IntakeAction.PLACING)
-                                        .withTimeout(IntakeConstants.PlacingTimeout)
-                                        .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle)))));
+                                .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))));
     }
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
@@ -62,7 +62,8 @@ public class AutoAlign {
         return DriveCommands.driveToPose(drive, drivePose::get)
                 .alongWith(new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRangeAlgae))
-                        .andThen(AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)));
+                        .andThen(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
+                .andThen(AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive));
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

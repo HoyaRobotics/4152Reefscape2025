@@ -45,6 +45,21 @@ public class AlgaeCommands {
                 Set.of(superStructure.arm, superStructure.elevator));
     }
 
+    public static Command preStageRemoveAlgaeV2(SuperStructure superStructure, AlgaeIntake algaeIntake, Drive drive) {
+
+        return new DeferredCommand(
+                () -> {
+                    List<SuperStructurePose> algaePoses =
+                            SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
+
+                    // is this correct?
+                    return superStructure
+                            .moveToPose(algaePoses.get(0));
+                },
+                Set.of(superStructure.arm, superStructure.elevator));
+    }
+
+
     public static Command scoreAlgaeInNet(SuperStructure superStructure, AlgaeIntake algaeIntake) {
         return superStructure
                 .moveToPose(SuperStructurePose.ALGAE_NET)
