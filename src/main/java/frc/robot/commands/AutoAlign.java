@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -29,7 +30,6 @@ import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.PoseUtils;
-
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -41,17 +41,27 @@ public class AutoAlign {
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
     public static Command autoAlignAndPlace(
-            DriveMap driveController, Drive drive, SuperStructure superStructure, Intake intake, Side side, Optional<SuperStructurePose> superStructurePose) {
+            DriveMap driveController,
+            Drive drive,
+            SuperStructure superStructure,
+            Intake intake,
+            Side side,
+            Optional<SuperStructurePose> superStructurePose) {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return DriveCommands.driveToPose(drive, drivePose::get, Degrees.of(50))
                 .alongWith(new SequentialCommandGroup(
-                        buttonWatcher.WaitSelectPose(),
+                        new DeferredCommand(
+                                () -> superStructurePose.isEmpty() ? buttonWatcher.WaitSelectPose() : Commands.none(),
+                                Set.of(superStructure.arm, superStructure.elevator)),
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         new DeferredCommand(
-                                () -> superStructure.moveToPose(superStructurePose.isEmpty() ? buttonWatcher.getSelectedPose() : superStructurePose.get()),
+                                () -> superStructure.moveToPose(
+                                        superStructurePose.isEmpty()
+                                                ? buttonWatcher.getSelectedPose()
+                                                : superStructurePose.get()),
                                 Set.of(superStructure.arm, superStructure.elevator))))
                 .andThen(intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)

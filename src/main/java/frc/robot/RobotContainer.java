@@ -20,8 +20,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.AutoPlaceCommand;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
@@ -86,6 +83,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import java.util.Optional;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -239,8 +237,19 @@ public class RobotContainer {
         superStructure = new SuperStructure(elevator, arm);
         intake.setPoseSupplier(superStructure::getTargetPose);
 
-        NamedCommands.registerCommand("alignLeftPlaceL4", AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.LEFT, Optional.empty()));
-        NamedCommands.registerCommand("alignRightPlaceL4", AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.RIGHT, Optional.empty()));
+        NamedCommands.registerCommand(
+                "alignLeftPlaceL4",
+                AutoAlign.autoAlignAndPlace(
+                        driveController, drive, superStructure, intake, Side.LEFT, Optional.of(SuperStructurePose.L4)));
+        NamedCommands.registerCommand(
+                "alignRightPlaceL4",
+                AutoAlign.autoAlignAndPlace(
+                        driveController,
+                        drive,
+                        superStructure,
+                        intake,
+                        Side.RIGHT,
+                        Optional.of(SuperStructurePose.L4)));
 
         NamedCommands.registerCommand(
                 "alignToRightCoralStation",
@@ -384,11 +393,13 @@ public class RobotContainer {
 
         driveController
                 .alignLeftBranch()
-                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.LEFT, Optional.empty()));
+                .whileTrue(AutoAlign.autoAlignAndPlace(
+                        driveController, drive, superStructure, intake, Side.LEFT, Optional.empty()));
 
         driveController
                 .alignRightBranch()
-                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.RIGHT, Optional.empty()));
+                .whileTrue(AutoAlign.autoAlignAndPlace(
+                        driveController, drive, superStructure, intake, Side.RIGHT, Optional.empty()));
     }
 
     /**
