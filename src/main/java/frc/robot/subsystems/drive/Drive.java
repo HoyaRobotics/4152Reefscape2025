@@ -316,6 +316,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         return kinematics.toChassisSpeeds(getModuleStates());
     }
 
+    public ChassisSpeeds getFieldChassisSpeeds() {
+        return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
+    }
+
     /** Returns the position of each module in radians. */
     public double[] getWheelRadiusCharacterizationPositions() {
         double[] values = new double[4];

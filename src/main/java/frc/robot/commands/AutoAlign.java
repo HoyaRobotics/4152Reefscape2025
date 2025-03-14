@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(20);
-    private static final Distance StartSuperStructureRangeAlgae = Inches.of(20);
+    private static final Distance StartSuperStructureRangeAlgae = Inches.of(50);
 
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
