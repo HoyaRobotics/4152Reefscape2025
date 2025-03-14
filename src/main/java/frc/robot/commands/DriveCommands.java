@@ -144,8 +144,8 @@ public class DriveCommands {
 
                             // Convert to field relative speeds & send command
                             ChassisSpeeds speeds = new ChassisSpeeds(
-                                    xSpeed * drive.getMaxLinearSpeedMetersPerSec(),
-                                    ySpeed * drive.getMaxLinearSpeedMetersPerSec(),
+                                    xSpeed,
+                                    ySpeed,
                                     angleSpeed);
                             drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
                         },
@@ -153,18 +153,22 @@ public class DriveCommands {
                 // Reset PID controller when command starts
                 .beforeStarting(() -> {
                     Pose2d endPose = poseSupplier.get();
+
                     angleController.reset(drive.getRotation().getRadians());
                     xController.reset(drive.getFieldChassisSpeeds().vxMetersPerSecond);
                     yController.reset(drive.getFieldChassisSpeeds().vyMetersPerSecond);
+
                     xController.setGoal(endPose.getX());
                     xController.setTolerance(Units.inchesToMeters(0.5));
+
                     yController.setGoal(endPose.getY());
                     yController.setTolerance(Units.inchesToMeters(0.5));
+
                     angleController.setGoal(endPose.getRotation().getRadians());
                     angleController.setTolerance(Math.PI / 90);
                 })
                 .until(() -> {
-                    return xController.atSetpoint() && yController.atSetpoint() && angleController.atGoal();
+                    return xController.atGoal() && yController.atGoal() && angleController.atGoal();
                 })
                 .finallyDo(() -> {
                     drive.stop();
