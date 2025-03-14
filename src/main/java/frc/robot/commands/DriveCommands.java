@@ -16,7 +16,6 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -110,7 +109,7 @@ public class DriveCommands {
      * Drives to provided field relative pose, rotating first if necessary
      */
 
-     /*
+    /*
     public static Command driveToPose(Drive drive, Supplier<Pose2d> poseSupplier) {
         return driveToPose(drive, poseSupplier, ANGLE_TOLERANCE);
     }

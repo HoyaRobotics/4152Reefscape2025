@@ -57,7 +57,7 @@ public class ArmIOReal implements ArmIO {
         armConfig.Feedback.FeedbackRemoteSensorID = 33;
         armConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         armConfig.Feedback.RotorToSensorRatio = armRatio;
-        armConfig.MotionMagic.MotionMagicAcceleration = 2.0; // 0.3
+        armConfig.MotionMagic.MotionMagicAcceleration = 3.0; // 2.0
         armConfig.MotionMagic.MotionMagicCruiseVelocity = 0.8;
         armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

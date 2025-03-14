@@ -133,7 +133,7 @@ public class SuperStructure {
         return elevator.moveToPosition(pose.elevatorPosition)
                 .alongWith(new WaitUntilCommand(() -> pose.elevatorPosition
                                 .minus(elevator.getPosition())
-                                .lt(ElevatorConstants.retractingError))
+                                .lt(ElevatorConstants.tiltingDistance))
                         .deadlineFor(arm.moveToAngle(getMovingAngle(pose)))
                         .andThen(arm.moveToAngle(pose.armAngle)))
                 .beforeStarting(() -> targetPose = pose)

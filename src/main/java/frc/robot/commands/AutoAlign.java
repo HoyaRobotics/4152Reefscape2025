@@ -50,7 +50,7 @@ public class AutoAlign {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
-        return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(50)))
+        return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
                 .alongWith(new SequentialCommandGroup(
                         new DeferredCommand(
                                 () -> superStructurePose.isEmpty() ? buttonWatcher.WaitSelectPose() : Commands.none(),
