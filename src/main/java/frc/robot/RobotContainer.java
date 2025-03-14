@@ -20,8 +20,17 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+import java.util.Optional;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -83,12 +92,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import java.util.Optional;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -237,6 +240,18 @@ public class RobotContainer {
         superStructure = new SuperStructure(elevator, arm);
         intake.setPoseSupplier(superStructure::getTargetPose);
 
+        NamedCommands.registerCommand("alignGetCoralRight", Commands.deadline(intake.runWithSensor(IntakeAction.INTAKING)
+                        .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
+                        .andThen(() -> intake.stopIntake()),
+                        DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT)).andThen(
+                        Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive))));
+
+        NamedCommands.registerCommand("alignGetCoralLeft", Commands.deadline(intake.runWithSensor(IntakeAction.INTAKING)
+                .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
+                .andThen(() -> intake.stopIntake()),
+                DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT)).andThen(
+                Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive))));
+
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
                 AutoAlign.autoAlignAndPlace(
@@ -250,16 +265,6 @@ public class RobotContainer {
                         intake,
                         Side.RIGHT,
                         Optional.of(SuperStructurePose.L4)));
-
-        NamedCommands.registerCommand(
-                "alignToRightCoralStation",
-                DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT)));
-        NamedCommands.registerCommand(
-                "alignToLeftCoralStation",
-                DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT)));
-
-        NamedCommands.registerCommand(
-                "driveForward", Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0, 0)), drive));
 
         NamedCommands.registerCommand(
                 "intakePlace", intake.run(IntakeAction.PLACING).withTimeout(0.5).andThen(() -> intake.stopIntake()));
