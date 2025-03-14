@@ -110,6 +110,7 @@ public class DriveCommands {
      * Drives to provided field relative pose, rotating first if necessary
      */
 
+     /*
     public static Command driveToPose(Drive drive, Supplier<Pose2d> poseSupplier) {
         return driveToPose(drive, poseSupplier, ANGLE_TOLERANCE);
     }
@@ -174,6 +175,7 @@ public class DriveCommands {
                     drive.stop();
                 });
     }
+                */
 
     /**
      * Field relative drive command using joystick for linear control and PID for angular control. Possible use cases

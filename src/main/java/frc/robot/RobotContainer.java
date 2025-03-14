@@ -39,6 +39,7 @@ import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.constants.Constants;
@@ -243,7 +244,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT))
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())
                                 .andThen(Commands.run(
                                         () -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive))));
 
@@ -253,7 +254,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        DriveCommands.driveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT))
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())
                                 .andThen(Commands.run(
                                         () -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive))));
 
@@ -298,9 +299,10 @@ public class RobotContainer {
 
         NamedCommands.registerCommand(
                 "alignToReefCenter",
-                DriveCommands.driveToPose(
+                new DriveToPose(
                         drive,
-                        () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), Side.CENTER)));
+                        () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), Side.CENTER),
+                        Optional.empty()));
 
         NamedCommands.registerCommand("removeAlgae", AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
 
