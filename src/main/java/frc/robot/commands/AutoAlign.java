@@ -84,6 +84,7 @@ public class AutoAlign {
         return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_PRE_NET))
                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET))
-                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
+                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout))
+                .andThen(superStructure.moveToPose(SuperStructurePose.HOLD));
     }
 }
