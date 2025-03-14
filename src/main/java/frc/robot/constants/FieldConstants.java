@@ -163,11 +163,12 @@ public class FieldConstants {
             blueCenterFaces[5] = new Pose2d(
                     Units.inchesToMeters(160.375), Units.inchesToMeters(130.144), Rotation2d.fromDegrees(-120));
 
-            double allianceReefCenterDiff = fieldLength - (2 * Reef.center.getX());
+            // double allianceReefCenterDiff = fieldLength - (2 * Reef.center.getX());
             for (int i = 0; i < 6; ++i) {
                 Pose2d blueFace = blueCenterFaces[i];
                 redCenterFaces[i] =
-                        new Pose2d(blueFace.getX() + allianceReefCenterDiff, blueFace.getY(), blueFace.getRotation());
+                        new Pose2d(FieldMirroringUtils.flip(blueFace.getTranslation()), FieldMirroringUtils.flip(blueFace.getRotation()));
+                        // new Pose2d(blueFace.getX() + allianceReefCenterDiff, blueFace.getY(), blueFace.getRotation());
             }
         }
     }
