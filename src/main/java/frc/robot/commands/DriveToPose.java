@@ -66,9 +66,9 @@ public class DriveToPose extends Command {
 
      Pose2d endPose = poseSupplier.get();
 
-      angleController.reset(drive.getRotation().getRadians());
-      xController.reset(drive.getFieldChassisSpeeds().vxMetersPerSecond);
-      yController.reset(drive.getFieldChassisSpeeds().vyMetersPerSecond);
+      angleController.reset(drive.getRotation().getRadians(), drive.getFieldChassisSpeeds().omegaRadiansPerSecond);
+      xController.reset(drive.getPose().getX(), drive.getFieldChassisSpeeds().vxMetersPerSecond);
+      yController.reset(drive.getPose().getY(), drive.getFieldChassisSpeeds().vyMetersPerSecond);
 
       xController.setGoal(endPose.getX());
       xController.setTolerance(Units.inchesToMeters(0.5));
