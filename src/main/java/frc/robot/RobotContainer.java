@@ -20,6 +20,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -237,21 +239,8 @@ public class RobotContainer {
         superStructure = new SuperStructure(elevator, arm);
         intake.setPoseSupplier(superStructure::getTargetPose);
 
-        NamedCommands.registerCommand(
-                "alignToRightBranch",
-                DriveCommands.driveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.RIGHT)));
-
-        NamedCommands.registerCommand(
-                "alignToRightBranchContinuous",
-                DriveCommands.driveToPoseContinuous(drive, () -> Reef.getClosestBranchPose(drive, Side.RIGHT)));
-
-        NamedCommands.registerCommand(
-                "alignToLeftBranch",
-                DriveCommands.driveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.LEFT)));
-
-        NamedCommands.registerCommand(
-                "alignToLeftBranchContinuous",
-                DriveCommands.driveToPoseContinuous(drive, () -> Reef.getClosestBranchPose(drive, Side.LEFT)));
+        NamedCommands.registerCommand("alignLeftPlaceL4", AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.LEFT, Optional.empty()));
+        NamedCommands.registerCommand("alignRightPlaceL4", AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.RIGHT, Optional.empty()));
 
         NamedCommands.registerCommand(
                 "alignToRightCoralStation",
@@ -262,12 +251,6 @@ public class RobotContainer {
 
         NamedCommands.registerCommand(
                 "driveForward", Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0, 0)), drive));
-
-        NamedCommands.registerCommand("placeL4", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L4));
-        NamedCommands.registerCommand("placeL3", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L3));
-        NamedCommands.registerCommand("placeL2", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.L2));
-        NamedCommands.registerCommand(
-                "placeTrough", new AutoPlaceCommand(superStructure, intake, SuperStructurePose.TROUGH));
 
         NamedCommands.registerCommand(
                 "intakePlace", intake.run(IntakeAction.PLACING).withTimeout(0.5).andThen(() -> intake.stopIntake()));
@@ -401,11 +384,11 @@ public class RobotContainer {
 
         driveController
                 .alignLeftBranch()
-                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.LEFT));
+                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.LEFT, Optional.empty()));
 
         driveController
                 .alignRightBranch()
-                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.RIGHT));
+                .whileTrue(AutoAlign.autoAlignAndPlace(driveController, drive, superStructure, intake, Side.RIGHT, Optional.empty()));
     }
 
     /**

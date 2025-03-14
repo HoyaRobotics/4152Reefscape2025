@@ -13,19 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToLeftBranch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "placeL4"
+            "name": "alignLeftPlaceL4"
           }
         },
         {
@@ -81,19 +69,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToRightBranch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "placeL4"
+            "name": "alignRightPlaceL4"
           }
         },
         {
@@ -149,19 +125,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToLeftBranch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "placeL4"
+            "name": "alignLeftPlaceL4"
           }
         },
         {
@@ -217,19 +181,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToRightBranch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "placeL4"
+            "name": "alignRightPlaceL4"
           }
         }
       ]

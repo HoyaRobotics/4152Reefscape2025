@@ -29,6 +29,8 @@ import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.PoseUtils;
+
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -37,8 +39,9 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(20);
 
     // if player lets go of back buttons finish moving to pose but dont outtake
+    // switch while moving ifn ew level chosen
     public static Command autoAlignAndPlace(
-            DriveMap driveController, Drive drive, SuperStructure superStructure, Intake intake, Side side) {
+            DriveMap driveController, Drive drive, SuperStructure superStructure, Intake intake, Side side, Optional<SuperStructurePose> superStructurePose) {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
@@ -48,7 +51,7 @@ public class AutoAlign {
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         new DeferredCommand(
-                                () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
+                                () -> superStructure.moveToPose(superStructurePose.isEmpty() ? buttonWatcher.getSelectedPose() : superStructurePose.get()),
                                 Set.of(superStructure.arm, superStructure.elevator))))
                 .andThen(intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)

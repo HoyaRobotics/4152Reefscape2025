@@ -13,13 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToLeftBranch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "placeL4"
+            "name": "alignLeftPlaceL4"
           }
         },
         {
