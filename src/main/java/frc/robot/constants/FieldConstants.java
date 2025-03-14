@@ -113,7 +113,7 @@ public class FieldConstants {
             Pose2d centerFace = drive.getPose().nearest(getAllianceReefList());
             int faceIndex = getAllianceReefList().indexOf(centerFace);
 
-            return faceIndex % 2 == 0 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
+            return faceIndex % 2 == 1 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
         }
 
         public static Pose2d getClosestBranchPose(Drive drive, Side side) {
