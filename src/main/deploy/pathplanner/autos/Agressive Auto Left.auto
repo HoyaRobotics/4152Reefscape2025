@@ -25,39 +25,7 @@
         {
           "type": "named",
           "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "intakeReceiveWithSensor"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "alignToLeftCoralStation"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "driveForward"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "alignGetCoralLeft"
           }
         },
         {
@@ -81,39 +49,7 @@
         {
           "type": "named",
           "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "intakeReceiveWithSensor"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "alignToLeftCoralStation"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "driveForward"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "alignGetCoralLeft"
           }
         },
         {
@@ -137,39 +73,7 @@
         {
           "type": "named",
           "data": {
-            "name": "StopDrive"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "intakeReceiveWithSensor"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "alignToLeftCoralStation"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "driveForward"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "alignGetCoralLeft"
           }
         },
         {
