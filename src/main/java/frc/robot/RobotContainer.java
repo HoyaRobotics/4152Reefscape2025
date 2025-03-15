@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
@@ -394,14 +393,14 @@ public class RobotContainer {
         driveController
                 .deployClimber()
                 .onTrue(Commands.repeatingSequence(superStructure.moveToPose(SuperStructurePose.CLIMB_STOW))
-                        .alongWith(ClimbCommands.climberPosition(climber, ClimberConstants.deployAngle, true)));
+                        .alongWith(climber.runAngle(ClimberConstants.deployAngle, true)));
 
         driveController
                 .climbCage()
                 .onTrue(Commands.repeatingSequence(superStructure.moveToPose(SuperStructurePose.CLIMB_STOW))
-                        .alongWith(ClimbCommands.climberPosition(climber, ClimberConstants.climbAngle, false)));
+                        .alongWith(climber.runAngle(ClimberConstants.climbAngle, false)));
 
-        driveController.resetClimber().onTrue(ClimbCommands.climberPosition(climber, ClimberConstants.baseAngle, true));
+        driveController.resetClimber().onTrue(climber.runAngle(ClimberConstants.baseAngle, true));
 
         driveController
                 .alignLeftBranch()
