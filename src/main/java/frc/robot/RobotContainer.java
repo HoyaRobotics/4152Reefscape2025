@@ -338,9 +338,7 @@ public class RobotContainer {
 
         switch (Constants.intakeVersion) {
             case V1:
-                driveController
-                        .removeAlgae()
-                        .onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
+                driveController.removeAlgae().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
                 break;
 
             default:
@@ -348,9 +346,7 @@ public class RobotContainer {
                         .removeAlgae()
                         .whileTrue(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
 
-                driveController
-                        .scoreBarge()
-                        .whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
+                driveController.scoreBarge().whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
 
                 driveController
                         .scoreProcessor()
@@ -358,6 +354,7 @@ public class RobotContainer {
                 break;
         }
 
+        /*
         driveController
                 .moveToL4(false)
                 .onTrue(new PlacingCommand(
@@ -370,6 +367,7 @@ public class RobotContainer {
                 .moveToL2(false)
                 .onTrue(new PlacingCommand(
                         superStructure, intake, SuperStructurePose.L2, driveController.ejectCoral()));
+                        */
         driveController
                 .moveToTrough(false)
                 .onTrue(new PlacingCommand(

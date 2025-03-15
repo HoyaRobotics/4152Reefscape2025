@@ -164,7 +164,7 @@ public class FieldConstants {
                     && DriverStation.getAlliance().get() == Alliance.Red;
 
             Pose2d centerFace = isRed ? processorFaceRed : processorFaceBlue;
-            return centerFace.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(0.0)));
+            return centerFace.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(180)));
         }
     }
 

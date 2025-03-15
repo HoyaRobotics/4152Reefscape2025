@@ -81,13 +81,12 @@ public class AutoAlign {
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
-        return new DriveToPose(drive, drivePose, Optional.of(Degrees.of(360)))
+        return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
                 .alongWith(Commands.sequence(
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         superStructure.moveToPose(SuperStructurePose.PROCESSOR)))
-                .andThen(algaeIntake.run(AlgaeIntakeAction.PROCESSOR))
-                .withTimeout(AlgaeIntakeConstants.PlacingTimeout);
+                .andThen(algaeIntake.run(AlgaeIntakeAction.PROCESSOR).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
