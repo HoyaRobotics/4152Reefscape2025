@@ -29,6 +29,7 @@ public class SuperStructure {
         // Elevator position, arm angle
         TROUGH(Inches.of(7.0), Degrees.of(-60)),
         LOADING(Inches.of(16.0), Degrees.of(-35)),
+        PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(13.0), Degrees.of(135.0)),
         L3(Inches.of(28.75), Degrees.of(135.0)), // 15.75 more than L2
         L4(Inches.of(52.75), Degrees.of(140.0)),

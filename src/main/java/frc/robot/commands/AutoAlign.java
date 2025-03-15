@@ -5,16 +5,19 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.FieldConstants.Processor;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
@@ -74,6 +77,17 @@ public class AutoAlign {
                                 .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))))
                 .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
                         .onlyIf(() -> removeAlgae));
+    }
+
+    public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+        Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
+        return new DriveToPose(drive, drivePose, Optional.of(Degrees.of(360)))
+                .alongWith(Commands.sequence(
+                        new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
+                                .lt(AutoAlign.StartSuperStructureRange)),
+                        superStructure.moveToPose(SuperStructurePose.PROCESSOR)))
+                .andThen(algaeIntake.run(AlgaeIntakeAction.PROCESSOR))
+                .withTimeout(AlgaeIntakeConstants.PlacingTimeout);
     }
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

@@ -339,21 +339,22 @@ public class RobotContainer {
         switch (Constants.intakeVersion) {
             case V1:
                 driveController
-                        .xboxController
-                        .leftBumper()
+                        .removeAlgae()
                         .onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
                 break;
 
             default:
                 driveController
-                        .xboxController
-                        .rightBumper()
+                        .removeAlgae()
                         .whileTrue(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
 
                 driveController
-                        .xboxController
-                        .leftBumper()
+                        .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
+
+                driveController
+                        .scoreProcessor()
+                        .whileTrue(AutoAlign.autoAlignLoadProcessor(drive, superStructure, algaeIntake));
                 break;
         }
 

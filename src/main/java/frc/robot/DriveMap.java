@@ -25,6 +25,12 @@ public interface DriveMap {
 
     Trigger runIntake();
 
+    Trigger scoreProcessor();
+
+    Trigger removeAlgae();
+
+    Trigger scoreBarge();
+
     Trigger alignRightBranch();
 
     Trigger alignLeftBranch();
@@ -108,7 +114,22 @@ class DriverXbox implements DriveMap {
     }
 
     @Override
+    public Trigger scoreBarge() {
+        return xboxController.leftBumper();
+    }
+
+    @Override
+    public Trigger scoreProcessor() {
+        return xboxController.leftTrigger();
+    }
+
+    @Override
+    public Trigger removeAlgae() {
+        return xboxController.rightBumper();
+    }
+
+    @Override
     public BooleanSupplier ejectCoral() {
-        return xboxController.leftTrigger(0.1);
+        return moveToTrough(false);
     }
 }

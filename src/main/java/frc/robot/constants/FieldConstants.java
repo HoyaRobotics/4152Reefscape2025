@@ -152,6 +152,22 @@ public class FieldConstants {
         }
     }
 
+    public static class Processor {
+        public static final Pose2d processorFaceBlue =
+                new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
+        public static final Pose2d processorFaceRed = new Pose2d(
+                FieldMirroringUtils.flip(processorFaceBlue.getTranslation()),
+                FieldMirroringUtils.flip(processorFaceBlue.getRotation()));
+
+        public static Pose2d getProcessorPose() {
+            boolean isRed = DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red;
+
+            Pose2d centerFace = isRed ? processorFaceRed : processorFaceBlue;
+            return centerFace.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(0.0)));
+        }
+    }
+
     public static class Net {
         // distance from robot bumper to center -> 0.48 meters?
         public static final Distance xOffset = Inches.of(303.5);
