@@ -12,11 +12,12 @@ import edu.wpi.first.units.measure.Current;
 /** Add your docs here. */
 public class AlgaeIntakeConstants {
     public enum AlgaeIntakeAction {
-        HOLDING(Amps.of(40), RevolutionsPerSecond.of(15.0)),
-        INTAKING(Amps.of(40), RevolutionsPerSecond.of(15.0)),
+        HOLDING(Amps.of(60), RevolutionsPerSecond.of(15.0)), // 40
+        INTAKING(Amps.of(60), RevolutionsPerSecond.of(15.0)), // 40
         PROCESSOR(Amps.of(10), RevolutionsPerSecond.of(-8.0)),
         NET(Amps.of(40), RevolutionsPerSecond.of(-22.0)),
-        EMPTY(Amps.of(10), RevolutionsPerSecond.of(2.0));
+        EMPTY(Amps.of(0), RevolutionsPerSecond.of(0));
+        // EMPTY(Amps.of(10), RevolutionsPerSecond.of(2.0));
 
         public final Current currentLimit;
         public final AngularVelocity speed;

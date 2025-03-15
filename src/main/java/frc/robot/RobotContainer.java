@@ -25,7 +25,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -141,7 +140,10 @@ public class RobotContainer {
                 algaeIntake = new AlgaeIntake(new AlgaeIntakeIOReal());
                 climber = new Climber(new ClimberIOReal());
 
-                vision = new Vision(drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
+                vision = new Vision(
+                        drive,
+                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
 
                 break;
             case SIM:
@@ -165,6 +167,10 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 VisionConstants.camera0Name,
                                 VisionConstants.robotToCamera0,
+                                driveSimulation::getSimulatedDriveTrainPose),
+                        new VisionIOPhotonVisionSim(
+                                VisionConstants.camera1Name,
+                                VisionConstants.robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
                 // elevator = new Elevator(new ElevatorIOSim());
                 elevator = new Elevator(new ElevatorIOAdvancedSim());
@@ -242,9 +248,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())
-                                .andThen(Commands.run(
-                                        () -> drive.runVelocity(new ChassisSpeeds(0.3, 0.0, 0.0)), drive))));
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -252,9 +256,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())
-                                .andThen(Commands.run(
-                                        () -> drive.runVelocity(new ChassisSpeeds(0.3, 0.0, 0.0)), drive))));
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
@@ -287,7 +289,12 @@ public class RobotContainer {
                         .andThen(AlgaeCommands.removeL2AlgaeV1(superStructure, intake)));
 
         NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
-        NamedCommands.registerCommand("goToL4", superStructure.moveToPose(SuperStructurePose.L4));
+        NamedCommands.registerCommand(
+                "goToL4", superStructure.elevator.moveToPosition(SuperStructurePose.L4.elevatorPosition));
+
+        NamedCommands.registerCommand(
+                "intakeReceive",
+                superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(IntakeAction.INTAKING)));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

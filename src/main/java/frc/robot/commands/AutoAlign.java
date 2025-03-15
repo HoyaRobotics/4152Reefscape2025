@@ -29,7 +29,6 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.PoseUtils;
 import java.util.Optional;
@@ -37,7 +36,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class AutoAlign {
-    private static final Distance StartSuperStructureRange = Inches.of(20);
+    private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(50);
     private static final double PosePollFreq = 0.05;
 
@@ -70,11 +69,12 @@ public class AutoAlign {
                                 .repeatedly()
                                 .until(superStructure::isAtPosition)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
-                .andThen(intake.run(IntakeAction.PLACING)
-                        .withTimeout(IntakeConstants.PlacingTimeout)
-                        .andThen(intake.run(IntakeAction.PLACING)
+                .andThen(Commands.sequence(
+                        intake.runWithSensor(IntakeAction.PLACING),
+                        intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
+                        intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
-                                .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))))
+                                .deadlineFor(superStructure.retractArm(SuperStructurePose.BASE.armAngle))))
                 .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
                         .onlyIf(() -> removeAlgae));
     }

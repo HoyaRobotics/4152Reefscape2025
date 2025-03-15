@@ -29,7 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     private final TalonFX algaeIntakeMotor = new TalonFX(37, "rio");
     private final LaserCan laserCan = new LaserCan(38);
-    double intakeRatio = 48.0 / 8;
+    double intakeRatio = 30.0 / 11;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
     private VoltageOut voltageRequest = new VoltageOut(0.0);
@@ -51,7 +51,7 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
 
         if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
             double measureDistance = measurement.distance_mm;
-            double algaeDistance = Inches.of(2.0).in(Millimeters);
+            double algaeDistance = Inches.of(4.0).in(Millimeters);
 
             return measureDistance <= algaeDistance;
         } else {
@@ -71,12 +71,13 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
 
     private void configureMotors() {
         TalonFXConfiguration algaeIntakeMotorConfig = new TalonFXConfiguration();
+        // algaeIntakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         algaeIntakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         algaeIntakeMotorConfig.Voltage.PeakForwardVoltage = 12.0;
         algaeIntakeMotorConfig.Voltage.PeakReverseVoltage = -12.0;
-        algaeIntakeMotorConfig.Slot0.kV = 0.649; // 0.295 for a 30/11 gear ratio , 0.472 48 / 11
+        algaeIntakeMotorConfig.Slot0.kV = 0.295; // 0.295 for a 30/11 gear ratio , 0.472 48 / 11, 0.649 48 / 8
         algaeIntakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         algaeIntakeMotor.getConfigurator().apply(algaeIntakeMotorConfig);

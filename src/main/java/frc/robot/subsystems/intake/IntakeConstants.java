@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.Current;
 /** Add your docs here. */
 public class IntakeConstants {
     public enum IntakeAction {
-        HOLDING(Amps.of(5), RevolutionsPerSecond.of(1.0)),
+        HOLDING(Amps.of(15), RevolutionsPerSecond.of(2.0)),
         INTAKING(Amps.of(20), RevolutionsPerSecond.of(15.0)),
         TROUGH(Amps.of(30), RevolutionsPerSecond.of(-5.0)),
         PLACING(Amps.of(30), RevolutionsPerSecond.of(-25.0)),
@@ -33,5 +33,6 @@ public class IntakeConstants {
     public static final AngularVelocity HoldingSpeed = RevolutionsPerSecond.of(1.0);*/
 
     public static final double PlacingTimeout = 0.35; // 0.30
+    public static final double PostSensingTimeout = 0.08;
     public static final double PostPlacingTimeout = 0.35;
 }

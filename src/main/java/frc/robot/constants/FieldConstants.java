@@ -50,7 +50,7 @@ public class FieldConstants {
                         FieldMirroringUtils.flip(coralStation.getRotation()));
             }
             return coralStation.transformBy(
-                    new Transform2d(0.36, Units.inchesToMeters(2.5), Rotation2d.fromDegrees(180))); // 0.48
+                    new Transform2d(0.4825, Units.inchesToMeters(2.5), Rotation2d.fromDegrees(180))); // 0.48
         }
 
         public static void simulateHumanPlayer(RobotContainer robotContainer) {
@@ -164,7 +164,8 @@ public class FieldConstants {
                     && DriverStation.getAlliance().get() == Alliance.Red;
 
             Pose2d centerFace = isRed ? processorFaceRed : processorFaceBlue;
-            return centerFace.transformBy(new Transform2d(0.48, 0.0, Rotation2d.fromDegrees(180)));
+            return centerFace.transformBy(
+                    new Transform2d(0.48 + Units.inchesToMeters(3), 0.0, Rotation2d.fromDegrees(180)));
         }
     }
 
