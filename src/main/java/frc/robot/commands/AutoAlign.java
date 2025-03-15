@@ -36,6 +36,7 @@ import java.util.function.Supplier;
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(20);
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(50);
+    private static final double PosePollFreq = 0.05;
 
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
@@ -62,7 +63,7 @@ public class AutoAlign {
                                                         ? buttonWatcher.getSelectedPose()
                                                         : superStructurePose.get()),
                                         Set.of(superStructure.arm, superStructure.elevator))
-                                .withTimeout(0.05)
+                                .withTimeout(PosePollFreq)
                                 .repeatedly()
                                 .until(superStructure::isAtPosition)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())

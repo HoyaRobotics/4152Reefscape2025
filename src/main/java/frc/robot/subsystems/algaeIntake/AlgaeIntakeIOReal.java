@@ -5,6 +5,7 @@
 package frc.robot.subsystems.algaeIntake;
 
 import static edu.wpi.first.units.Units.Amp;
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -13,6 +14,13 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import au.grapplerobotics.ConfigurationFailedException;
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
+import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -21,6 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Add your docs here. */
 public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     private final TalonFX algaeIntakeMotor = new TalonFX(37, "rio");
+    private final LaserCan laserCan = new LaserCan(0);
     double intakeRatio = 48.0 / 11;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
@@ -30,11 +39,35 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
 
     public AlgaeIntakeIOReal() {
         configureMotors();
+        configureLaserCan();
     }
 
-    public boolean hasAlgae() {
+    public boolean hasAlgaeCurrent() {
         double current = filter.calculate(algaeIntakeMotor.getStatorCurrent().getValueAsDouble());
         return current >= 5.0;
+    }
+
+    public boolean hasAlgaeSensed() {
+        Measurement measurement = laserCan.getMeasurement();
+
+        if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+            double measureDistance = measurement.distance_mm;
+            double algaeDistance = Inches.of(2.0).in(Millimeters);
+
+            return measureDistance <= algaeDistance;
+        } else {
+            return false;
+        }
+    }
+
+    private void configureLaserCan() {
+        try {
+            laserCan.setRangingMode(RangingMode.SHORT);
+            laserCan.setRegionOfInterest(new RegionOfInterest(4, 4, 8, 8));
+            laserCan.setTimingBudget(TimingBudget.TIMING_BUDGET_20MS);
+        } catch (ConfigurationFailedException e) {
+            System.out.println("Configuration failed! " + e);
+        }
     }
 
     private void configureMotors() {
@@ -78,6 +111,6 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     public void updateInputs(AlgaeIntakeInputs inputs) {
         // check sensors for game piece
         inputs.speed = RotationsPerSecond.of(algaeIntakeMotor.getVelocity().getValueAsDouble());
-        inputs.hasAlgae = hasAlgae();
+        inputs.hasAlgae = hasAlgaeSensed();
     }
 }
