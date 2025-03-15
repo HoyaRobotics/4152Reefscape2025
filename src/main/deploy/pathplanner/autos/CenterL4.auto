@@ -38,13 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "alignToReefCenter"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "removeAlgae"
+            "name": "alignRemoveAlgaeV2"
           }
         },
         {

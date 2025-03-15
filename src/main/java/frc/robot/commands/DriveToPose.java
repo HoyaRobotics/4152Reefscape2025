@@ -98,6 +98,7 @@ public class DriveToPose extends Command {
             if (!withingAngleTolerance) {
                 xController.reset(drive.getPose().getX(), drive.getFieldChassisSpeeds().vxMetersPerSecond);
                 yController.reset(drive.getPose().getY(), drive.getFieldChassisSpeeds().vyMetersPerSecond);
+
                 xController.setGoal(poseSupplier.get().getX());
                 yController.setGoal(poseSupplier.get().getY());
             }

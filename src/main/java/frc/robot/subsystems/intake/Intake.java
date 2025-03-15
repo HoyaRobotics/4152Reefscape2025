@@ -6,8 +6,6 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +17,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
+    /*
     public class IntakeAction {
         public final Current currentLimit;
         public final AngularVelocity speed;
@@ -28,6 +27,7 @@ public class Intake extends SubsystemBase {
             this.currentLimit = currentLimit;
         }
     }
+        */
 
     private final IntakeIO io;
     private Supplier<SuperStructurePose> poseSupplier;

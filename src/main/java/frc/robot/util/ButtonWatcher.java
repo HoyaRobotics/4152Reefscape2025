@@ -5,9 +5,11 @@
 package frc.robot.util;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class ButtonWatcher {
@@ -16,21 +18,15 @@ public class ButtonWatcher {
 
     public ButtonWatcher(DriveMap controller) {
         this.controller = controller;
+
+        controller.moveToL2(true).onTrue(Commands.runOnce(() -> selectedPose = SuperStructurePose.L2));
+        controller.moveToL3(true).onTrue(Commands.runOnce(() -> selectedPose = SuperStructurePose.L3));
+        controller.moveToL4(true).onTrue(Commands.runOnce(() -> selectedPose = SuperStructurePose.L4));
     }
 
     public Command WaitSelectPose() {
-        return new WaitUntilCommand(() -> {
-            if (controller.moveToL2(true).getAsBoolean()) {
-                selectedPose = SuperStructurePose.L2;
-            } else if (controller.moveToL3(true).getAsBoolean()) {
-                selectedPose = SuperStructurePose.L3;
-            } else if (controller.moveToL4(true).getAsBoolean()) {
-                selectedPose = SuperStructurePose.L4;
-            } else {
-                return false;
-            }
-            return true;
-        });
+        return new WaitUntilCommand(() -> selectedPose != SuperStructurePose.BASE)
+                .beforeStarting(() -> selectedPose = SuperStructurePose.BASE);
     }
 
     public SuperStructurePose getSelectedPose() {

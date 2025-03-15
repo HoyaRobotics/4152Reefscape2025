@@ -1,7 +1,8 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -106,8 +107,20 @@ public class FieldConstants {
 
         private static final double PIPE_FROM_REEF_CENTER_INCHES =
                 6.469; // taken from FieldConstants adjustY for reef y offset
-        public static final Pose2d[] blueCenterFaces = new Pose2d[6];
-        public static final Pose2d[] redCenterFaces = new Pose2d[6];
+        public static final Pose2d[] blueCenterFaces = {
+            new Pose2d(Units.inchesToMeters(144.003), Units.inchesToMeters(158.500), Rotation2d.fromDegrees(180)),
+            new Pose2d(Units.inchesToMeters(160.373), Units.inchesToMeters(186.857), Rotation2d.fromDegrees(120)),
+            new Pose2d(Units.inchesToMeters(193.116), Units.inchesToMeters(186.858), Rotation2d.fromDegrees(60)),
+            new Pose2d(Units.inchesToMeters(209.489), Units.inchesToMeters(158.502), Rotation2d.fromDegrees(0)),
+            new Pose2d(Units.inchesToMeters(193.118), Units.inchesToMeters(130.145), Rotation2d.fromDegrees(-60)),
+            new Pose2d(Units.inchesToMeters(160.375), Units.inchesToMeters(130.144), Rotation2d.fromDegrees(-120))
+        };
+
+        public static final Pose2d[] redCenterFaces = Arrays.stream(blueCenterFaces)
+                .map(blueFace -> new Pose2d(
+                        FieldMirroringUtils.flip(blueFace.getTranslation()),
+                        FieldMirroringUtils.flip(blueFace.getRotation())))
+                .toArray(Pose2d[]::new);
 
         public static AlgaeLevel getNearestAlgaePoses(Drive drive) {
             Pose2d centerFace = drive.getPose().nearest(getAllianceReefList());
@@ -130,47 +143,12 @@ public class FieldConstants {
             final double distanceFromReef = 0.48;
             final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 0.5; // 1.2 V1
             final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES + 0.5; // 1.45 V1
-            if (side == Side.LEFT) {
-                return facePose.transformBy(new Transform2d(
-                        distanceFromReef, // Robot length / 2
-                        -Units.inchesToMeters(leftOffset),
-                        Rotation2d.fromDegrees(0.0)));
-            } else if (side == Side.RIGHT) {
-                return facePose.transformBy(new Transform2d(
-                        distanceFromReef, // Robot length / 2
-                        Units.inchesToMeters(rightOffset),
-                        Rotation2d.fromDegrees(0.0)));
-            } else {
-                return facePose.transformBy(new Transform2d(
-                        distanceFromReef, // Robot length / 2
-                        0.0,
-                        Rotation2d.fromDegrees(0.0)));
-            }
-        }
 
-        static {
-            // Initialize faces
-            blueCenterFaces[0] = new Pose2d(
-                    Units.inchesToMeters(144.003), Units.inchesToMeters(158.500), Rotation2d.fromDegrees(180));
-            blueCenterFaces[1] = new Pose2d(
-                    Units.inchesToMeters(160.373), Units.inchesToMeters(186.857), Rotation2d.fromDegrees(120));
-            blueCenterFaces[2] = new Pose2d(
-                    Units.inchesToMeters(193.116), Units.inchesToMeters(186.858), Rotation2d.fromDegrees(60));
-            blueCenterFaces[3] =
-                    new Pose2d(Units.inchesToMeters(209.489), Units.inchesToMeters(158.502), Rotation2d.fromDegrees(0));
-            blueCenterFaces[4] = new Pose2d(
-                    Units.inchesToMeters(193.118), Units.inchesToMeters(130.145), Rotation2d.fromDegrees(-60));
-            blueCenterFaces[5] = new Pose2d(
-                    Units.inchesToMeters(160.375), Units.inchesToMeters(130.144), Rotation2d.fromDegrees(-120));
+            final double yOffset = side == Side.CENTER
+                    ? 0.0
+                    : side == Side.RIGHT ? Units.inchesToMeters(rightOffset) : -Units.inchesToMeters(leftOffset);
 
-            // double allianceReefCenterDiff = fieldLength - (2 * Reef.center.getX());
-            for (int i = 0; i < 6; ++i) {
-                Pose2d blueFace = blueCenterFaces[i];
-                redCenterFaces[i] = new Pose2d(
-                        FieldMirroringUtils.flip(blueFace.getTranslation()),
-                        FieldMirroringUtils.flip(blueFace.getRotation()));
-                // new Pose2d(blueFace.getX() + allianceReefCenterDiff, blueFace.getY(), blueFace.getRotation());
-            }
+            return facePose.transformBy(new Transform2d(distanceFromReef, yOffset, Rotation2d.fromDegrees(0.0)));
         }
     }
 
