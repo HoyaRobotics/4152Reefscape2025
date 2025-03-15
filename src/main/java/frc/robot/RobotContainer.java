@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
@@ -272,38 +271,14 @@ public class RobotContainer {
                         Optional.of(SuperStructurePose.L4)));
 
         NamedCommands.registerCommand(
-                "intakePlace", intake.run(IntakeAction.PLACING).withTimeout(0.5).andThen(() -> intake.stopIntake()));
-
+                "alignRemoveAlgaeV2", AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
         NamedCommands.registerCommand(
-                "intakePlaceWithSensor",
-                intake.runWithSensor(IntakeAction.PLACING).andThen(() -> intake.stopIntake()));
-
-        NamedCommands.registerCommand(
-                "intakeReceive",
-                intake.run(IntakeAction.INTAKING).alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)));
-
-        NamedCommands.registerCommand(
-                "intakeReceiveWithSensor",
-                intake.runWithSensor(IntakeAction.INTAKING)
-                        .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
-                        .andThen(() -> intake.stopIntake()));
+                "alignRemoveAlgaeV1",
+                new DriveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.CENTER), Optional.empty())
+                        .andThen(AlgaeCommands.removeL2AlgaeV1(superStructure, intake)));
 
         NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
-
         NamedCommands.registerCommand("goToL4", superStructure.moveToPose(SuperStructurePose.L4));
-        NamedCommands.registerCommand("goToL3", superStructure.moveToPose(SuperStructurePose.L3));
-        NamedCommands.registerCommand("goToL2", superStructure.moveToPose(SuperStructurePose.L2));
-        NamedCommands.registerCommand("goToTrough", superStructure.moveToPose(SuperStructurePose.TROUGH));
-        NamedCommands.registerCommand("StopDrive", new InstantCommand(() -> drive.stop(), drive));
-
-        NamedCommands.registerCommand(
-                "alignToReefCenter",
-                new DriveToPose(
-                        drive,
-                        () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), Side.CENTER),
-                        Optional.empty()));
-
-        NamedCommands.registerCommand("removeAlgae", AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
