@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -47,15 +46,14 @@ public class AutoAlign {
             Intake intake,
             AlgaeIntake algaeIntake,
             Side side,
-            Optional<SuperStructurePose> superStructurePose) {
+            Optional<SuperStructurePose> superStructurePose,
+            boolean removeAlgae) {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
                 .alongWith(new SequentialCommandGroup(
-                        new DeferredCommand(
-                                () -> superStructurePose.isEmpty() ? buttonWatcher.WaitSelectPose() : Commands.none(),
-                                Set.of(superStructure.arm, superStructure.elevator)),
+                        buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         new DeferredCommand(
@@ -73,7 +71,8 @@ public class AutoAlign {
                         .andThen(intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
                                 .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))))
-                .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
+                .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
+                        .onlyIf(() -> removeAlgae));
     }
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

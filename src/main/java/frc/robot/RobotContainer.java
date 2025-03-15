@@ -265,7 +265,8 @@ public class RobotContainer {
                         intake,
                         algaeIntake,
                         Side.LEFT,
-                        Optional.of(SuperStructurePose.L4)));
+                        Optional.of(SuperStructurePose.L4),
+                        false));
         NamedCommands.registerCommand(
                 "alignRightPlaceL4",
                 AutoAlign.autoAlignAndPlace(
@@ -275,7 +276,8 @@ public class RobotContainer {
                         intake,
                         algaeIntake,
                         Side.RIGHT,
-                        Optional.of(SuperStructurePose.L4)));
+                        Optional.of(SuperStructurePose.L4),
+                        false));
 
         NamedCommands.registerCommand(
                 "alignRemoveAlgaeV2", AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
@@ -387,12 +389,26 @@ public class RobotContainer {
         driveController
                 .alignLeftBranch()
                 .whileTrue(AutoAlign.autoAlignAndPlace(
-                        driveController, drive, superStructure, intake, algaeIntake, Side.LEFT, Optional.empty()));
+                        driveController,
+                        drive,
+                        superStructure,
+                        intake,
+                        algaeIntake,
+                        Side.LEFT,
+                        Optional.empty(),
+                        true));
 
         driveController
                 .alignRightBranch()
                 .whileTrue(AutoAlign.autoAlignAndPlace(
-                        driveController, drive, superStructure, intake, algaeIntake, Side.RIGHT, Optional.empty()));
+                        driveController,
+                        drive,
+                        superStructure,
+                        intake,
+                        algaeIntake,
+                        Side.RIGHT,
+                        Optional.empty(),
+                        true));
     }
 
     /**
