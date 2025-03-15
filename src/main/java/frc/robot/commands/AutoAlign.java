@@ -45,6 +45,7 @@ public class AutoAlign {
             Drive drive,
             SuperStructure superStructure,
             Intake intake,
+            AlgaeIntake algaeIntake,
             Side side,
             Optional<SuperStructurePose> superStructurePose) {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
@@ -58,16 +59,21 @@ public class AutoAlign {
                         new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         new DeferredCommand(
-                                () -> superStructure.moveToPose(
-                                        superStructurePose.isEmpty()
-                                                ? buttonWatcher.getSelectedPose()
-                                                : superStructurePose.get()),
-                                Set.of(superStructure.arm, superStructure.elevator))))
+                                        () -> superStructure.moveToPose(
+                                                superStructurePose.isEmpty()
+                                                        ? buttonWatcher.getSelectedPose()
+                                                        : superStructurePose.get()),
+                                        Set.of(superStructure.arm, superStructure.elevator))
+                                .withTimeout(0.05)
+                                .repeatedly()
+                                .until(superStructure::isAtPosition)))
+                .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
                 .andThen(intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)
                         .andThen(intake.run(IntakeAction.PLACING)
                                 .withTimeout(IntakeConstants.PlacingTimeout)
-                                .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))));
+                                .deadlineFor(superStructure.retractArm(ArmConstants.baseAngle))))
+                .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
     }
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

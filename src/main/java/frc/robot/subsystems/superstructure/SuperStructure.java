@@ -118,6 +118,10 @@ public class SuperStructure {
                 });
     }
 
+    public boolean isAtPosition() {
+        return elevator.isAtPosition(targetPose.elevatorPosition) && arm.isArmAtPosition(targetPose.armAngle);
+    }
+
     public BooleanSupplier waitTillRetracted() {
         return () -> arm.getArmPosition().minus(ArmConstants.safeRetractAngle).lt(Degrees.of(0));
     }
