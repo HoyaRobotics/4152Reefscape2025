@@ -57,10 +57,10 @@ public class SuperStructure {
         L3(Inches.of(28.75), Degrees.of(135.0)), // 15.75 more than L2
         L4(Inches.of(52.75), Degrees.of(140.0)),
 
-        L2_ALGAE(Inches.of(3.5), Degrees.of(170)),
-        L2_ALGAE_GRAB(Inches.of(7.5), Degree.of(170)),
+        L2_ALGAE(Inches.of(4.0), Degrees.of(170)),
+        L2_ALGAE_GRAB(Inches.of(8.5), Degree.of(170)),
         L2_ALGAE_REMOVE(Inches.of(0.0), Degree.of(103)),
-        L3_ALGAE(Inches.of(19.25), Degrees.of(170)), // 15.75 more than L2 20.75
+        L3_ALGAE(Inches.of(19.75), Degrees.of(170)), // 15.75 more than L2 20.75
         L3_ALGAE_GRAB(Inches.of(24.25), Degrees.of(170)), // 15.75 more than L2 25.75
         L3_ALGAE_REMOVE(Inches.of(9.25), Degrees.of(103)), // 15.75 more than L2 10.75
 

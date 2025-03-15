@@ -246,7 +246,7 @@ public class RobotContainer {
                                 .andThen(() -> intake.stopIntake()),
                         new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())
                                 .andThen(Commands.run(
-                                        () -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive))));
+                                        () -> drive.runVelocity(new ChassisSpeeds(0.3, 0.0, 0.0)), drive))));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -256,7 +256,7 @@ public class RobotContainer {
                                 .andThen(() -> intake.stopIntake()),
                         new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())
                                 .andThen(Commands.run(
-                                        () -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive))));
+                                        () -> drive.runVelocity(new ChassisSpeeds(0.3, 0.0, 0.0)), drive))));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",

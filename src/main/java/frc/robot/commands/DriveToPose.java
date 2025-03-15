@@ -96,8 +96,8 @@ public class DriveToPose extends Command {
         // starts driving once almost fully turned
         if (Math.abs(angleController.getPositionError()) < angleDeltaTolerance.in(Radians)) {
             if (!withingAngleTolerance) {
-                xController.reset(drive.getFieldChassisSpeeds().vxMetersPerSecond);
-                yController.reset(drive.getFieldChassisSpeeds().vyMetersPerSecond);
+                xController.reset(drive.getPose().getX(), drive.getFieldChassisSpeeds().vxMetersPerSecond);
+                yController.reset(drive.getPose().getY(), drive.getFieldChassisSpeeds().vyMetersPerSecond);
                 xController.setGoal(poseSupplier.get().getX());
                 yController.setGoal(poseSupplier.get().getY());
             }
