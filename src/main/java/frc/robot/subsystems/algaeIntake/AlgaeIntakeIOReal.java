@@ -29,7 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Add your docs here. */
 public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     private final TalonFX algaeIntakeMotor = new TalonFX(37, "rio");
-    private final LaserCan laserCan = new LaserCan(0);
+    private final LaserCan laserCan = new LaserCan(38);
     double intakeRatio = 48.0 / 11;
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
