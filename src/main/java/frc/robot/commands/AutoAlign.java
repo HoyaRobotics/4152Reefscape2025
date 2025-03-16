@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,6 +36,7 @@ import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
@@ -92,13 +95,24 @@ public class AutoAlign {
     }
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+        Supplier<Pose2d> movingPose = () -> {
+            Pose2d pose = Processor.getProcessorPose().transformBy(new Transform2d(-0.75, 0.0, new Rotation2d()));
+            Logger.recordOutput("Processor/movingPose", pose);
+            return pose;
+        };
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
-        return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
-                .alongWith(Commands.sequence(
-                        new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                .lt(AutoAlign.StartSuperStructureRange)),
-                        superStructure.moveToPose(SuperStructurePose.PROCESSOR)))
-                .andThen(algaeIntake.run(AlgaeIntakeAction.PROCESSOR).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
+        return superStructure
+                .moveToPose(SuperStructurePose.PROCESSOR)
+                .deadlineFor(new DriveToPose(drive, movingPose::get, Optional.of(Degrees.of(360))))
+                .andThen(new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
+                        .alongWith(Commands.sequence(
+                                new WaitUntilCommand(
+                                        () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
+                                                .lt(AutoAlign.StartSuperStructureRange)),
+                                superStructure.moveToPose(SuperStructurePose.PROCESSOR)))
+                        .andThen(algaeIntake
+                                .run(AlgaeIntakeAction.PROCESSOR)
+                                .withTimeout(AlgaeIntakeConstants.PlacingTimeout)));
     }
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
