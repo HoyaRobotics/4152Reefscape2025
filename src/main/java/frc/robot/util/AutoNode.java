@@ -35,6 +35,7 @@ public class AutoNode {
 
     public Command getCommand(Drive drive) {
         return new DriveToPose(drive, poseSupplier, angleDeltaTolerance, Optional.empty(), true)
+                .asProxy()
                 .until(
                         transitionTolerance.isPresent()
                                 ? PoseUtils.poseInRange(
@@ -44,6 +45,11 @@ public class AutoNode {
                                 : () -> false)
                 .alongWith(toSchedule);
     }
+
+    /*
+    public AutoNode addDeadlineCondition(Command deadline) {
+
+    }*/
 
     public AutoNode setCommand(Command toSchedule) {
         this.toSchedule = toSchedule;
@@ -57,7 +63,7 @@ public class AutoNode {
 
     public AutoNode addCommandOnInRange(Supplier<Pose2d> poseSupplier, Command toSchedule, Distance triggerRange) {
         this.addCommand(Commands.waitUntil(PoseUtils.poseInRange(poseSupplier, this.poseSupplier.get(), triggerRange))
-            .andThen(toSchedule));
+                .andThen(toSchedule.beforeStarting(() -> System.out.println("Command in range"))));
         return this;
     }
 

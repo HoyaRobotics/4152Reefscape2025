@@ -79,6 +79,18 @@ public class AutoAlign {
                         .onlyIf(() -> removeAlgae));
     }
 
+    public static Command placingSequence(
+            SuperStructure superStructure, Intake intake, SuperStructurePose superStructurePose) {
+
+        return Commands.sequence(
+                superStructure.moveToPose(superStructurePose),
+                intake.runWithSensor(IntakeAction.PLACING),
+                intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
+                intake.run(IntakeAction.PLACING)
+                        .withTimeout(IntakeConstants.PlacingTimeout)
+                        .deadlineFor(superStructure.retractArm(SuperStructurePose.BASE.armAngle)));
+    }
+
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
         return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)), Optional.empty(), false)
