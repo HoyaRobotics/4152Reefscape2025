@@ -29,7 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     private final TalonFX algaeIntakeMotor = new TalonFX(37, "rio");
     private final LaserCan laserCan = new LaserCan(38);
-    double intakeRatio = 30.0 / 11;
+    double intakeRatio = (30.0 / 15.0) * (44.0 / 8.0);
 
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
     private VoltageOut voltageRequest = new VoltageOut(0.0);
@@ -77,7 +77,7 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
         algaeIntakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         algaeIntakeMotorConfig.Voltage.PeakForwardVoltage = 12.0;
         algaeIntakeMotorConfig.Voltage.PeakReverseVoltage = -12.0;
-        algaeIntakeMotorConfig.Slot0.kV = 0.295; // 0.295 for a 30/11 gear ratio , 0.472 48 / 11, 0.649 48 / 8
+        algaeIntakeMotorConfig.Slot0.kV = 0.295; // 0.295 for a 30/11 gear ratio , 0.472 48 / 11, 0.649 48 / 8, 1.19 11/1s
         algaeIntakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         algaeIntakeMotor.getConfigurator().apply(algaeIntakeMotorConfig);

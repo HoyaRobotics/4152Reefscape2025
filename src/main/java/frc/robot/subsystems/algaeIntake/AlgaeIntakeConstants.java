@@ -12,6 +12,10 @@ import edu.wpi.first.units.measure.Current;
 /** Add your docs here. */
 public class AlgaeIntakeConstants {
     public enum AlgaeIntakeAction {
+        // Fastest speeds
+        // (44/8) * (30/15) gear ratio max speed is 9.09 rps
+        // (30/11) gear ratio max speed is 36.66 rps
+        // (48/11) gear ratio max speed is 22.91 rps
         HOLDING(Amps.of(60), RevolutionsPerSecond.of(15.0)), // 40
         INTAKING(Amps.of(60), RevolutionsPerSecond.of(15.0)), // 40
         PROCESSOR(Amps.of(10), RevolutionsPerSecond.of(-8.0)),
