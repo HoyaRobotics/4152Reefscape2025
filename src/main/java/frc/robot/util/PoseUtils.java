@@ -17,8 +17,9 @@ public class PoseUtils {
         return Meters.of(pose1.getTranslation().getDistance(pose2.getTranslation()));
     }
 
-    public static BooleanSupplier poseInRange(Supplier<Pose2d> referencePose, Pose2d targetPose, Distance range) {
-        return () ->
-                PoseUtils.distanceBetweenPoses(referencePose.get(), targetPose).lt(range);
+    public static BooleanSupplier poseInRange(
+            Supplier<Pose2d> referencePose, Supplier<Pose2d> targetPose, Distance range) {
+        return () -> PoseUtils.distanceBetweenPoses(referencePose.get(), targetPose.get())
+                .lt(range);
     }
 }

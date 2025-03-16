@@ -1,24 +1,7 @@
 package frc.robot.commands.Autos;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import frc.robot.RobotContainer;
-import frc.robot.commands.AutoAlign;
-import frc.robot.commands.HoldPosition;
-import frc.robot.constants.FieldConstants.CoralStation;
-import frc.robot.constants.FieldConstants.Reef;
-import frc.robot.constants.FieldConstants.Side;
-import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
-import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import frc.robot.util.AutoNode;
-import java.util.LinkedList;
-import java.util.List;
-
 // variable intake height proportional to distance
+/*
 public class RightAuto extends PoserAuto {
     @Override
     protected List<AutoNode> getAutoGraph(RobotContainer robot) {
@@ -80,3 +63,4 @@ public class RightAuto extends PoserAuto {
         return nodes;
     }
 }
+    */

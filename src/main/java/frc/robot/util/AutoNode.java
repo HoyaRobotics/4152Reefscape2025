@@ -1,17 +1,6 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.RobotContainer;
-import frc.robot.commands.DriveToPose;
-import frc.robot.subsystems.drive.Drive;
-import java.util.Optional;
-import java.util.function.Supplier;
-
+/*
 public class AutoNode {
     private Supplier<Pose2d> poseSupplier;
 
@@ -89,3 +78,5 @@ public class AutoNode {
         return this;
     }
 }
+
+*/

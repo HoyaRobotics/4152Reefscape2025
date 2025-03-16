@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.Autos.RightAuto;
+import frc.robot.commands.Autos.RightAutoRewrite;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
@@ -249,13 +249,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(
-                                drive,
-                                () -> CoralStation.getCoralStationPose(Side.RIGHT),
-                                Optional.empty(),
-                                Optional.empty(),
-                                false,
-                                true)));
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -263,13 +257,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(
-                                drive,
-                                () -> CoralStation.getCoralStationPose(Side.LEFT),
-                                Optional.empty(),
-                                Optional.empty(),
-                                false,
-                                true)));
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
@@ -298,13 +286,7 @@ public class RobotContainer {
                 "alignRemoveAlgaeV2", AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
         NamedCommands.registerCommand(
                 "alignRemoveAlgaeV1",
-                new DriveToPose(
-                                drive,
-                                () -> Reef.getClosestBranchPose(drive, Side.CENTER),
-                                Optional.empty(),
-                                Optional.empty(),
-                                false,
-                                true)
+                new DriveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.CENTER), Optional.empty())
                         .andThen(AlgaeCommands.removeL2AlgaeV1(superStructure, intake)));
 
         NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
@@ -317,7 +299,8 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-        autoChooser.addOption("pidToPoseTest", new RightAuto().getAutoCommand(this));
+        autoChooser.addOption(
+                "pidToPoseTest", new RightAutoRewrite(drive, superStructure, intake, algaeIntake).getAutoCommand());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
