@@ -25,11 +25,11 @@ public class RightAuto extends PoserAuto {
                         .addCommandOnInRange(
                                 robot.drive::getPose,
                                 AutoAlign.placingSequence(robot.superStructure, robot.intake, SuperStructurePose.L4),
-                                Inches.of(45)),
+                                Inches.of(60)),
                 new AutoNode(Reef.offsetReefPose(Reef.redCenterFaces[4], Side.LEFT)
-                                .transformBy(new Transform2d(0.0, -1.5, new Rotation2d())))
+                                .transformBy(new Transform2d(2.0, -0.5, new Rotation2d())))
                         .setDeltaTolerance(Degrees.of(360))
-                        .setTransitionTolerance(Meters.of(1.5), Degrees.of(360)),
+                        .setTransitionTolerance(Meters.of(1.75), Degrees.of(360)),
                 new AutoNode(() -> CoralStation.getCoralStationPose(Side.RIGHT))
                         .setCommand(robot.intake
                                 .runWithSensor(IntakeAction.INTAKING)
