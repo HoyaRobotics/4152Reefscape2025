@@ -16,13 +16,13 @@ public class AutoNode {
 
     private Optional<Angle> angleDeltaTolerance;
     private Optional<Pair<Distance, Angle>> transitionTolerance;
-    private Optional<Command> toSchedule;
+    private Command toSchedule;
 
     public AutoNode(Supplier<Pose2d> poseSupplier) {
         this.poseSupplier = poseSupplier;
         angleDeltaTolerance = Optional.empty();
         transitionTolerance = Optional.empty();
-        toSchedule = Optional.empty();
+        toSchedule = Commands.none();
     }
 
     public AutoNode(Pose2d targetPose) {
@@ -42,13 +42,22 @@ public class AutoNode {
                                         poseSupplier.get(),
                                         transitionTolerance.get().getFirst())
                                 : () -> false)
-                .alongWith(toSchedule.orElse(Commands.none()));
-        // return new DriveToPose(drive, () -> this.targetPose, angleDeltaTolerance, transitionTolerance, true)
-        //        .alongWith(toSchedule.orElse(Commands.none()));
+                .alongWith(toSchedule);
     }
 
     public AutoNode setCommand(Command toSchedule) {
-        this.toSchedule = Optional.of(toSchedule);
+        this.toSchedule = toSchedule;
+        return this;
+    }
+
+    public AutoNode addCommand(Command toSchedule) {
+        this.toSchedule = this.toSchedule.alongWith(toSchedule);
+        return this;
+    }
+
+    public AutoNode addCommandOnInRange(Supplier<Pose2d> poseSupplier, Command toSchedule, Distance triggerRange) {
+        this.addCommand(Commands.waitUntil(PoseUtils.poseInRange(poseSupplier, this.poseSupplier.get(), triggerRange))
+            .andThen(toSchedule));
         return this;
     }
 
