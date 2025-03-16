@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
+import frc.robot.commands.Autos.RightAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
@@ -95,14 +96,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
     // Subsystems
-    private final Drive drive;
-    private final Vision vision;
-    private final Elevator elevator;
-    private final Arm arm;
-    private final Intake intake;
-    private final AlgaeIntake algaeIntake;
-    private final Climber climber;
-    private final SuperStructure superStructure;
+    public final Drive drive;
+    public final Vision vision;
+    public final Elevator elevator;
+    public final Arm arm;
+    public final Intake intake;
+    public final AlgaeIntake algaeIntake;
+    public final Climber climber;
+    public final SuperStructure superStructure;
 
     public final DriverXbox driveController = new DriverXbox(0);
 
@@ -248,7 +249,12 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
+                        new DriveToPose(
+                                drive,
+                                () -> CoralStation.getCoralStationPose(Side.RIGHT),
+                                Optional.empty(),
+                                Optional.empty(),
+                                false)));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -256,7 +262,12 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
+                        new DriveToPose(
+                                drive,
+                                () -> CoralStation.getCoralStationPose(Side.LEFT),
+                                Optional.empty(),
+                                Optional.empty(),
+                                false)));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
@@ -285,7 +296,12 @@ public class RobotContainer {
                 "alignRemoveAlgaeV2", AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
         NamedCommands.registerCommand(
                 "alignRemoveAlgaeV1",
-                new DriveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.CENTER), Optional.empty())
+                new DriveToPose(
+                                drive,
+                                () -> Reef.getClosestBranchPose(drive, Side.CENTER),
+                                Optional.empty(),
+                                Optional.empty(),
+                                false)
                         .andThen(AlgaeCommands.removeL2AlgaeV1(superStructure, intake)));
 
         NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
@@ -298,6 +314,7 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser.addOption("pidToPoseTest", new RightAuto().getAutoCommand(this));
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -312,6 +329,8 @@ public class RobotContainer {
         // Configure the button bindings
         configureDriverButtonBindings();
     }
+
+    private void generateAutos() {}
 
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a

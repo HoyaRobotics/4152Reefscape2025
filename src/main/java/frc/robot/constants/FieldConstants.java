@@ -41,14 +41,18 @@ public class FieldConstants {
         private static boolean inCoralStationRange = false;
 
         public static Pose2d getCoralStationPose(Side side) {
+            Pose2d coralStation = side == Side.RIGHT ? RightSidePose : LeftSidePose;
+            /*
             boolean isRed = DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red;
-            Pose2d coralStation = side == Side.RIGHT ? RightSidePose : LeftSidePose;
             if (isRed) {
                 coralStation = new Pose2d(
                         FieldMirroringUtils.flip(coralStation.getTranslation()),
                         FieldMirroringUtils.flip(coralStation.getRotation()));
             }
+            */
+            coralStation = FieldMirroringUtils.toCurrentAlliancePose(coralStation);
+            Logger.recordOutput("CoralStation/goal", coralStation);
             return coralStation.transformBy(
                     new Transform2d(0.4825, Units.inchesToMeters(2.5), Rotation2d.fromDegrees(180))); // 0.48
         }

@@ -77,7 +77,8 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
         algaeIntakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;
         algaeIntakeMotorConfig.Voltage.PeakForwardVoltage = 12.0;
         algaeIntakeMotorConfig.Voltage.PeakReverseVoltage = -12.0;
-        algaeIntakeMotorConfig.Slot0.kV = 0.295; // 0.295 for a 30/11 gear ratio , 0.472 48 / 11, 0.649 48 / 8, 1.19 11/1s
+        algaeIntakeMotorConfig.Slot0.kV =
+                0.295; // 0.295 for a 30/11 gear ratio , 0.472 48 / 11, 0.649 48 / 8, 1.19 11/1s
         algaeIntakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         algaeIntakeMotor.getConfigurator().apply(algaeIntakeMotorConfig);

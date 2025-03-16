@@ -4,15 +4,17 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -37,6 +39,8 @@ public class DriveToPose extends Command {
 
     private final Angle angleDeltaTolerance;
 
+    private final Pair<Distance, Angle> controllerTolerance;
+
     private final Drive drive;
 
     private final Supplier<Pose2d> poseSupplier;
@@ -56,12 +60,23 @@ public class DriveToPose extends Command {
     private final ProfiledPIDController angleController = new ProfiledPIDController(
             ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
+    private final Optional<SlewRateLimiter> linearXSlewFilter;
+    private final Optional<SlewRateLimiter> linearYSlewFilter;
+
     /** Creates a new DriveToPose. */
-    public DriveToPose(Drive drive, Supplier<Pose2d> poseSupplier, Optional<Angle> angleDeltaTolerance) {
+    public DriveToPose(
+            Drive drive,
+            Supplier<Pose2d> poseSupplier,
+            Optional<Angle> angleDeltaTolerance,
+            Optional<Pair<Distance, Angle>> controllerTolerance,
+            boolean limitSlewRate) {
         addRequirements(drive);
         this.drive = drive;
         this.angleDeltaTolerance = angleDeltaTolerance.orElse(Degrees.of(5.0));
         this.poseSupplier = poseSupplier;
+        this.controllerTolerance = controllerTolerance.orElse(new Pair<>(Inches.of(0.5), Degrees.of(2)));
+        this.linearXSlewFilter = limitSlewRate ? Optional.of(new SlewRateLimiter(4)) : Optional.empty();
+        this.linearYSlewFilter = limitSlewRate ? Optional.of(new SlewRateLimiter(4)) : Optional.empty();
     }
 
     // Called when the command is initially scheduled.
@@ -76,13 +91,13 @@ public class DriveToPose extends Command {
         yController.reset(drive.getPose().getY(), drive.getFieldChassisSpeeds().vyMetersPerSecond);
 
         xController.setGoal(endPose.getX());
-        xController.setTolerance(Units.inchesToMeters(0.5));
+        xController.setTolerance(controllerTolerance.getFirst().in(Meters));
 
         yController.setGoal(endPose.getY());
-        yController.setTolerance(Units.inchesToMeters(0.5));
+        yController.setTolerance(controllerTolerance.getFirst().in(Meters));
 
         angleController.setGoal(endPose.getRotation().getRadians());
-        angleController.setTolerance(Math.PI / 90);
+        angleController.setTolerance(controllerTolerance.getSecond().in(Radians));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -108,6 +123,17 @@ public class DriveToPose extends Command {
         }
 
         // Convert to field relative speeds & send command
+        /*
+        if (linearXSlewFilter.isPresent()) {
+            Logger.recordOutput("SlewRate/RawXspeed", xSpeed);
+            Logger.recordOutput("SlewRate/RawYspeed", ySpeed);
+            xSpeed = linearXSlewFilter.get().calculate(xSpeed);
+            ySpeed = linearYSlewFilter.get().calculate(ySpeed);
+            Logger.recordOutput("SlewRate/FilteredXspeed", xSpeed);
+            Logger.recordOutput("SlewRate/FilteredYspeed", ySpeed);
+        }
+        */
+
         ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, angleSpeed);
         drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
     }
