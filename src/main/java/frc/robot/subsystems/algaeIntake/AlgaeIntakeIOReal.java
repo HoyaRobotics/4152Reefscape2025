@@ -19,6 +19,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -71,7 +72,7 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
 
     private void configureMotors() {
         TalonFXConfiguration algaeIntakeMotorConfig = new TalonFXConfiguration();
-        // algaeIntakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        algaeIntakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
         algaeIntakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         algaeIntakeMotorConfig.Feedback.SensorToMechanismRatio = intakeRatio;

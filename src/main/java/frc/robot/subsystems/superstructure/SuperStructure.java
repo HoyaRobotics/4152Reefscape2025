@@ -28,7 +28,7 @@ public class SuperStructure {
 
         // Elevator position, arm angle
         TROUGH(Inches.of(7.0), Degrees.of(-60)),
-        LOADING(Inches.of(16.0), Degrees.of(-35)),
+        LOADING(Inches.of(18), Degrees.of(-35)),
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(13.0), Degrees.of(135.0)),
         L3(Inches.of(28.75), Degrees.of(135.0)), // 15.75 more than L2
@@ -46,7 +46,7 @@ public class SuperStructure {
 
         HOLD(Inches.of(3.0), Degrees.of(103)),
         CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),
-        BASE(Inches.of(16.0), Degrees.of(-35)); // 3.0, -25
+        BASE(Inches.of(18), Degrees.of(-35)); // 3.0, -25
 
         public final Distance elevatorPosition;
         public final Angle armAngle;

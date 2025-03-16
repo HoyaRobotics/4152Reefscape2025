@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -20,6 +19,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToPose extends Command {
@@ -60,8 +60,7 @@ public class DriveToPose extends Command {
     private final ProfiledPIDController angleController = new ProfiledPIDController(
             ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
-    private final Optional<SlewRateLimiter> linearXSlewFilter;
-    private final Optional<SlewRateLimiter> linearYSlewFilter;
+    private boolean stopDrive;
 
     /** Creates a new DriveToPose. */
     public DriveToPose(
@@ -69,19 +68,23 @@ public class DriveToPose extends Command {
             Supplier<Pose2d> poseSupplier,
             Optional<Angle> angleDeltaTolerance,
             Optional<Pair<Distance, Angle>> controllerTolerance,
-            boolean limitSlewRate) {
+            boolean limitSlewRate,
+            boolean stopDrive) {
         addRequirements(drive);
+        this.stopDrive = stopDrive;
         this.drive = drive;
         this.angleDeltaTolerance = angleDeltaTolerance.orElse(Degrees.of(5.0));
         this.poseSupplier = poseSupplier;
         this.controllerTolerance = controllerTolerance.orElse(new Pair<>(Inches.of(0.5), Degrees.of(2)));
-        this.linearXSlewFilter = limitSlewRate ? Optional.of(new SlewRateLimiter(4)) : Optional.empty();
-        this.linearYSlewFilter = limitSlewRate ? Optional.of(new SlewRateLimiter(4)) : Optional.empty();
+        // this.linearXSlewFilter = limitSlewRate ? Optional.of(new SlewRateLimiter(4)) : Optional.empty();
+        // this.linearYSlewFilter = limitSlewRate ? Optional.of(new SlewRateLimiter(4)) : Optional.empty();
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        if (Math.abs(angleController.getPositionError()) < angleDeltaTolerance.in(Radians))
+            withingAngleTolerance = true;
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
         Pose2d endPose = poseSupplier.get();
@@ -123,6 +126,8 @@ public class DriveToPose extends Command {
         }
 
         // Convert to field relative speeds & send command
+        Logger.recordOutput("PIDToPose/xSpeed", xSpeed);
+        Logger.recordOutput("PIDToPose/ySpeed", ySpeed);
         /*
         if (linearXSlewFilter.isPresent()) {
             Logger.recordOutput("SlewRate/RawXspeed", xSpeed);
@@ -141,7 +146,7 @@ public class DriveToPose extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        drive.stop();
+        if (stopDrive) drive.stop();
     }
 
     // Returns true when the command should end.

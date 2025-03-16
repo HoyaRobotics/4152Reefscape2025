@@ -254,7 +254,8 @@ public class RobotContainer {
                                 () -> CoralStation.getCoralStationPose(Side.RIGHT),
                                 Optional.empty(),
                                 Optional.empty(),
-                                false)));
+                                false,
+                                true)));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -267,7 +268,8 @@ public class RobotContainer {
                                 () -> CoralStation.getCoralStationPose(Side.LEFT),
                                 Optional.empty(),
                                 Optional.empty(),
-                                false)));
+                                false,
+                                true)));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
@@ -301,7 +303,8 @@ public class RobotContainer {
                                 () -> Reef.getClosestBranchPose(drive, Side.CENTER),
                                 Optional.empty(),
                                 Optional.empty(),
-                                false)
+                                false,
+                                true)
                         .andThen(AlgaeCommands.removeL2AlgaeV1(superStructure, intake)));
 
         NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));

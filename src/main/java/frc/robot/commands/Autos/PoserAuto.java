@@ -16,7 +16,7 @@ public abstract class PoserAuto {
         SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
         List<AutoNode> nodes = getAutoGraph(robot);
-        nodes.forEach((node) -> autoCommand.addCommands(node.getCommand(robot.drive)));
+        nodes.forEach((node) -> autoCommand.addCommands(node.getCommand(robot.drive, robot)));
         List<Pose2d> autoPoses =
                 nodes.stream().map((node) -> node.getTargetPose()).toList();
         Logger.recordOutput("PIDAuto/Poses", autoPoses.toArray(new Pose2d[0]));

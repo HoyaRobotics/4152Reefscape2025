@@ -133,6 +133,10 @@ public class FieldConstants {
             return faceIndex % 2 == 1 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
         }
 
+        public static Pose2d getAllianceReefBranch(int faceIndex, Side side) {
+            return FieldMirroringUtils.toCurrentAlliancePose(offsetReefPose(blueCenterFaces[faceIndex], side));
+        }
+
         public static Pose2d getClosestBranchPose(Drive drive, Side side) {
             return offsetReefPose(drive.getPose().nearest(getAllianceReefList()), side);
         }

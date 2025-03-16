@@ -62,11 +62,11 @@ public class ArmIOReal implements ArmIO {
         armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         armConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        armConfig.Slot0.kG = 0.01;
+        // armConfig.Slot0.kG = 0.01;
         armConfig.Slot0.kS = 0.15;
         armConfig.Slot0.kV = 21.04111;
         armConfig.Slot0.kA = 0.0;
-        armConfig.Slot0.kP = 45;
+        armConfig.Slot0.kP = 45; // 45
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(180.0);
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
