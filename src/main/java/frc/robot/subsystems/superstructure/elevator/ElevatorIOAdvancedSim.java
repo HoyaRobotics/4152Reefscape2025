@@ -30,7 +30,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
     public ElevatorIOAdvancedSim() {
         configureMotors();
         elevatorSim = new ElevatorSim(
-                DCMotor.getFalcon500(2), 8, 12.63380394, 0.0573 / 2, 0, Units.inchesToMeters(53.5), true, 0.0);
+                DCMotor.getFalcon500(2), 8.0, 9.156, 0.0573 / 2.0, 0.0, Units.inchesToMeters(53.5), true, 0.0);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 35;
         elevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         elevatorMotorConfig.Feedback.SensorToMechanismRatio = elevatorToDistanceRatio;
-        elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 2.5;
+        elevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 6.0;
         elevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 2.0;
         elevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         elevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
