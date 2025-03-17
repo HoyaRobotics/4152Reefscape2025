@@ -117,11 +117,15 @@ public class AutoAlign {
 
     public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, Side.CENTER);
-        return new DriveToPose(drive, drivePose::get, Optional.empty())
+        Supplier<Pose2d> movingPose = () ->
+                Reef.getClosestBranchPose(drive, Side.CENTER).transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
+
+        return new DriveToPose(drive, movingPose::get, Optional.empty())
                 .alongWith(new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRangeAlgae))
                         .andThen(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
-                .andThen(AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive));
+                .andThen(new DriveToPose(drive, drivePose::get, Optional.empty())
+                        .andThen(AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)));
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

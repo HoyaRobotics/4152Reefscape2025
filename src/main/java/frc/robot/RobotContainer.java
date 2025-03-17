@@ -250,8 +250,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(
-                                drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -259,8 +258,7 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(
-                                drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
+                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
@@ -377,7 +375,6 @@ public class RobotContainer {
                 break;
         }
 
-        /*
         driveController
                 .moveToL4(false)
                 .onTrue(new PlacingCommand(
@@ -390,7 +387,7 @@ public class RobotContainer {
                 .moveToL2(false)
                 .onTrue(new PlacingCommand(
                         superStructure, intake, SuperStructurePose.L2, driveController.ejectCoral()));
-                        */
+
         driveController
                 .moveToTrough(false)
                 .onTrue(new PlacingCommand(
