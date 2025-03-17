@@ -78,6 +78,7 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOAdvancedSim;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -173,8 +174,8 @@ public class RobotContainer {
                                 VisionConstants.camera1Name,
                                 VisionConstants.robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
-                // elevator = new Elevator(new ElevatorIOSim());
-                elevator = new Elevator(new ElevatorIOAdvancedSim());
+                elevator = new Elevator(new ElevatorIOSim());
+                //elevator = new Elevator(new ElevatorIOAdvancedSim());
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 // intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
