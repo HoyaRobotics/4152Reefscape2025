@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.Autos.RightAuto;
+import frc.robot.commands.Autos.Coral3Piece;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
@@ -301,7 +301,9 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         autoChooser.addOption(
-                "pidToPoseTest", new RightAuto(drive, superStructure, intake, algaeIntake).getAutoCommand());
+                "3PieceRight", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
+        autoChooser.addOption(
+                "3PieceLeft", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.LEFT));
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));

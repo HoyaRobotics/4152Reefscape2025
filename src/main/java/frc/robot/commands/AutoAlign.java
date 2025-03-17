@@ -77,8 +77,7 @@ public class AutoAlign {
                         .onlyIf(() -> removeAlgae));
     }
 
-    public static Command placingSequence(
-            SuperStructure superStructure, Intake intake) {
+    public static Command placingSequence(SuperStructure superStructure, Intake intake) {
 
         return Commands.sequence(
                 intake.runWithSensor(IntakeAction.PLACING),

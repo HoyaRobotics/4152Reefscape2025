@@ -50,7 +50,8 @@ public abstract class PoserAuto {
                                 Set.of())
                         .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake))
                         .andThen(superStructure.moveToPose(SuperStructurePose.L4)))
-                .andThen(superStructure.moveToPose(SuperStructurePose.L4)
+                .andThen(superStructure
+                        .moveToPose(SuperStructurePose.L4)
                         .andThen(AutoAlign.placingSequence(superStructure, intake)));
     }
 
