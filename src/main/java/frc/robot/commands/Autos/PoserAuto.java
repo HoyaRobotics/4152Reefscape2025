@@ -49,7 +49,9 @@ public abstract class PoserAuto {
                                         PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance)),
                                 Set.of())
                         .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake))
-                        .andThen(AutoAlign.placingSequence(superStructure, intake, SuperStructurePose.L4)));
+                        .andThen(superStructure.moveToPose(SuperStructurePose.L4)))
+                .andThen(superStructure.moveToPose(SuperStructurePose.L4)
+                        .andThen(AutoAlign.placingSequence(superStructure, intake)));
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {

@@ -72,21 +72,15 @@ public class AutoAlign {
                                 .repeatedly()
                                 .until(superStructure::isAtPosition)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
-                .andThen(Commands.sequence(
-                        intake.runWithSensor(IntakeAction.PLACING),
-                        intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
-                        intake.run(IntakeAction.PLACING)
-                                .withTimeout(IntakeConstants.PlacingTimeout)
-                                .deadlineFor(superStructure.retractArm(SuperStructurePose.BASE.armAngle))))
+                .andThen(placingSequence(superStructure, intake))
                 .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
                         .onlyIf(() -> removeAlgae));
     }
 
     public static Command placingSequence(
-            SuperStructure superStructure, Intake intake, SuperStructurePose superStructurePose) {
+            SuperStructure superStructure, Intake intake) {
 
         return Commands.sequence(
-                superStructure.moveToPose(superStructurePose),
                 intake.runWithSensor(IntakeAction.PLACING),
                 intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
                 intake.run(IntakeAction.PLACING)
