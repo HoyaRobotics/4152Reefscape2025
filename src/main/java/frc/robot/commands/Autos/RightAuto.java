@@ -1,66 +1,50 @@
 package frc.robot.commands.Autos;
 
-// variable intake height proportional to distance
-/*
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.AutoAlign;
+import frc.robot.constants.FieldConstants.Reef;
+import frc.robot.constants.FieldConstants.Side;
+import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import java.util.function.Supplier;
+
 public class RightAuto extends PoserAuto {
-    @Override
-    protected List<AutoNode> getAutoGraph(RobotContainer robot) {
-        List<AutoNode> nodes = new LinkedList();
 
-        // place preloaded
-        nodes.add(new AutoNode(() -> Reef.getAllianceReefBranch(4, Side.LEFT))
-                .setDeltaTolerance(Degrees.of(360))
-                .addCommandOnInRange(
-                        robot.drive::getPose,
-                        AutoAlign.placingSequence(robot.superStructure, robot.intake, SuperStructurePose.L4),
-                        Inches.of(55)));
+    public RightAuto(Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
+        super(drive, superStructure, intake, algaeIntake);
+    }
 
-        // Go get first coral
-        nodes.add(new AutoNode(() -> Reef.getAllianceReefBranch(4, Side.LEFT)
-                        .transformBy(new Transform2d(0.0, -2.75, new Rotation2d())))
-                .addDeadline(robot.superStructure.moveToPose(SuperStructurePose.LOADING))
-                .setDeltaTolerance(Degrees.of(360))
-                .setTransitionTolerance(Meters.of(2.0), Degrees.of(360)));
-        nodes.add(new AutoNode(() -> CoralStation.getCoralStationPose(Side.RIGHT))
-                .setCommand(robot.intake
-                        .runWithSensor(IntakeAction.INTAKING)
-                        .deadlineFor(robot.superStructure.moveToPose(SuperStructurePose.LOADING))
-                        .andThen(() -> robot.intake.stopIntake()))
-                .setDeltaTolerance(Degrees.of(360)));
+    public Command getAutoCommand() {
+        SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
-        // place second coral
-        nodes.add(new AutoNode(Reef.getAllianceReefBranch(5, Side.RIGHT))
-                .setDeltaTolerance(Degrees.of(360))
-                .addCommandOnInRange(
-                        robot.drive::getPose,
-                        AutoAlign.placingSequence(robot.superStructure, robot.intake, SuperStructurePose.L4),
-                        new HoldPosition(robot.elevator, robot.arm, robot.intake, robot.algaeIntake),
-                        Inches.of(55)));
+        autoCommand.addCommands(alignAndPlaceCoral(4, Side.LEFT));
 
-        // get third coral
-        nodes.add(new AutoNode(() -> CoralStation.getCoralStationPose(Side.RIGHT))
-                .setCommand(robot.intake
-                        .runWithSensor(IntakeAction.INTAKING)
-                        .deadlineFor(robot.superStructure.moveToPose(SuperStructurePose.LOADING))
-                        .andThen(() -> robot.intake.stopIntake()))
-                .setDeltaTolerance(Degrees.of(360)));
+        Supplier<Pose2d> waypointPose =
+                () -> Reef.getAllianceReefBranch(4, Side.LEFT).transformBy(new Transform2d(0.5, 0, Rotation2d.kZero));
+        autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(0.25))
+                .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
-        // place third coral
-        nodes.add(new AutoNode(Reef.getAllianceReefBranch(5, Side.LEFT))
-                .setDeltaTolerance(Degrees.of(360))
-                .addCommandOnInRange(
-                        robot.drive::getPose,
-                        AutoAlign.placingSequence(robot.superStructure, robot.intake, SuperStructurePose.L4),
-                        new HoldPosition(robot.elevator, robot.arm, robot.intake, robot.algaeIntake),
-                        Inches.of(55)));
-        // get tfourth coral
-        nodes.add(new AutoNode(() -> CoralStation.getCoralStationPose(Side.RIGHT))
-                .setCommand(robot.intake
-                        .runWithSensor(IntakeAction.INTAKING)
-                        .deadlineFor(robot.superStructure.moveToPose(SuperStructurePose.LOADING))
-                        .andThen(() -> robot.intake.stopIntake()))
-                .setDeltaTolerance(Degrees.of(360)));
-        return nodes;
+        Supplier<Pose2d> secondWaypoint = () ->
+                Reef.getAllianceReefBranch(5, Side.RIGHT).transformBy(new Transform2d(0.75, -0.5, Rotation2d.kZero));
+        autoCommand.addCommands(transitionWaypoint(secondWaypoint, Meters.of(0.5))
+                .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
+
+        autoCommand.addCommands(alignAndReceiveCoral(Side.RIGHT));
+        autoCommand.addCommands(alignAndPlaceCoral(5, Side.RIGHT));
+
+        autoCommand.addCommands(alignAndReceiveCoral(Side.RIGHT));
+        autoCommand.addCommands(alignAndPlaceCoral(5, Side.LEFT));
+        autoCommand.addCommands(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
+
+        return autoCommand;
     }
 }
-    */
