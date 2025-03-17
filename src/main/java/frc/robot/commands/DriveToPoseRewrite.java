@@ -5,9 +5,7 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Radians;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -25,11 +23,11 @@ import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToPoseRewrite extends Command {
-    private static final double LINEAR_KP = 8.0;
-    private static final double LINEAR_KD = 0.0;
+    private static double LINEAR_KP = 5.8;
+    private static double LINEAR_KD = 0.20;
 
-    private static final double LINEAR_MAX_VELOCITY = 4.5;
-    private static final double LINEAR_MAX_ACCELERATION = 5.7;
+    private static double LINEAR_MAX_VELOCITY = 4.5;
+    private static final double LINEAR_MAX_ACCELERATION = 7.89; // 5.7
 
     private static final double ANGLE_KP = 1.0 * TunerConstants.kDriveGearRatio;
     private static final double ANGLE_KD = 0.0; // 0.4
@@ -63,6 +61,7 @@ public class DriveToPoseRewrite extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
         Pose2d endPose = poseSupplier.get();
@@ -97,10 +96,10 @@ public class DriveToPoseRewrite extends Command {
             ySpeed = yController.calculate(drive.getPose().getY());
         }
 
-        xSpeed = xLimiter.calculate(xSpeed);
-        ySpeed = yLimiter.calculate(ySpeed);
-        xSpeed = MathUtil.clamp(xSpeed, -LINEAR_MAX_VELOCITY, LINEAR_MAX_VELOCITY);
-        ySpeed = MathUtil.clamp(ySpeed, -LINEAR_MAX_VELOCITY, LINEAR_MAX_VELOCITY);
+        // xSpeed = xLimiter.calculate(xSpeed);
+        // ySpeed = yLimiter.calculate(ySpeed);
+        // xSpeed = MathUtil.clamp(xSpeed, -LINEAR_MAX_VELOCITY, LINEAR_MAX_VELOCITY);
+        // ySpeed = MathUtil.clamp(ySpeed, -LINEAR_MAX_VELOCITY, LINEAR_MAX_VELOCITY);
 
         Logger.recordOutput("PIDToPose/xSpeed", xSpeed);
         Logger.recordOutput("PIDToPose/ySpeed", ySpeed);
@@ -119,7 +118,7 @@ public class DriveToPoseRewrite extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        //return xController.atSetpoint() && yController.atSetpoint() && angleController.atGoal();
-        return false;
+        return xController.atSetpoint() && yController.atSetpoint() && angleController.atGoal();
+        // return false;
     }
 }

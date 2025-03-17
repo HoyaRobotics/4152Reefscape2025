@@ -96,7 +96,7 @@ public class AutoAlign {
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> movingPose = () -> {
-            Pose2d pose = Processor.getProcessorPose().transformBy(new Transform2d(-0.75, 0.0, new Rotation2d()));
+            Pose2d pose = Processor.getProcessorPose().transformBy(new Transform2d(-0.35, 0.0, new Rotation2d()));
             Logger.recordOutput("Processor/movingPose", pose);
             return pose;
         };

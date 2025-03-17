@@ -24,6 +24,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -35,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.Autos.RightAutoRewrite;
+import frc.robot.commands.Autos.RightAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
@@ -76,7 +77,6 @@ import frc.robot.subsystems.superstructure.arm.ArmIOReal;
 import frc.robot.subsystems.superstructure.arm.ArmIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
-import frc.robot.subsystems.superstructure.elevator.ElevatorIOAdvancedSim;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.Vision;
@@ -175,7 +175,7 @@ public class RobotContainer {
                                 VisionConstants.robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
                 elevator = new Elevator(new ElevatorIOSim());
-                //elevator = new Elevator(new ElevatorIOAdvancedSim());
+                // elevator = new Elevator(new ElevatorIOAdvancedSim());
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 // intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
@@ -250,7 +250,8 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
+                        new DriveToPose(
+                                drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignGetCoralLeft",
@@ -258,7 +259,8 @@ public class RobotContainer {
                         intake.runWithSensor(IntakeAction.INTAKING)
                                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
                                 .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
+                        new DriveToPose(
+                                drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
 
         NamedCommands.registerCommand(
                 "alignLeftPlaceL4",
@@ -301,7 +303,7 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         autoChooser.addOption(
-                "pidToPoseTest", new RightAutoRewrite(drive, superStructure, intake, algaeIntake).getAutoCommand());
+                "pidToPoseTest", new RightAuto(drive, superStructure, intake, algaeIntake).getAutoCommand());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -348,6 +350,14 @@ public class RobotContainer {
                 .whileTrue(superStructure
                         .moveToPose(SuperStructurePose.LOADING)
                         .alongWith(intake.run(IntakeAction.INTAKING)));
+        driveController
+                .xboxController
+                .povRight()
+                .whileTrue(new DriveToPose(
+                        drive,
+                        () -> Reef.getAllianceReefBranch(5, Side.CENTER)
+                                .transformBy(new Transform2d(1.0, 0.0, new Rotation2d())),
+                        Optional.of(Degrees.of(360))));
 
         switch (Constants.intakeVersion) {
             case V1:

@@ -7,6 +7,7 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -22,19 +23,10 @@ import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToPose extends Command {
-    private static final double LINEAR_KP = 1.0 * TunerConstants.kDriveGearRatio;
-    private static final double LINEAR_KI = 0.0;
-    private static final double LINEAR_KD = 0.0;
-
-    private static final double LINEAR_MAX_VELOCITY = 4.5;
-    private static final double LINEAR_MAX_ACCELERATION = 5.7;
-
     private static final double ANGLE_KP = 1.0 * TunerConstants.kDriveGearRatio;
     private static final double ANGLE_KD = 0.0; // 0.4
     private static final double ANGLE_MAX_VELOCITY = 10.0;
     private static final double ANGLE_MAX_ACCELERATION = 15.0;
-
-    private boolean withingAngleTolerance = false;
 
     private final Angle angleDeltaTolerance;
 
@@ -42,17 +34,8 @@ public class DriveToPose extends Command {
 
     private final Supplier<Pose2d> poseSupplier;
 
-    private final ProfiledPIDController xController = new ProfiledPIDController(
-            LINEAR_KP,
-            LINEAR_KI,
-            LINEAR_KD,
-            new TrapezoidProfile.Constraints(LINEAR_MAX_VELOCITY, LINEAR_MAX_ACCELERATION));
-
-    private final ProfiledPIDController yController = new ProfiledPIDController(
-            LINEAR_KP,
-            LINEAR_KI,
-            LINEAR_KD,
-            new TrapezoidProfile.Constraints(LINEAR_MAX_VELOCITY, LINEAR_MAX_ACCELERATION));
+    private final PIDController xController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    private final PIDController yController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
 
     private final ProfiledPIDController angleController = new ProfiledPIDController(
             ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
@@ -68,20 +51,19 @@ public class DriveToPose extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        if (Math.abs(angleController.getPositionError()) < angleDeltaTolerance.in(Radians))
-            withingAngleTolerance = true;
+
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
         Pose2d endPose = poseSupplier.get();
 
         angleController.reset(drive.getRotation().getRadians(), drive.getFieldChassisSpeeds().omegaRadiansPerSecond);
-        xController.reset(drive.getPose().getX(), drive.getFieldChassisSpeeds().vxMetersPerSecond);
-        yController.reset(drive.getPose().getY(), drive.getFieldChassisSpeeds().vyMetersPerSecond);
+        xController.reset();
+        yController.reset();
 
-        xController.setGoal(endPose.getX());
+        xController.setSetpoint(endPose.getX());
         xController.setTolerance(Units.inchesToMeters(0.5));
 
-        yController.setGoal(endPose.getY());
+        yController.setSetpoint(endPose.getY());
         yController.setTolerance(Units.inchesToMeters(0.5));
 
         angleController.setGoal(endPose.getRotation().getRadians());
@@ -98,14 +80,6 @@ public class DriveToPose extends Command {
 
         // starts driving once almost fully turned
         if (Math.abs(angleController.getPositionError()) < angleDeltaTolerance.in(Radians)) {
-            if (!withingAngleTolerance) {
-                xController.reset(drive.getPose().getX(), drive.getFieldChassisSpeeds().vxMetersPerSecond);
-                yController.reset(drive.getPose().getY(), drive.getFieldChassisSpeeds().vyMetersPerSecond);
-
-                xController.setGoal(poseSupplier.get().getX());
-                yController.setGoal(poseSupplier.get().getY());
-            }
-            withingAngleTolerance = true;
             xSpeed = xController.calculate(drive.getPose().getX());
             ySpeed = yController.calculate(drive.getPose().getY());
         }
@@ -118,6 +92,8 @@ public class DriveToPose extends Command {
         drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
     }
 
+    // todo: eject coral button
+
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
@@ -127,6 +103,6 @@ public class DriveToPose extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return xController.atGoal() && yController.atGoal() && angleController.atGoal();
+        return xController.atSetpoint() && yController.atSetpoint() && angleController.atGoal();
     }
 }

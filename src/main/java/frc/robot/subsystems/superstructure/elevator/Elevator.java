@@ -87,7 +87,7 @@ public class Elevator extends SubsystemBase {
     public Command zeroPosition() {
         return Commands.run(() -> this.io.setVoltage(Volts.of(-1.0)))
                 .beforeStarting(() -> this.io.changeSoftLimits(false))
-                .until(() -> this.io.getCurrent().gt(Amps.of(20.0)))
+                .until(() -> this.io.getCurrent().gt(Amps.of(25.0)))
                 .finallyDo(() -> {
                     this.io.zeroEncoder();
                     this.io.changeSoftLimits(true);

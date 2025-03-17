@@ -34,7 +34,6 @@ public abstract class PoserAuto {
     protected final Intake intake;
     protected final AlgaeIntake algaeIntake;
 
-    // public abstract Command getAutoCommand(Set<Subsystem> requirements);
     public PoserAuto(Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
         this.drive = drive;
         this.superStructure = superStructure;
@@ -65,19 +64,4 @@ public abstract class PoserAuto {
                         .alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)))
                 .andThen(() -> intake.stopIntake());
     }
-
-    /*
-    public Command getAutoCommand(RobotContainer robot) {
-        SequentialCommandGroup autoCommand = new SequentialCommandGroup();
-
-        List<AutoNode> nodes = getAutoGraph(robot);
-        nodes.forEach((node) -> autoCommand.addCommands(node.getCommand(robot.drive, robot)));
-        List<Pose2d> autoPoses =
-                nodes.stream().map((node) -> node.getTargetPose()).toList();
-        Logger.recordOutput("PIDAuto/Poses", autoPoses.toArray(new Pose2d[0]));
-
-        return autoCommand;
-    } */
-
-    // protected abstract List<AutoNode> getAutoGraph(RobotContainer robot);
 }
