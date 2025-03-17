@@ -27,10 +27,14 @@ public class RightAutoRewrite extends PoserAuto {
 
         autoCommand.addCommands(alignAndPlaceCoral(4, Side.LEFT));
 
-        Supplier<Pose2d> waypointPose = () ->
-                Reef.getAllianceReefBranch(4, Side.LEFT).transformBy(new Transform2d(0.0, -2.75, new Rotation2d()));
-        autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(2.0))
+        Supplier<Pose2d> waypointPose =
+                () -> Reef.getAllianceReefBranch(4, Side.LEFT).transformBy(new Transform2d(0.5, 0, new Rotation2d()));
+        autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(0.25))
                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.L4)));
+
+        Supplier<Pose2d> secondWaypoint = () -> Reef.getAllianceReefBranch(5, Side.RIGHT)
+            .transformBy(new Transform2d(0.5, 0, new Rotation2d()));
+        autoCommand.addCommands(transitionWaypoint(secondWaypoint, Meters.of(0.25)));
 
         autoCommand.addCommands(alignAndReceiveCoral(Side.RIGHT));
         autoCommand.addCommands(alignAndPlaceCoral(5, Side.RIGHT));
