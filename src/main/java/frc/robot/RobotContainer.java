@@ -39,6 +39,7 @@ import frc.robot.commands.Autos.Coral3Piece;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
+import frc.robot.commands.LEDSequence;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants.CoralStation;
@@ -68,6 +69,10 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIORealV1;
 import frc.robot.subsystems.intake.IntakeIORealV2;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.leds.LED;
+import frc.robot.subsystems.leds.LEDIO;
+import frc.robot.subsystems.leds.LEDIOReal;
+import frc.robot.subsystems.leds.LEDIOSim;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
@@ -104,6 +109,7 @@ public class RobotContainer {
     public final AlgaeIntake algaeIntake;
     public final Climber climber;
     public final SuperStructure superStructure;
+    public final LED led;
 
     public final DriverXbox driveController = new DriverXbox(0);
 
@@ -145,7 +151,7 @@ public class RobotContainer {
                         drive,
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                         new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-
+                led = new LED(new LEDIOReal());
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -218,7 +224,7 @@ public class RobotContainer {
                         arm);
                 algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim());
                 climber = new Climber(new ClimberIOSim());
-
+                led = new LED(new LEDIOSim());
                 break;
 
             default:
@@ -236,7 +242,7 @@ public class RobotContainer {
                 intake = new Intake(new IntakeIO() {}, elevator, arm);
                 algaeIntake = new AlgaeIntake(new AlgaeIntakeIO() {});
                 climber = new Climber(new ClimberIO() {});
-
+                led = new LED(new LEDIO() {});
                 break;
         }
 
@@ -335,6 +341,8 @@ public class RobotContainer {
                 () -> -driveController.xboxController.getRightX()));
 
         elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake, algaeIntake));
+
+        led.setDefaultCommand(new LEDSequence(led, intake).ignoringDisable(true));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM

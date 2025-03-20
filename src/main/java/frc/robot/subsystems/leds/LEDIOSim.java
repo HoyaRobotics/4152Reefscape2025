@@ -4,14 +4,7 @@
 
 package frc.robot.subsystems.leds;
 
-import org.littletonrobotics.junction.AutoLog;
-
 /** Add your docs here. */
-public interface LEDIO {
-    @AutoLog
-    class LEDInputs {}
-
-    default void setLED(int r, int g, int b, int start, int end) {}
-
-    default void updateInputs(LEDInputs inputs) {}
+public class LEDIOSim implements LEDIO {
+    public LEDIOSim() {}
 }

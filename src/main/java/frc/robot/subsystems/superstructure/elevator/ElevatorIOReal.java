@@ -51,16 +51,16 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void setPosition(Distance targetPosition, boolean motionMagic) {
-        if(motionMagic) {
+        if (motionMagic) {
             frontElevatorMotor.setControl(
-                magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+                    magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
             backElevatorMotor.setControl(
-                magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
-        }else{
+                    magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+        } else {
             frontElevatorMotor.setControl(
-                positionRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+                    positionRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
             backElevatorMotor.setControl(
-                positionRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+                    positionRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
         }
     }
 
