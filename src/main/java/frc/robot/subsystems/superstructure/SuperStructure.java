@@ -34,7 +34,7 @@ public class SuperStructure {
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(11.5), Degrees.of(135.0)), // 13.0
         L3(Inches.of(27.25), Degrees.of(135.0)), // 15.75 more than L2
-        L4(Inches.of(52.7), Degrees.of(140.0)),
+        L4(Inches.of(52.7), Degrees.of(143.0)), // 140
 
         L2_ALGAE(Inches.of(4.0), Degrees.of(160)),
         L2_ALGAE_GRAB(Inches.of(7), Degree.of(160)),
