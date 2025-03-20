@@ -34,7 +34,7 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
     }
 
     @Override
-    public void setPosition(Distance targetPosition) {
+    public void setPosition(Distance targetPosition, boolean motionMagic) {
         frontElevatorMotor.setControl(
                 magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
         backElevatorMotor.setControl(
@@ -98,6 +98,6 @@ public class ElevatorIOAdvancedSim implements ElevatorIO {
         frontElevatorMotor.setPosition(0.0);
         backElevatorMotor.setPosition(0.0);
 
-        setPosition(Meters.of(0.0));
+        setPosition(Meters.of(0.0), true);
     }
 }

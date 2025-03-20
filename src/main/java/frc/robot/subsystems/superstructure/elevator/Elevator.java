@@ -9,6 +9,11 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -16,6 +21,9 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.FieldConstants.CoralStation;
+import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -55,7 +63,7 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/ElevatorPose", this.stage2Pose);
     }
 
-    /*
+    
     public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
         LinearFilter filter = LinearFilter.movingAverage(50);
         return Commands.defer(
@@ -75,16 +83,16 @@ public class Elevator extends SubsystemBase {
                             Distance height = SuperStructurePose.LOADING.elevatorPosition.minus(
                                     Inches.of(xOffset.abs(Inches) * 1.0 / 4.5));
                             Distance inputHeight = height.gt(minHeight) ? height : minHeight;
-                            return moveToPosition(Inches.of(filter.calculate(inputHeight.in(Inches))))
+                            return moveToPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false)
                                     .withTimeout(0.05);
                         },
                         Set.of(this))
                 .repeatedly();
-    }*/
+    }
 
-    public Command moveToPosition(Distance targetPosition) {
+    public Command moveToPosition(Distance targetPosition, boolean motionMagic) {
         return Commands.run(() -> {}, this)
-                .beforeStarting(() -> setPosition(targetPosition))
+                .beforeStarting(() -> setPosition(targetPosition, motionMagic))
                 .until(() -> isAtPosition(targetPosition));
     }
 
@@ -108,8 +116,8 @@ public class Elevator extends SubsystemBase {
         return this.inputs.position;
     }
 
-    public void setPosition(Distance targetPosition) {
-        this.io.setPosition(targetPosition);
+    public void setPosition(Distance targetPosition, boolean motionMagic) {
+        this.io.setPosition(targetPosition, motionMagic);
     }
 
     public Command zeroPosition() {

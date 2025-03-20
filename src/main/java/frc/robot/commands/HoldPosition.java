@@ -45,10 +45,10 @@ public class HoldPosition extends Command {
         final AlgaeIntakeAction algaeIntakeAction = hasAlgae ? AlgaeIntakeAction.HOLDING : AlgaeIntakeAction.EMPTY;
 
         if (hasCoral || hasAlgae) {
-            elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition);
+            elevator.setPosition(SuperStructurePose.HOLD.elevatorPosition, true);
             arm.setArmPosition(SuperStructurePose.HOLD.armAngle);
         } else {
-            elevator.setPosition(SuperStructurePose.BASE.elevatorPosition);
+            elevator.setPosition(SuperStructurePose.BASE.elevatorPosition, true);
             arm.setArmPosition(SuperStructurePose.BASE.armAngle);
         }
 

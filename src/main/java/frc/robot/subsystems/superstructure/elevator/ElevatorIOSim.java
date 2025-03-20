@@ -24,7 +24,7 @@ public class ElevatorIOSim implements ElevatorIO {
     }
 
     @Override
-    public void setPosition(Distance targetPosition) {
+    public void setPosition(Distance targetPosition, boolean motionMagic) {
         elevatorController.setSetpoint(targetPosition.in(Meters));
     }
 

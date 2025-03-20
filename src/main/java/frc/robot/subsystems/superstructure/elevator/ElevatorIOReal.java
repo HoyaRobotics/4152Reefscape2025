@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Meters;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -25,6 +26,7 @@ public class ElevatorIOReal implements ElevatorIO {
     double elevatorToDistanceRatio = 8.0 / (0.0572958 * Math.PI); // Meters
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
+    private final PositionVoltage positionRequest = new PositionVoltage(0.0);
 
     public ElevatorIOReal() {
         configureMotors();
@@ -48,11 +50,18 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     @Override
-    public void setPosition(Distance targetPosition) {
-        frontElevatorMotor.setControl(
+    public void setPosition(Distance targetPosition, boolean motionMagic) {
+        if(motionMagic) {
+            frontElevatorMotor.setControl(
                 magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
-        backElevatorMotor.setControl(
+            backElevatorMotor.setControl(
                 magicRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+        }else{
+            frontElevatorMotor.setControl(
+                positionRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+            backElevatorMotor.setControl(
+                positionRequest.withPosition(targetPosition.in(Meters)).withSlot(0));
+        }
     }
 
     @Override
@@ -108,6 +117,6 @@ public class ElevatorIOReal implements ElevatorIO {
         frontElevatorMotor.setPosition(0.0);
         backElevatorMotor.setPosition(0.0);
 
-        setPosition(Meters.of(0.0));
+        setPosition(Meters.of(0.0), true);
     }
 }

@@ -17,7 +17,7 @@ public interface ElevatorIO {
         public Distance position;
     }
 
-    default void setPosition(Distance targetPosition) {}
+    default void setPosition(Distance targetPosition, boolean motionMagic) {}
 
     default void setVoltage(Voltage voltage) {}
 

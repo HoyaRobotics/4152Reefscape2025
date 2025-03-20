@@ -111,7 +111,7 @@ public class SuperStructure {
     }
 
     public Command moveToPose(SuperStructurePose pose) {
-        return elevator.moveToPosition(pose.elevatorPosition)
+        return elevator.moveToPosition(pose.elevatorPosition, true)
                 .alongWith(new WaitUntilCommand(() -> pose.elevatorPosition
                                 .minus(elevator.getPosition())
                                 .lt(ElevatorConstants.tiltingDistance))

@@ -291,7 +291,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
         NamedCommands.registerCommand(
-                "goToL4", superStructure.elevator.moveToPosition(SuperStructurePose.L4.elevatorPosition));
+                "goToL4", superStructure.elevator.moveToPosition(SuperStructurePose.L4.elevatorPosition, true));
 
         NamedCommands.registerCommand(
                 "intakeReceive",
