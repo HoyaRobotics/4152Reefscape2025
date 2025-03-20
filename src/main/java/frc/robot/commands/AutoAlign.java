@@ -124,7 +124,8 @@ public class AutoAlign {
                 .andThen(Commands.sequence(
                         new DriveToPose(drive, drivePose::get, Optional.empty()),
                         AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
-                        new DriveToPose(drive, movingPose::get, Optional.empty())));
+                        new DriveToPose(drive, movingPose::get, Optional.empty()),
+                        superStructure.arm.moveToAngle(Degrees.of(130))));
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
