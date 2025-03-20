@@ -4,7 +4,10 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
@@ -39,21 +42,27 @@ public class AlgaeCommands {
                     return superStructure
                             .moveToPose(algaePoses.get(0))
                             .andThen(superStructure.moveToPose(algaePoses.get(1)))
-                            .andThen(superStructure.moveToPose(algaePoses.get(2)))
                             .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
+                    /*
+                    .andThen(superStructure.moveToPose(algaePoses.get(2)))
+                    .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));*/
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
     }
 
     public static Command preStageRemoveAlgaeV2(SuperStructure superStructure, AlgaeIntake algaeIntake, Drive drive) {
 
-        return new DeferredCommand(
+        return Commands.defer(
                 () -> {
                     List<SuperStructurePose> algaePoses =
                             SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
 
+                    SuperStructurePose prePose = algaePoses.get(0);
                     // is this correct?
-                    return superStructure.moveToPose(algaePoses.get(0));
+                    return superStructure
+                            .moveToPose(prePose)
+                            .until(() -> superStructure.arm.withinTolerance(prePose.armAngle, Degrees.of(5)))
+                            .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
     }

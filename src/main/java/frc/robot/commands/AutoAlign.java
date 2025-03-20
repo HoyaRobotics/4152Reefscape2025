@@ -40,7 +40,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
-    private static final Distance StartSuperStructureRangeAlgae = Inches.of(50);
+    private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
+    private static final Distance ThrowNetTolerance = Inches.of(12);
+    private static final double L2DelaySeconds = 0.1;
     private static final double PosePollFreq = 0.05;
 
     // if player lets go of back buttons finish moving to pose but dont outtake
@@ -64,14 +66,16 @@ public class AutoAlign {
                                 .lt(AutoAlign.StartSuperStructureRange)),
                         new DeferredCommand(
                                         () -> superStructure.moveToPose(
-                                                superStructurePose.isEmpty()
-                                                        ? buttonWatcher.getSelectedPose()
-                                                        : superStructurePose.get()),
+                                                superStructurePose.orElse(buttonWatcher.getSelectedPose())),
                                         Set.of(superStructure.arm, superStructure.elevator))
                                 .withTimeout(PosePollFreq)
                                 .repeatedly()
                                 .until(superStructure::isAtPosition)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
+                .andThen(Commands.waitSeconds(L2DelaySeconds).onlyIf(() -> {
+                    SuperStructurePose pose = superStructurePose.orElse(buttonWatcher.getSelectedPose());
+                    return pose == SuperStructurePose.L2;
+                }))
                 .andThen(placingSequence(superStructure, intake))
                 .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
                         .onlyIf(() -> removeAlgae));
@@ -117,16 +121,22 @@ public class AutoAlign {
                 .alongWith(new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                 .lt(AutoAlign.StartSuperStructureRangeAlgae))
                         .andThen(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
-                .andThen(new DriveToPose(drive, drivePose::get, Optional.empty())
-                        .andThen(AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)));
+                .andThen(Commands.sequence(
+                        new DriveToPose(drive, drivePose::get, Optional.empty()),
+                        AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
+                        new DriveToPose(drive, movingPose::get, Optional.empty())));
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose());
         return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
-                .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_PRE_NET))
-                .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET))
-                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout))
-                .andThen(superStructure.moveToPose(SuperStructurePose.HOLD));
+                .andThen(superStructure
+                        .moveToPose(SuperStructurePose.ALGAE_NET)
+                        .alongWith(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
+                                        .elevatorPosition
+                                        .minus(superStructure.elevator.getPosition())
+                                        .lt(ThrowNetTolerance))
+                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))))
+                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 }

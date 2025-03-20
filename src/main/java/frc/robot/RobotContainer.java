@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.Coral3Piece;
@@ -299,12 +298,13 @@ public class RobotContainer {
                 superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(IntakeAction.INTAKING)));
 
         // Set up auto routines
+
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         autoChooser.addOption(
                 "3PieceRight", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
         autoChooser.addOption(
                 "3PieceLeft", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.LEFT));
-
+        /*
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
@@ -314,7 +314,7 @@ public class RobotContainer {
                 "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+        */
         // Configure the button bindings
         configureDriverButtonBindings();
     }
@@ -359,6 +359,14 @@ public class RobotContainer {
                                 .transformBy(new Transform2d(1.0, 0.0, new Rotation2d())),
                         Optional.of(Degrees.of(360))));
 
+        /*
+         * Problems:
+         *
+         *      - disabling in auto
+         *      - elevator height hitting limit, auto only
+         *      - algae intake randomly running (not lasercan fault)
+         *      - move arm while zeroing
+         */
         switch (Constants.intakeVersion) {
             case V1:
                 driveController.removeAlgae().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));

@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.algaeIntake;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +18,8 @@ public class AlgaeIntake extends SubsystemBase {
 
     private final AlgaeIntakeIO io;
     private AlgaeIntakeInputsAutoLogged inputs;
+
+    private Current currentLimit = Amps.of(0);
 
     public AlgaeIntake(AlgaeIntakeIO io) {
         this.io = io;
@@ -37,7 +41,10 @@ public class AlgaeIntake extends SubsystemBase {
     }
 
     public void runIntake(AlgaeIntakeAction intaking) {
-        io.setCurrentLimit(intaking.currentLimit);
+        if (intaking.currentLimit != currentLimit) {
+            io.setCurrentLimit(intaking.currentLimit);
+            currentLimit = intaking.currentLimit;
+        }
         io.setSpeed(intaking.speed);
     }
 

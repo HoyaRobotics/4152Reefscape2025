@@ -36,21 +36,18 @@ public class FieldConstants {
 
     public static class CoralStation {
         public static final Pose2d RightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
-        public static final Pose2d LeftSidePose = new Pose2d(0.89, 7.32, Rotation2d.fromDegrees(-54));
+        public static final Pose2d LeftSidePose = new Pose2d(0.89, 7.43, Rotation2d.fromDegrees(-54)); // y: 7.32
 
         private static boolean inCoralStationRange = false;
 
+        public static Pose2d getClosestCoralStation(Pose2d drivePose) {
+            return drivePose.nearest(List.of(
+                    FieldMirroringUtils.toCurrentAlliancePose(RightSidePose),
+                    FieldMirroringUtils.toCurrentAlliancePose(LeftSidePose)));
+        }
+
         public static Pose2d getCoralStationPose(Side side) {
             Pose2d coralStation = side == Side.RIGHT ? RightSidePose : LeftSidePose;
-            /*
-            boolean isRed = DriverStation.getAlliance().isPresent()
-                    && DriverStation.getAlliance().get() == Alliance.Red;
-            if (isRed) {
-                coralStation = new Pose2d(
-                        FieldMirroringUtils.flip(coralStation.getTranslation()),
-                        FieldMirroringUtils.flip(coralStation.getRotation()));
-            }
-            */
             coralStation = FieldMirroringUtils.toCurrentAlliancePose(coralStation);
             Logger.recordOutput("CoralStation/goal", coralStation);
             return coralStation.transformBy(

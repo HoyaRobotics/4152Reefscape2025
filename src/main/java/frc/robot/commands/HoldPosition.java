@@ -19,12 +19,14 @@ public class HoldPosition extends Command {
     private final Arm arm;
     private final Intake intake;
     private final AlgaeIntake algaeIntake;
+    // private final Supplier<Pose2d> drivePose;
     /** Creates a new HoldPosition. */
     public HoldPosition(Elevator elevator, Arm arm, Intake intake, AlgaeIntake algaeIntake) {
         this.elevator = elevator;
         this.arm = arm;
         this.intake = intake;
         this.algaeIntake = algaeIntake;
+        // this.drivePose = drivePose;
         addRequirements(elevator, arm, intake, algaeIntake);
         // Use addRequirements() here to declare subsystem dependencies.
     }

@@ -34,6 +34,7 @@ public class DriveToPose extends Command {
 
     private final Supplier<Pose2d> poseSupplier;
 
+    // 0.946 * gear ratio
     private final PIDController xController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
     private final PIDController yController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
 

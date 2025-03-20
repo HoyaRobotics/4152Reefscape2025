@@ -4,9 +4,10 @@
 // McT testing Git
 package frc.robot.subsystems.superstructure.elevator;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -54,6 +55,33 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/ElevatorPose", this.stage2Pose);
     }
 
+    /*
+    public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
+        LinearFilter filter = LinearFilter.movingAverage(50);
+        return Commands.defer(
+                        () -> {
+                            Pose2d currentPose = drivePose.get();
+                            final Distance minHeight = Inches.of(15);
+                            Distance xOffset = Meters.of(currentPose
+                                            .relativeTo(CoralStation.getClosestCoralStation(currentPose))
+                                            .getMeasureX()
+                                            .abs(Meters)
+                                    - 0.48);
+                            Logger.recordOutput("Loading/yOffset", xOffset.abs(Inches));
+                            Logger.recordOutput(
+                                    "relativeDifference",
+                                    currentPose.relativeTo(CoralStation.getClosestCoralStation(drivePose.get())));
+
+                            Distance height = SuperStructurePose.LOADING.elevatorPosition.minus(
+                                    Inches.of(xOffset.abs(Inches) * 1.0 / 4.5));
+                            Distance inputHeight = height.gt(minHeight) ? height : minHeight;
+                            return moveToPosition(Inches.of(filter.calculate(inputHeight.in(Inches))))
+                                    .withTimeout(0.05);
+                        },
+                        Set.of(this))
+                .repeatedly();
+    }*/
+
     public Command moveToPosition(Distance targetPosition) {
         return Commands.run(() -> {}, this)
                 .beforeStarting(() -> setPosition(targetPosition))
@@ -87,7 +115,7 @@ public class Elevator extends SubsystemBase {
     public Command zeroPosition() {
         return Commands.run(() -> this.io.setVoltage(Volts.of(-1.0)))
                 .beforeStarting(() -> this.io.changeSoftLimits(false))
-                .until(() -> this.io.getCurrent().gt(Amps.of(25.0)))
+                .until(() -> this.io.getCurrent().gt(Amps.of(35.0)))
                 .finallyDo(() -> {
                     this.io.zeroEncoder();
                     this.io.changeSoftLimits(true);

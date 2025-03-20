@@ -64,11 +64,12 @@ public class ArmIOReal implements ArmIO {
         armConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         // armConfig.Slot0.kG = 0.01;
         armConfig.Slot0.kS = 0.15;
+        armConfig.Slot0.kD = 0.08;
         armConfig.Slot0.kV = 23.0; // 21.04111;
         armConfig.Slot0.kA = 0.0;
-        armConfig.Slot0.kP = 45; // 45
+        armConfig.Slot0.kP = 80; // 45
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(180.0);
+        armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(200.0);
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         // armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.12;
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(-65.0);
