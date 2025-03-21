@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import java.util.Set;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -62,29 +61,23 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
-        LinearFilter filter = LinearFilter.movingAverage(50);
-        return Commands.defer(
-                        () -> {
-                            Pose2d currentPose = drivePose.get();
-                            final Distance minHeight = Inches.of(15);
-                            Distance xOffset = Meters.of(currentPose
-                                            .relativeTo(CoralStation.getClosestCoralStation(currentPose))
-                                            .getMeasureX()
-                                            .abs(Meters)
-                                    - 0.48);
-                            Logger.recordOutput("Loading/yOffset", xOffset.abs(Inches));
-                            Logger.recordOutput(
-                                    "relativeDifference",
-                                    currentPose.relativeTo(CoralStation.getClosestCoralStation(drivePose.get())));
+        LinearFilter filter = LinearFilter.movingAverage(2);
+        return Commands.run(() -> {
+            Pose2d currentPose = drivePose.get();
+            final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
+            final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
+            Distance xOffset = currentPose
+                    .relativeTo(CoralStation.getClosestCoralStation(currentPose))
+                    .getMeasureX()
+                    .minus(Meters.of(0.48));
+            Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
 
-                            Distance height = SuperStructurePose.LOADING.elevatorPosition.minus(
-                                    Inches.of(xOffset.abs(Inches) * 1.0 / 4.5));
-                            Distance inputHeight = height.gt(minHeight) ? height : minHeight;
-                            return moveToPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false)
-                                    .withTimeout(0.05);
-                        },
-                        Set.of(this))
-                .repeatedly();
+            Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 1.5 / 4.5));
+            Distance inputHeight = height.gt(minHeight) ? height : minHeight;
+            inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
+            Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));
+            setPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false);
+        });
     }
 
     public Command moveToPosition(Distance targetPosition, boolean motionMagic) {
@@ -118,7 +111,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command zeroPosition() {
-        return Commands.run(() -> this.io.setVoltage(Volts.of(-1.0)))
+        return Commands.run(() -> this.io.setVoltage(Volts.of(-1.0)), this)
                 .beforeStarting(() -> this.io.changeSoftLimits(false))
                 .until(() -> this.io.getCurrent().gt(Amps.of(35.0)))
                 .finallyDo(() -> {

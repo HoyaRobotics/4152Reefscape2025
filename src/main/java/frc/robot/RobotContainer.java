@@ -24,7 +24,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -326,8 +325,6 @@ public class RobotContainer {
         configureDriverButtonBindings();
     }
 
-    private void generateAutos() {}
-
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a
      * {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
@@ -352,14 +349,25 @@ public class RobotContainer {
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d()); // zero gyro
         driveController.resetGyro().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        driveController.zeroElevator().onTrue(elevator.zeroPosition());
-
         driveController
-                .runIntake()
-                .whileTrue(superStructure
-                        .moveToPose(SuperStructurePose.LOADING)
-                        .alongWith(intake.run(IntakeAction.INTAKING)));
-        //driveController.xboxController.povRight().whileTrue(new DriveToPose(drive, () -> Reef.getAllianceReefBranch(5, Side.CENTER).transformBy(new Transform2d(1.0, 0.0, new Rotation2d())), Optional.of(Degrees.of(360))));
+                .zeroElevator()
+                .onTrue(arm.moveToAngle(SuperStructurePose.ZERO.armAngle)
+                        .andThen(elevator.zeroPosition()
+                                .alongWith(Commands.run(
+                                        () -> arm.setArmPosition(SuperStructurePose.ZERO.armAngle), arm))));
+
+        if (!Constants.useVariableIntakeHeight) {
+            driveController
+                    .runIntake()
+                    .whileTrue(superStructure
+                            .moveToPose(SuperStructurePose.LOADING)
+                            .alongWith(intake.run(IntakeAction.INTAKING)));
+        } else {
+            driveController.runIntake().whileTrue(elevator.moveToLoadingPose(() -> drive.getPose()));
+        }
+        // driveController.xboxController.povRight().whileTrue(new DriveToPose(drive, () ->
+        // Reef.getAllianceReefBranch(5, Side.CENTER).transformBy(new Transform2d(1.0, 0.0, new Rotation2d())),
+        // Optional.of(Degrees.of(360))));
 
         /*
          * Problems:

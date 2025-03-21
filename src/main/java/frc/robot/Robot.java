@@ -13,8 +13,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +34,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
-    private boolean inCoralStationRange = false;
 
     public Robot() {
         CanBridge.runTCP();

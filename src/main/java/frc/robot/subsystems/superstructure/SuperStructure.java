@@ -18,6 +18,9 @@ import java.util.function.Supplier;
 // would be nice to alway know what level we are at?
 public class SuperStructure {
 
+    public static final Distance intakeSlopeRate =
+            Inches.of(1.5); // distance to go down per 4.5in of coral infront of loading station
+
     public enum AlgaeLevel {
         ALGAE_L2,
         ALGAE_L3
@@ -35,6 +38,8 @@ public class SuperStructure {
         // POST_TROUGH(Inches.of(0), Degrees.of(110)),
         // TROUGH(Inches.of(0), Degrees.of(120)),
         LOADING(Inches.of(16.75), Degrees.of(-35)), // 18
+        MAX_LOADING(Inches.of(18.0), Degrees.of(-35)),
+        MIN_LOADING(Inches.of(10.0), Degrees.of(-35)),
         LOADING_CORAL_BETW(Inches.of(17), Degrees.of(-35)),
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(11.5), Degrees.of(135.0)), // 13.0
@@ -50,7 +55,7 @@ public class SuperStructure {
 
         ALGAE_PRE_NET(Inches.of(52.7), Degrees.of(103)),
         ALGAE_NET(Inches.of(52.7), Degrees.of(83)),
-
+        ZERO(Inches.of(0.0), Degrees.of(103)),
         HOLD(Inches.of(3.0), Degrees.of(103)),
         CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),
         BASE(Inches.of(16.75), Degrees.of(-35)); // 3.0, -25

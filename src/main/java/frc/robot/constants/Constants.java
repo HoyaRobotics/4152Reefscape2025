@@ -42,4 +42,6 @@ public final class Constants {
         /** V2 Coral And Algae Intake */
         V2
     }
+
+    public static final boolean useVariableIntakeHeight = false;
 }
