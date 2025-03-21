@@ -20,6 +20,5 @@ public class LEDConstants {
         }
     }
 
-    public static double flashingOnTimeout = 0.15;
-    public static double flashingOffTimeout = 0.15;
+    public static double flashingTimeout = 0.05;
 }

@@ -41,6 +41,7 @@ import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.LEDSequence;
 import frc.robot.commands.PlacingCommand;
+import frc.robot.commands.PlacingCommandTrough;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef;
@@ -358,14 +359,7 @@ public class RobotContainer {
                 .whileTrue(superStructure
                         .moveToPose(SuperStructurePose.LOADING)
                         .alongWith(intake.run(IntakeAction.INTAKING)));
-        driveController
-                .xboxController
-                .povRight()
-                .whileTrue(new DriveToPose(
-                        drive,
-                        () -> Reef.getAllianceReefBranch(5, Side.CENTER)
-                                .transformBy(new Transform2d(1.0, 0.0, new Rotation2d())),
-                        Optional.of(Degrees.of(360))));
+        //driveController.xboxController.povRight().whileTrue(new DriveToPose(drive, () -> Reef.getAllianceReefBranch(5, Side.CENTER).transformBy(new Transform2d(1.0, 0.0, new Rotation2d())), Optional.of(Degrees.of(360))));
 
         /*
          * Problems:
@@ -408,8 +402,7 @@ public class RobotContainer {
 
         driveController
                 .moveToTrough(false)
-                .onTrue(new PlacingCommand(
-                        superStructure, intake, SuperStructurePose.TROUGH, driveController.ejectCoral()));
+                .onTrue(new PlacingCommandTrough(superStructure, intake, driveController.ejectCoral()));
 
         driveController
                 .deployClimber()

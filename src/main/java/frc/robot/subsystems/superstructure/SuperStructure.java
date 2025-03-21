@@ -28,8 +28,13 @@ public class SuperStructure {
         // constants call the constructor
 
         // Elevator position, arm angle
-        TROUGH(Inches.of(7.0), Degrees.of(-60)),
-        LOADING(Inches.of(18), Degrees.of(-35)),
+        TROUGH(Inches.of(7.5), Degrees.of(-60)),
+        POST_TROUGH(Inches.of(12), Degrees.of(-60)),
+        POST_POST_TROUGH(Inches.of(16.75), Degrees.of(-60)),
+        // TROUGH(Inches.of(0), Degrees.of(135)),
+        // POST_TROUGH(Inches.of(0), Degrees.of(110)),
+        // TROUGH(Inches.of(0), Degrees.of(120)),
+        LOADING(Inches.of(16.75), Degrees.of(-35)), // 18
         LOADING_CORAL_BETW(Inches.of(17), Degrees.of(-35)),
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(11.5), Degrees.of(135.0)), // 13.0
@@ -48,7 +53,7 @@ public class SuperStructure {
 
         HOLD(Inches.of(3.0), Degrees.of(103)),
         CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),
-        BASE(Inches.of(18), Degrees.of(-35)); // 3.0, -25
+        BASE(Inches.of(16.75), Degrees.of(-35)); // 3.0, -25
 
         public final Distance elevatorPosition;
         public final Angle armAngle;

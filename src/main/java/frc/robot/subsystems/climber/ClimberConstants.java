@@ -16,7 +16,7 @@ public class ClimberConstants {
 
     public static final Angle deployAngle = Degrees.of(90);
     public static final Angle baseAngle = Degrees.of(0);
-    public static final Angle climbAngle = Degrees.of(5);
+    public static final Angle climbAngle = Degrees.of(0);
     public static final Voltage climbUpVoltage = Volts.of(8.0);
     public static final Voltage climbDownVoltage = Volts.of(-8.0);
 }

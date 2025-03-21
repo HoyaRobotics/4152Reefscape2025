@@ -14,7 +14,7 @@ public class IntakeConstants {
     public enum IntakeAction {
         HOLDING(Amps.of(20), RevolutionsPerSecond.of(2.0)), // 15
         INTAKING(Amps.of(20), RevolutionsPerSecond.of(15.0)),
-        TROUGH(Amps.of(30), RevolutionsPerSecond.of(-5.0)),
+        TROUGH(Amps.of(30), RevolutionsPerSecond.of(-8.0)),
         PLACING(Amps.of(40), RevolutionsPerSecond.of(-25.0)),
         EMPTY(Amps.of(10), RevolutionsPerSecond.of(0.0));
 
