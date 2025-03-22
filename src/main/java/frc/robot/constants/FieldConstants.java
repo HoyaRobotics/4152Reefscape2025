@@ -111,9 +111,15 @@ public class FieldConstants {
         public static final Pose2d[] blueCenterFaces = {
             new Pose2d(Units.inchesToMeters(144.003), Units.inchesToMeters(158.500), Rotation2d.fromDegrees(180)),
             new Pose2d(Units.inchesToMeters(160.373), Units.inchesToMeters(186.857), Rotation2d.fromDegrees(120)),
-            new Pose2d(Units.inchesToMeters(193.116), Units.inchesToMeters(186.858), Rotation2d.fromDegrees(60)),
+            new Pose2d(
+                    Units.inchesToMeters(192.913),
+                    Units.inchesToMeters(186.858),
+                    Rotation2d.fromDegrees(60)), // 193.116
             new Pose2d(Units.inchesToMeters(209.489), Units.inchesToMeters(158.502), Rotation2d.fromDegrees(0)),
-            new Pose2d(Units.inchesToMeters(193.118), Units.inchesToMeters(130.145), Rotation2d.fromDegrees(-60)),
+            new Pose2d(
+                    Units.inchesToMeters(192.913),
+                    Units.inchesToMeters(130.145),
+                    Rotation2d.fromDegrees(-60)), // 193.118
             new Pose2d(Units.inchesToMeters(160.375), Units.inchesToMeters(130.144), Rotation2d.fromDegrees(-120))
         };
 
@@ -146,8 +152,8 @@ public class FieldConstants {
 
         public static Pose2d offsetReefPose(Pose2d facePose, Side side) {
             final double distanceFromReef = 0.48;
-            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES - 0.5; // 1.2 V1
-            final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES + 0.5; // 1.45 V1
+            final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES + 0.75; // 1.2 V1, - 0.5
+            final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES; // 1.45 V1
 
             final double yOffset = side == Side.CENTER
                     ? 0.0

@@ -20,8 +20,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,14 +34,11 @@ import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.Coral3Piece;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.LEDSequence;
 import frc.robot.commands.PlacingCommand;
 import frc.robot.commands.PlacingCommandTrough;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants.CoralStation;
-import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.constants.VisionConstants;
 import frc.robot.generated.TunerConstants;
@@ -249,6 +244,7 @@ public class RobotContainer {
         superStructure = new SuperStructure(elevator, arm);
         intake.setPoseSupplier(superStructure::getTargetPose);
 
+        /*
         NamedCommands.registerCommand(
                 "alignGetCoralRight",
                 Commands.deadline(
@@ -302,10 +298,11 @@ public class RobotContainer {
         NamedCommands.registerCommand(
                 "intakeReceive",
                 superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(IntakeAction.INTAKING)));
-
+        */
         // Set up auto routines
 
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        // autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser.addOption(
                 "3PieceRight", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
         autoChooser.addOption(
@@ -353,7 +350,7 @@ public class RobotContainer {
                 .zeroElevator()
                 .onTrue(arm.moveToAngle(SuperStructurePose.ZERO.armAngle)
                         .andThen(elevator.zeroPosition()
-                                .alongWith(Commands.run(
+                                .deadlineFor(Commands.run(
                                         () -> arm.setArmPosition(SuperStructurePose.ZERO.armAngle), arm))));
 
         if (!Constants.useVariableIntakeHeight) {
@@ -363,7 +360,9 @@ public class RobotContainer {
                             .moveToPose(SuperStructurePose.LOADING)
                             .alongWith(intake.run(IntakeAction.INTAKING)));
         } else {
-            driveController.runIntake().whileTrue(elevator.moveToLoadingPose(() -> drive.getPose()));
+            driveController
+                    .runIntake()
+                    .whileTrue(elevator.moveToLoadingPose(drive::getPose).alongWith(intake.run(IntakeAction.INTAKING)));
         }
         // driveController.xboxController.povRight().whileTrue(new DriveToPose(drive, () ->
         // Reef.getAllianceReefBranch(5, Side.CENTER).transformBy(new Transform2d(1.0, 0.0, new Rotation2d())),

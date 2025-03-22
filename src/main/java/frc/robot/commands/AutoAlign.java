@@ -42,7 +42,7 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     private static final Distance ThrowNetTolerance = Inches.of(12);
-    private static final double L2DelaySeconds = 0.1;
+    private static final double L2DelaySeconds = 0.2;
     private static final double PosePollFreq = 0.05;
 
     // if player lets go of back buttons finish moving to pose but dont outtake
@@ -82,7 +82,6 @@ public class AutoAlign {
     }
 
     public static Command placingSequence(SuperStructure superStructure, Intake intake) {
-
         return Commands.sequence(
                 intake.runWithSensor(IntakeAction.PLACING),
                 intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),

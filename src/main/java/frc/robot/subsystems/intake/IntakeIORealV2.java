@@ -30,6 +30,7 @@ public class IntakeIORealV2 implements IntakeIO {
     private final LaserCan lasercan = new LaserCan(35);
     double intakeRatio = 34.0 / 8;
 
+    private boolean sensedCoral = false;
     private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
     private VoltageOut voltageRequest = new VoltageOut(0.0);
 
@@ -45,10 +46,9 @@ public class IntakeIORealV2 implements IntakeIO {
             double measureDistance = measurement.distance_mm;
             double coralDistance = Inches.of(1.0).in(Millimeters);
 
-            return measureDistance <= coralDistance;
-        } else {
-            return false;
+            sensedCoral = measureDistance <= coralDistance;
         }
+        return sensedCoral;
     }
 
     private void configureLaserCan() {
