@@ -30,7 +30,7 @@ public class PlacingCommand extends SequentialCommandGroup {
                 intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)
                         .andThen(intake.run(IntakeAction.PLACING)
-                                .alongWith(superStructure.retractArm(ArmConstants.baseAngle))
+                                .alongWith(superStructure.arm.moveToAngle(ArmConstants.baseAngle))
                                 .until(superStructure.waitTillRetracted())));
     }
 }

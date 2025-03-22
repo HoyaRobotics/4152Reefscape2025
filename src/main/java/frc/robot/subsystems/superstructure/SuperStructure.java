@@ -140,8 +140,4 @@ public class SuperStructure {
     public BooleanSupplier waitTillRetracted() {
         return () -> arm.getArmPosition().minus(ArmConstants.safeRetractAngle).lt(Degrees.of(0));
     }
-
-    public Command retractArm(Angle retractAngle) {
-        return arm.moveToAngle(retractAngle);
-    }
 }

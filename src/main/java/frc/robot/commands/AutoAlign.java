@@ -13,9 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
 import frc.robot.constants.FieldConstants;
@@ -36,12 +36,11 @@ import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
-    private static final Distance ThrowNetTolerance = Inches.of(12);
+    private static final Distance ThrowNetTolerance = Inches.of(14); // 12
     private static final double L2DelaySeconds = 0.2;
     private static final double PosePollFreq = 0.05;
 
@@ -59,43 +58,48 @@ public class AutoAlign {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
-        return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
-                .alongWith(new SequentialCommandGroup(
-                        buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
-                        new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                .lt(AutoAlign.StartSuperStructureRange)),
-                        new DeferredCommand(
-                                        () -> superStructure.moveToPose(
-                                                superStructurePose.orElse(buttonWatcher.getSelectedPose())),
-                                        Set.of(superStructure.arm, superStructure.elevator))
-                                .withTimeout(PosePollFreq)
-                                .repeatedly()
-                                .until(superStructure::isAtPosition)))
+        return Commands.sequence(
+                        new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
+                                .alongWith(Commands.sequence(
+                                        buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
+                                        new WaitUntilCommand(
+                                                () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
+                                                        .lt(AutoAlign.StartSuperStructureRange)),
+                                        new DeferredCommand(
+                                                        () -> superStructure.moveToPose(superStructurePose.orElse(
+                                                                buttonWatcher.getSelectedPose())),
+                                                        Set.of(superStructure.arm, superStructure.elevator))
+                                                .withTimeout(PosePollFreq)
+                                                .repeatedly()
+                                                .until(superStructure::isAtPosition))),
+                        // Commands.runOnce(() -> System.out.println("fully aligned")),
+                        placingSequence(
+                                superStructure,
+                                intake,
+                                () -> superStructurePose.orElse(buttonWatcher.getSelectedPose())),
+                        // Commands.runOnce(() -> System.out.println("placing sequence ended")),
+                        autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
+                                .onlyIf(() -> removeAlgae))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
-                .andThen(Commands.waitSeconds(L2DelaySeconds).onlyIf(() -> {
-                    SuperStructurePose pose = superStructurePose.orElse(buttonWatcher.getSelectedPose());
-                    return pose == SuperStructurePose.L2;
-                }))
-                .andThen(placingSequence(superStructure, intake))
-                .andThen(autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
-                        .onlyIf(() -> removeAlgae));
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
-    public static Command placingSequence(SuperStructure superStructure, Intake intake) {
+    public static Command placingSequence(
+            SuperStructure superStructure, Intake intake, Supplier<SuperStructurePose> currentPose) {
         return Commands.sequence(
+                Commands.waitSeconds(L2DelaySeconds)
+                        .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
+                                || currentPose.get() == SuperStructurePose.L3),
                 intake.runWithSensor(IntakeAction.PLACING),
                 intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
                 intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)
-                        .deadlineFor(superStructure.retractArm(SuperStructurePose.BASE.armAngle)));
+                        .deadlineFor(superStructure.arm.moveToAngle(SuperStructurePose.BASE.armAngle)));
     }
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
-        Supplier<Pose2d> movingPose = () -> {
-            Pose2d pose = Processor.getProcessorPose().transformBy(new Transform2d(-0.35, 0.0, new Rotation2d()));
-            Logger.recordOutput("Processor/movingPose", pose);
-            return pose;
-        };
+        Supplier<Pose2d> movingPose =
+                () -> Processor.getProcessorPose().transformBy(new Transform2d(-0.35, 0.0, new Rotation2d()));
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
         return superStructure
                 .moveToPose(SuperStructurePose.PROCESSOR)

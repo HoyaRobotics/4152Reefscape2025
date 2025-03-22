@@ -52,7 +52,7 @@ public abstract class PoserAuto {
                         .andThen(superStructure.moveToPose(SuperStructurePose.L4)))
                 .andThen(superStructure
                         .moveToPose(SuperStructurePose.L4)
-                        .andThen(AutoAlign.placingSequence(superStructure, intake)));
+                        .andThen(AutoAlign.placingSequence(superStructure, intake, () -> SuperStructurePose.L4)));
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
