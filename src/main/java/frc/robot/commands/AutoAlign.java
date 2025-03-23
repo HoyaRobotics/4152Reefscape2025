@@ -73,16 +73,11 @@ public class AutoAlign {
                                         new DeferredCommand(
                                                         () -> superStructure.moveToPose(superStructurePose.orElse(
                                                                 buttonWatcher.getSelectedPose())),
-                                                        Set.of(superStructure.arm, superStructure.elevator))
-                                                .withTimeout(PosePollFreq)
-                                                .repeatedly()
-                                                .until(superStructure::isAtPosition))),
-                        // Commands.runOnce(() -> System.out.println("fully aligned")),
+                                                        Set.of(superStructure.arm, superStructure.elevator)))),
                         placingSequence(
                                 superStructure,
                                 intake,
                                 () -> superStructurePose.orElse(buttonWatcher.getSelectedPose())),
-                        // Commands.runOnce(() -> System.out.println("placing sequence ended")),
                         autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
                                 .onlyIf(() -> removeAlgae))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
@@ -100,19 +95,6 @@ public class AutoAlign {
                 intake.run(IntakeAction.PLACING)
                         .withTimeout(IntakeConstants.PlacingTimeout)
                         .deadlineFor(superStructure.arm.moveToAngle(SuperStructurePose.BASE.armAngle)));
-    }
-
-    public static SequentialCommandGroup newPlacingSequence(
-            SuperStructure superStructure, Intake intake, Supplier<SuperStructurePose> currentPose) {
-        return new SequentialCommandGroup(
-                // new ConditionalCommand(currentPose.get() == SuperStructurePose.L2 || currentPose.get() ==
-                // SuperStructurePose.L3, Commands.none(), new WaitCommand(L2DelaySeconds)),
-                // new ConditionalCommand(new WaitCommand(L2DelaySeconds), Commands.none(), () -> currentPose.get() ==
-                // SuperStructurePose.L2 || currentPose.get() == SuperStructurePose.L3),
-                intake.run(IntakeAction.PLACING));
-        // intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
-        ///
-        // intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PlacingTimeout).deadlineFor(superStructure.arm.moveToAngle(SuperStructurePose.BASE.armAngle)));
     }
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
