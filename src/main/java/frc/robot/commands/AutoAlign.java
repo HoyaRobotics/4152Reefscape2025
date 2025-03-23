@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
 import frc.robot.constants.FieldConstants;
@@ -32,8 +31,6 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import frc.robot.subsystems.superstructure.arm.Arm;
-import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.PoseUtils;
 import java.util.Optional;
@@ -45,7 +42,6 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     private static final Distance ThrowNetTolerance = Inches.of(14); // 12
     private static final double L2DelaySeconds = 0.2;
-    private static final double PosePollFreq = 0.05;
 
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
@@ -53,8 +49,6 @@ public class AutoAlign {
             DriveMap driveController,
             Drive drive,
             SuperStructure superStructure,
-            Arm arm,
-            Elevator elevator,
             Intake intake,
             AlgaeIntake algaeIntake,
             Side side,
@@ -71,9 +65,9 @@ public class AutoAlign {
                                                 () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
                                                         .lt(AutoAlign.StartSuperStructureRange)),
                                         new DeferredCommand(
-                                                        () -> superStructure.moveToPose(superStructurePose.orElse(
-                                                                buttonWatcher.getSelectedPose())),
-                                                        Set.of(superStructure.arm, superStructure.elevator)))),
+                                                () -> superStructure.moveToPose(
+                                                        superStructurePose.orElse(buttonWatcher.getSelectedPose())),
+                                                Set.of(superStructure.arm, superStructure.elevator)))),
                         placingSequence(
                                 superStructure,
                                 intake,
