@@ -182,7 +182,7 @@ public class FieldConstants {
 
     public static class Net {
         // distance from robot bumper to center -> 0.48 meters?
-        public static final Distance xOffset = Inches.of(303.5 - 10); // 303.5
+        public static final Distance xOffset = Inches.of(303.5 - 13); // 303.5
         // distance from arena wall to net
         public static final Distance yOffset = Inches.of(6.243 - 0.83);
         public static final Distance netWidth = Inches.of(148.130);

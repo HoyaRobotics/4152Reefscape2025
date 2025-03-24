@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 // command the provided distance away from the next pose
 public abstract class PoserAuto {
 
-    static final Distance PlacingDistance = Inches.of(35); // 45
+    static final Distance PlacingDistance = Inches.of(35); // 35
     static final Angle PlacingAngleDeltaTolerance = Degrees.of(360);
 
     static final Angle CoralStationAngleDelta = Degrees.of(360);

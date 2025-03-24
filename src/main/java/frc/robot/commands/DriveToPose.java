@@ -35,8 +35,10 @@ public class DriveToPose extends Command {
     private final Supplier<Pose2d> poseSupplier;
 
     // 0.946 * gear ratio
-    private final PIDController xController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
-    private final PIDController yController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    // private final PIDController xController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    private final PIDController xController = new PIDController(0.43 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    // private final PIDController yController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    private final PIDController yController = new PIDController(0.43 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
 
     private final ProfiledPIDController angleController = new ProfiledPIDController(
             ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
