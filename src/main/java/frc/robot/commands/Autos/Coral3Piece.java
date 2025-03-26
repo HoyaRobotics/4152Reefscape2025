@@ -57,7 +57,7 @@ public class Coral3Piece extends PoserAuto {
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide3));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L2, reefFace3, branchSide4));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace3, branchSide4));
         // autoCommand.addCommands(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
 
         return autoCommand;

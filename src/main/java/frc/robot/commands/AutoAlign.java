@@ -85,11 +85,14 @@ public class AutoAlign {
                         .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
                                 || currentPose.get() == SuperStructurePose.L3),
                 intake.runWithSensor(IntakeAction.PLACING),
-                superStructure
-                        .arm
-                        .moveToAngle(Degrees.of(103))
-                        .deadlineFor(intake.run(IntakeAction.PLACING))
-                        .onlyIf(() -> !isAuto));
+                Commands.either(
+                                superStructure
+                                        .arm
+                                        .moveToAngle(SuperStructurePose.BASE.armAngle)
+                                        .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false)),
+                                superStructure.arm.moveToAngle(Degrees.of(103)),
+                                () -> isAuto)
+                        .deadlineFor(intake.run(IntakeAction.PLACING)));
     }
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
@@ -116,9 +119,7 @@ public class AutoAlign {
                 Reef.getClosestBranchPose(drive, Side.CENTER).transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
 
         return new DriveToPose(drive, movingPose::get, Optional.empty())
-                .alongWith(new WaitUntilCommand(() -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                .lt(AutoAlign.StartSuperStructureRangeAlgae))
-                        .andThen(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
+                .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
                 .andThen(Commands.sequence(
                         new DriveToPose(drive, drivePose::get, Optional.empty()),
                         AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),

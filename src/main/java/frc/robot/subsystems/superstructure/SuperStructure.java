@@ -151,11 +151,11 @@ public class SuperStructure {
                             .minus(Meters.of(0.48));
                     // Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
 
-                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 3.75 / 4.5));
+                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 4.5 / 4.5));
                     Distance inputHeight = height.gt(minHeight) ? height : minHeight;
                     // inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
 
-                    Angle angle = maxAngle.plus(Degrees.of(xOffset.in(Inches) * 3.0 / 4.5));
+                    Angle angle = maxAngle.plus(Degrees.of(xOffset.in(Inches) * 2.5 / 4.5));
                     Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
 
                     // Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));

@@ -62,7 +62,7 @@ public class AlgaeCommands {
                     // is this correct?
                     return superStructure
                             .moveToPose(prePose)
-                            .until(() -> superStructure.arm.withinTolerance(prePose.armAngle, Degrees.of(5)))
+                            .until(() -> superStructure.arm.withinTolerance(prePose.armAngle, Degrees.of(5))) // 5
                             .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
