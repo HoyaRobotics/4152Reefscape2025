@@ -73,7 +73,7 @@ public class ArmIOAdvancedSim implements ArmIO {
     }
 
     @Override
-    public void setPosition(Angle targetAngle) {
+    public void setPosition(Angle targetAngle, boolean motionMagic) {
         armMotor.setControl(magicRequest.withPosition(targetAngle).withSlot(0));
     }
 

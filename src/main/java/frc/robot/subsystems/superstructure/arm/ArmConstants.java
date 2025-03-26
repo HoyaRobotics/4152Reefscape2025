@@ -11,4 +11,5 @@ public class ArmConstants {
     public static final Angle safeRetractAngle = Degrees.of(150);
 
     public static final Angle zeroAngle = Degrees.of(120);
+    public static final boolean useMotionMagic = true;
 }

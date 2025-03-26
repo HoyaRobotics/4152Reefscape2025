@@ -7,6 +7,7 @@ package frc.robot.subsystems.superstructure.arm;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -24,6 +25,7 @@ public class ArmIOReal implements ArmIO {
     double armRatio = 185.7143;
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
+    private final PositionVoltage positionRequest = new PositionVoltage(0.0);
 
     public ArmIOReal() {
         configureArmMotor();
@@ -35,8 +37,12 @@ public class ArmIOReal implements ArmIO {
     }
 
     @Override
-    public void setPosition(Angle targetAngle) {
-        armMotor.setControl(magicRequest.withPosition(targetAngle).withSlot(0));
+    public void setPosition(Angle targetAngle, boolean motionMagic) {
+        if (motionMagic) {
+            armMotor.setControl(magicRequest.withPosition(targetAngle).withSlot(0));
+        } else {
+            armMotor.setControl(positionRequest.withPosition(targetAngle).withSlot(0));
+        }
     }
 
     @Override

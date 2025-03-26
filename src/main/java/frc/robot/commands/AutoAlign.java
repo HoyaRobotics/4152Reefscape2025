@@ -27,7 +27,6 @@ import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
@@ -41,7 +40,7 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     private static final Distance ThrowNetTolerance = Inches.of(14); // 12
-    private static final double L2DelaySeconds = 0.2;
+    private static final double L2DelaySeconds = 0.125;
 
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
@@ -71,7 +70,8 @@ public class AutoAlign {
                         placingSequence(
                                 superStructure,
                                 intake,
-                                () -> superStructurePose.orElse(buttonWatcher.getSelectedPose())),
+                                () -> superStructurePose.orElse(buttonWatcher.getSelectedPose()),
+                                false),
                         autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
                                 .onlyIf(() -> removeAlgae))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
@@ -79,16 +79,21 @@ public class AutoAlign {
     }
 
     public static Command placingSequence(
-            SuperStructure superStructure, Intake intake, Supplier<SuperStructurePose> currentPose) {
+            SuperStructure superStructure, Intake intake, Supplier<SuperStructurePose> currentPose, boolean isAuto) {
         return Commands.sequence(
                 Commands.waitSeconds(L2DelaySeconds)
                         .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
                                 || currentPose.get() == SuperStructurePose.L3),
                 intake.runWithSensor(IntakeAction.PLACING),
-                intake.run(IntakeAction.PLACING).withTimeout(IntakeConstants.PostSensingTimeout),
-                intake.run(IntakeAction.PLACING)
-                        .withTimeout(IntakeConstants.PlacingTimeout)
-                        .deadlineFor(superStructure.arm.moveToAngle(SuperStructurePose.BASE.armAngle)));
+                Commands.either(
+                                superStructure
+                                        .arm
+                                        .moveToAngle(SuperStructurePose.BASE.armAngle)
+                                        .until(() -> superStructure.arm.isPastPosition(Degrees.of(103), false)),
+                                superStructure.arm.moveToAngle(Degrees.of(103)),
+                                () -> isAuto)
+                        .deadlineFor(intake.run(IntakeAction.PLACING)));
+        // superStructure.arm.moveToAngle(Degrees.of(103)).deadlineFor(intake.run(IntakeAction.PLACING)));
     }
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

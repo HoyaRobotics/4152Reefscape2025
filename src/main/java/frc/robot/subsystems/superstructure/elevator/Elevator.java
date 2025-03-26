@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -61,23 +60,26 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
-        LinearFilter filter = LinearFilter.movingAverage(2);
-        return Commands.run(() -> {
-            Pose2d currentPose = drivePose.get();
-            final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
-            final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
-            Distance xOffset = currentPose
-                    .relativeTo(CoralStation.getClosestCoralStation(currentPose))
-                    .getMeasureX()
-                    .minus(Meters.of(0.48));
-            Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
+        // LinearFilter filter = LinearFilter.movingAverage(1);
+        return Commands.run(
+                () -> {
+                    Pose2d currentPose = drivePose.get();
+                    final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
+                    final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
+                    Distance xOffset = currentPose
+                            .relativeTo(CoralStation.getClosestCoralStation(currentPose))
+                            .getMeasureX()
+                            .minus(Meters.of(0.48));
+                    Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
 
-            Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 1.5 / 4.5));
-            Distance inputHeight = height.gt(minHeight) ? height : minHeight;
-            inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
-            Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));
-            setPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false);
-        });
+                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 3.0 / 4.5));
+                    Distance inputHeight = height.gt(minHeight) ? height : minHeight;
+                    inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
+                    Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));
+                    // setPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false);
+                    setPosition(inputHeight, false);
+                },
+                this);
     }
 
     public Command moveToPosition(Distance targetPosition, boolean motionMagic) {
@@ -111,7 +113,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command zeroPosition() {
-        return Commands.run(() -> this.io.setVoltage(Volts.of(-1.0)), this)
+        return Commands.run(() -> this.io.setVoltage(Volts.of(-2.0)), this)
                 .beforeStarting(() -> this.io.changeSoftLimits(false))
                 .until(() -> this.io.getCurrent().gt(Amps.of(35.0)))
                 .finallyDo(() -> {

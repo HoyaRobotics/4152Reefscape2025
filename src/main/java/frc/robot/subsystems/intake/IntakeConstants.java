@@ -27,12 +27,7 @@ public class IntakeConstants {
         }
     }
 
-    /*public static final AngularVelocity IntakingSpeed = RevolutionsPerSecond.of(15.0);
-    public static final AngularVelocity TroughSpeed = RevolutionsPerSecond.of(-8.0);
-    public static final AngularVelocity PlacingSpeed = RevolutionsPerSecond.of(-20.0);
-    public static final AngularVelocity HoldingSpeed = RevolutionsPerSecond.of(1.0);*/
-
-    public static final double PlacingTimeout = 0.35; // 0.30
+    public static final double PlacingTimeout = 0.25; // 0.35
     public static final double PostSensingTimeout = 0.12; // 0.08
     public static final double PostPlacingTimeout = 0.35;
 }

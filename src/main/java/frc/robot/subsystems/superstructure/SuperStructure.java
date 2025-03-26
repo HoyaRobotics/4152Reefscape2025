@@ -39,7 +39,7 @@ public class SuperStructure {
         // TROUGH(Inches.of(0), Degrees.of(120)),
         LOADING(Inches.of(16.75), Degrees.of(-35)), // 18
         MAX_LOADING(Inches.of(18.0), Degrees.of(-35)),
-        MIN_LOADING(Inches.of(10.0), Degrees.of(-35)),
+        MIN_LOADING(Inches.of(3.0), Degrees.of(-35)),
         LOADING_CORAL_BETW(Inches.of(17), Degrees.of(-35)),
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(11.5), Degrees.of(135.0)), // 13.0

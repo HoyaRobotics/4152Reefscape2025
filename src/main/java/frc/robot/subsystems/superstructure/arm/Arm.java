@@ -50,7 +50,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmPosition(Angle targetAngle) {
-        this.io.setPosition(targetAngle);
+        this.io.setPosition(targetAngle, ArmConstants.useMotionMagic);
     }
 
     public boolean isArmAtPosition(Angle queriedAngle) {
@@ -59,6 +59,10 @@ public class Arm extends SubsystemBase {
 
     public boolean withinTolerance(Angle targetAngle, Angle tolerance) {
         return inputs.armAngle.minus(targetAngle).abs(Degrees) < tolerance.in(Degrees);
+    }
+
+    public boolean isPastPosition(Angle queriedAngle, boolean increasing) {
+        return increasing ? queriedAngle.lt(inputs.armAngle) : queriedAngle.gt(inputs.armAngle);
     }
 
     public Angle getArmPosition() {

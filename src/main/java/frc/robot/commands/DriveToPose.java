@@ -27,6 +27,8 @@ public class DriveToPose extends Command {
     private static final double ANGLE_KD = 0.0; // 0.4
     private static final double ANGLE_MAX_VELOCITY = 10.0;
     private static final double ANGLE_MAX_ACCELERATION = 15.0;
+    private static final double LINEAR_KP = 0.43;
+    private static final double LINEAR_KD = 0.1;
 
     private final Angle angleDeltaTolerance;
 
@@ -36,9 +38,11 @@ public class DriveToPose extends Command {
 
     // 0.946 * gear ratio
     // private final PIDController xController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
-    private final PIDController xController = new PIDController(0.43 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    private final PIDController xController =
+            new PIDController(LINEAR_KP * TunerConstants.kDriveGearRatio, 0.0, LINEAR_KD);
     // private final PIDController yController = new PIDController(0.946 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
-    private final PIDController yController = new PIDController(0.43 * TunerConstants.kDriveGearRatio, 0.0, 0.0);
+    private final PIDController yController =
+            new PIDController(LINEAR_KP * TunerConstants.kDriveGearRatio, 0.0, LINEAR_KD);
 
     private final ProfiledPIDController angleController = new ProfiledPIDController(
             ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));

@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 // command the provided distance away from the next pose
 public abstract class PoserAuto {
 
-    static final Distance PlacingDistance = Inches.of(35); // 35
+    static final Distance PlacingDistance = Inches.of(75); // 35
     static final Angle PlacingAngleDeltaTolerance = Degrees.of(360);
 
     static final Angle CoralStationAngleDelta = Degrees.of(360);
@@ -41,7 +41,7 @@ public abstract class PoserAuto {
         this.algaeIntake = algaeIntake;
     }
 
-    public Command alignAndPlaceCoral(int reefFaceIndex, Side side) {
+    public Command alignAndPlaceCoral(SuperStructurePose superStructurePose, int reefFaceIndex, Side side) {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return new DriveToPose(drive, targetPose, Optional.of(PlacingAngleDeltaTolerance))
                 .alongWith(Commands.defer(
@@ -49,10 +49,10 @@ public abstract class PoserAuto {
                                         PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance)),
                                 Set.of())
                         .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake))
-                        .andThen(superStructure.moveToPose(SuperStructurePose.L4)))
+                        .andThen(superStructure.moveToPose(superStructurePose)))
                 .andThen(superStructure
-                        .moveToPose(SuperStructurePose.L4)
-                        .andThen(AutoAlign.placingSequence(superStructure, intake, () -> SuperStructurePose.L4)));
+                        .moveToPose(superStructurePose)
+                        .andThen(AutoAlign.placingSequence(superStructure, intake, () -> superStructurePose, true)));
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
@@ -64,7 +64,7 @@ public abstract class PoserAuto {
         Supplier<Pose2d> targetPose = () -> CoralStation.getCoralStationPose(side);
         return intake.runWithSensor(IntakeAction.INTAKING)
                 .deadlineFor(new DriveToPose(drive, targetPose, Optional.of(CoralStationAngleDelta))
-                        .alongWith(superStructure.moveToPose(SuperStructurePose.LOADING)))
+                        .alongWith(superStructure.elevator.moveToLoadingPose(drive::getPose)))
                 .andThen(() -> intake.stopIntake());
     }
 }

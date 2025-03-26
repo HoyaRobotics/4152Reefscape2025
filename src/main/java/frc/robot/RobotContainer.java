@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.Coral3Piece;
+import frc.robot.commands.Autos.Coral4PieceFar;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.LEDSequence;
@@ -244,69 +245,14 @@ public class RobotContainer {
         superStructure = new SuperStructure(elevator, arm);
         intake.setPoseSupplier(superStructure::getTargetPose);
 
-        /*
-        NamedCommands.registerCommand(
-                "alignGetCoralRight",
-                Commands.deadline(
-                        intake.runWithSensor(IntakeAction.INTAKING)
-                                .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
-                                .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.RIGHT), Optional.empty())));
-
-        NamedCommands.registerCommand(
-                "alignGetCoralLeft",
-                Commands.deadline(
-                        intake.runWithSensor(IntakeAction.INTAKING)
-                                .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING))
-                                .andThen(() -> intake.stopIntake()),
-                        new DriveToPose(drive, () -> CoralStation.getCoralStationPose(Side.LEFT), Optional.empty())));
-
-        NamedCommands.registerCommand(
-                "alignLeftPlaceL4",
-                AutoAlign.autoAlignAndPlace(
-                        driveController,
-                        drive,
-                        superStructure,
-                        intake,
-                        algaeIntake,
-                        Side.LEFT,
-                        Optional.of(SuperStructurePose.L4),
-                        false));
-        NamedCommands.registerCommand(
-                "alignRightPlaceL4",
-                AutoAlign.autoAlignAndPlace(
-                        driveController,
-                        drive,
-                        superStructure,
-                        intake,
-                        algaeIntake,
-                        Side.RIGHT,
-                        Optional.of(SuperStructurePose.L4),
-                        false));
-
-        NamedCommands.registerCommand(
-                "alignRemoveAlgaeV2", AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
-        NamedCommands.registerCommand(
-                "alignRemoveAlgaeV1",
-                new DriveToPose(drive, () -> Reef.getClosestBranchPose(drive, Side.CENTER), Optional.empty())
-                        .andThen(AlgaeCommands.removeL2AlgaeV1(superStructure, intake)));
-
-        NamedCommands.registerCommand("hold", new HoldPosition(elevator, arm, intake, algaeIntake));
-        NamedCommands.registerCommand(
-                "goToL4", superStructure.elevator.moveToPosition(SuperStructurePose.L4.elevatorPosition, true));
-
-        NamedCommands.registerCommand(
-                "intakeReceive",
-                superStructure.moveToPose(SuperStructurePose.LOADING).alongWith(intake.run(IntakeAction.INTAKING)));
-        */
-        // Set up auto routines
-
-        // autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser.addOption(
                 "3PieceRight", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
         autoChooser.addOption(
                 "3PieceLeft", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.LEFT));
+        autoChooser.addOption(
+                "4PieceFarRIght",
+                new Coral4PieceFar(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
         /*
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -362,20 +308,11 @@ public class RobotContainer {
         } else {
             driveController
                     .runIntake()
-                    .whileTrue(elevator.moveToLoadingPose(drive::getPose).alongWith(intake.run(IntakeAction.INTAKING)));
+                    .whileTrue(elevator.moveToLoadingPose(drive::getPose)
+                            .alongWith(arm.moveToAngle(SuperStructurePose.LOADING.armAngle))
+                            .alongWith(intake.run(IntakeAction.INTAKING)));
         }
-        // driveController.xboxController.povRight().whileTrue(new DriveToPose(drive, () ->
-        // Reef.getAllianceReefBranch(5, Side.CENTER).transformBy(new Transform2d(1.0, 0.0, new Rotation2d())),
-        // Optional.of(Degrees.of(360))));
 
-        /*
-         * Problems:
-         *
-         *      - disabling in auto
-         *      - elevator height hitting limit, auto only
-         *      - algae intake randomly running (not lasercan fault)
-         *      - move arm while zeroing
-         */
         switch (Constants.intakeVersion) {
             case V1:
                 driveController.removeAlgae().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));

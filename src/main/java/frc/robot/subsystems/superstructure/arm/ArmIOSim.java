@@ -29,7 +29,7 @@ public class ArmIOSim implements ArmIO {
                 false,
                 ArmConstants.startingAngle.in(Radians));
         armController.setTolerance(2.0);
-        setPosition(ArmConstants.startingAngle);
+        setPosition(ArmConstants.startingAngle, true);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ArmIOSim implements ArmIO {
     }
 
     @Override
-    public void setPosition(Angle targetAngle) {
+    public void setPosition(Angle targetAngle, boolean motionMagic) {
         armController.setSetpoint(targetAngle.in(Radians));
     }
 

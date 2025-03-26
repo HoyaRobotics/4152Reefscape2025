@@ -20,6 +20,7 @@ public class LEDSequence extends SequentialCommandGroup {
     public LEDSequence(LED led, Intake intake) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
+
         addCommands(
                 led.LEDCommand(LEDColors.EMPTY),
                 Commands.waitUntil(() -> intake.hasCoral()),
