@@ -308,8 +308,8 @@ public class RobotContainer {
         } else {
             driveController
                     .runIntake()
-                    .whileTrue(elevator.moveToLoadingPose(drive::getPose)
-                            .alongWith(arm.moveToAngle(SuperStructurePose.LOADING.armAngle))
+                    .whileTrue(superStructure
+                            .moveToLoadingPose(drive::getPose)
                             .alongWith(intake.run(IntakeAction.INTAKING)));
         }
 

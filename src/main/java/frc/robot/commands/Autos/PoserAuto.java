@@ -1,21 +1,26 @@
 package frc.robot.commands.Autos;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.*;
-import frc.robot.constants.FieldConstants.*;
-import frc.robot.subsystems.algaeIntake.*;
-import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.intake.*;
-import frc.robot.subsystems.intake.IntakeConstants.*;
+import frc.robot.commands.AutoAlign;
+import frc.robot.commands.DriveToPose;
+import frc.robot.commands.HoldPosition;
+import frc.robot.constants.FieldConstants.CoralStation;
+import frc.robot.constants.FieldConstants.Reef;
+import frc.robot.constants.FieldConstants.Side;
+import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import frc.robot.util.*;
+import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -24,7 +29,7 @@ import java.util.function.Supplier;
 // command the provided distance away from the next pose
 public abstract class PoserAuto {
 
-    static final Distance PlacingDistance = Inches.of(75); // 35
+    static final Distance PlacingDistance = Inches.of(70); // 35
     static final Angle PlacingAngleDeltaTolerance = Degrees.of(360);
 
     static final Angle CoralStationAngleDelta = Degrees.of(360);
@@ -64,7 +69,11 @@ public abstract class PoserAuto {
         Supplier<Pose2d> targetPose = () -> CoralStation.getCoralStationPose(side);
         return intake.runWithSensor(IntakeAction.INTAKING)
                 .deadlineFor(new DriveToPose(drive, targetPose, Optional.of(CoralStationAngleDelta))
-                        .alongWith(superStructure.elevator.moveToLoadingPose(drive::getPose)))
+                        .alongWith(superStructure
+                                .arm
+                                .moveToAngle(SuperStructurePose.BASE.armAngle)
+                                .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false))
+                                .andThen(superStructure.moveToLoadingPose(drive::getPose))))
                 .andThen(() -> intake.stopIntake());
     }
 }

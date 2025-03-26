@@ -40,7 +40,7 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     private static final Distance ThrowNetTolerance = Inches.of(14); // 12
-    private static final double L2DelaySeconds = 0.125;
+    private static final double L2DelaySeconds = 0.075; // 0.125
 
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
@@ -85,15 +85,11 @@ public class AutoAlign {
                         .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
                                 || currentPose.get() == SuperStructurePose.L3),
                 intake.runWithSensor(IntakeAction.PLACING),
-                Commands.either(
-                                superStructure
-                                        .arm
-                                        .moveToAngle(SuperStructurePose.BASE.armAngle)
-                                        .until(() -> superStructure.arm.isPastPosition(Degrees.of(103), false)),
-                                superStructure.arm.moveToAngle(Degrees.of(103)),
-                                () -> isAuto)
-                        .deadlineFor(intake.run(IntakeAction.PLACING)));
-        // superStructure.arm.moveToAngle(Degrees.of(103)).deadlineFor(intake.run(IntakeAction.PLACING)));
+                superStructure
+                        .arm
+                        .moveToAngle(Degrees.of(103))
+                        .deadlineFor(intake.run(IntakeAction.PLACING))
+                        .onlyIf(() -> !isAuto));
     }
 
     public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {

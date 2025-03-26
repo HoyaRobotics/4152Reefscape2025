@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -17,9 +16,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.FieldConstants.CoralStation;
-import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -59,6 +55,7 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/ElevatorPose", this.stage2Pose);
     }
 
+    /*
     public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
         // LinearFilter filter = LinearFilter.movingAverage(1);
         return Commands.run(
@@ -80,7 +77,7 @@ public class Elevator extends SubsystemBase {
                     setPosition(inputHeight, false);
                 },
                 this);
-    }
+    }*/
 
     public Command moveToPosition(Distance targetPosition, boolean motionMagic) {
         return Commands.run(() -> {}, this)

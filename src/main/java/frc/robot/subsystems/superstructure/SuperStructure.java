@@ -2,10 +2,14 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.constants.FieldConstants.CoralStation;
+import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -39,7 +43,7 @@ public class SuperStructure {
         // TROUGH(Inches.of(0), Degrees.of(120)),
         LOADING(Inches.of(16.75), Degrees.of(-35)), // 18
         MAX_LOADING(Inches.of(18.0), Degrees.of(-35)),
-        MIN_LOADING(Inches.of(3.0), Degrees.of(-35)),
+        MIN_LOADING(Inches.of(0.0), Degrees.of(-20)),
         LOADING_CORAL_BETW(Inches.of(17), Degrees.of(-35)),
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(11.5), Degrees.of(135.0)), // 13.0
@@ -131,6 +135,36 @@ public class SuperStructure {
                 .finallyDo(() -> {
                     currentPose = pose;
                 });
+    }
+
+    public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
+        return Commands.run(
+                () -> {
+                    Pose2d currentPose = drivePose.get();
+                    final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
+                    final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
+                    final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
+                    final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
+                    Distance xOffset = currentPose
+                            .relativeTo(CoralStation.getClosestCoralStation(currentPose))
+                            .getMeasureX()
+                            .minus(Meters.of(0.48));
+                    // Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
+
+                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 3.75 / 4.5));
+                    Distance inputHeight = height.gt(minHeight) ? height : minHeight;
+                    // inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
+
+                    Angle angle = maxAngle.plus(Degrees.of(xOffset.in(Inches) * 3.0 / 4.5));
+                    Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
+
+                    // Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));
+                    // setPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false);
+                    elevator.setPosition(inputHeight, false);
+                    arm.setArmPosition(inputAngle);
+                },
+                arm,
+                elevator);
     }
 
     public boolean isAtPosition() {

@@ -43,11 +43,11 @@ public class Coral3Piece extends PoserAuto {
             var coralStationPose = CoralStation.getCoralStationPose(autoSide);
             return new Pose2d(
                     branchPose
-                            .transformBy(new Transform2d(0.25, autoSide == Side.RIGHT ? -2.0 : 2.0, Rotation2d.kZero))
+                            .transformBy(new Transform2d(0.25, autoSide == Side.RIGHT ? -2.75 : 2.75, Rotation2d.kZero))
                             .getTranslation(),
                     branchPose.interpolate(coralStationPose, 0.5).getRotation());
         };
-        autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(1.0))
+        autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(1.75))
                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
@@ -57,7 +57,7 @@ public class Coral3Piece extends PoserAuto {
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide3));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace3, branchSide4));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L2, reefFace3, branchSide4));
         // autoCommand.addCommands(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
 
         return autoCommand;
