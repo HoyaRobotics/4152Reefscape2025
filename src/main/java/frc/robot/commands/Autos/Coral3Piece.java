@@ -47,6 +47,7 @@ public class Coral3Piece extends PoserAuto {
                             .getTranslation(),
                     branchPose.interpolate(coralStationPose, 0.5).getRotation());
         };
+
         autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(1.75))
                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
 

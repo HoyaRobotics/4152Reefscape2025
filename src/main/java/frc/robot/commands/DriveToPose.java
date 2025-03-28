@@ -93,6 +93,9 @@ public class DriveToPose extends Command {
 
         Logger.recordOutput("PIDToPose/xSpeed", xSpeed);
         Logger.recordOutput("PIDToPose/ySpeed", ySpeed);
+        Logger.recordOutput("PIDToPose/xAtSetpoint", xController.atSetpoint());
+        Logger.recordOutput("PIDToPose/yAtSetpoint", yController.atSetpoint());
+        Logger.recordOutput("PIDToPose/angleAtSetpoint", angleController.atSetpoint());
 
         // Convert to field relative speeds & send command
         ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, angleSpeed);

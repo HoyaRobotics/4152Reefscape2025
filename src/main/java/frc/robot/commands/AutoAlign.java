@@ -57,7 +57,7 @@ public class AutoAlign {
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return Commands.sequence(
-                        new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
+                        new DriveToPoseHeading(drive, drivePose::get, Optional.of(Degrees.of(360)))
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
                                         new WaitUntilCommand(

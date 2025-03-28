@@ -18,6 +18,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructure.AlgaeLevel;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly.CoralStationsSide;
@@ -130,8 +131,8 @@ public class FieldConstants {
                 .toArray(Pose2d[]::new);
 
         public static AlgaeLevel getNearestAlgaePoses(Drive drive) {
-            Pose2d centerFace = drive.getPose().nearest(getAllianceReefList());
-            int faceIndex = getAllianceReefList().indexOf(centerFace);
+            Pose2d centerFace = drive.getPose().nearest(getAllReefLists());
+            int faceIndex = getAllReefLists().indexOf(centerFace);
 
             return faceIndex % 2 == 1 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
         }
@@ -141,7 +142,12 @@ public class FieldConstants {
         }
 
         public static Pose2d getClosestBranchPose(Drive drive, Side side) {
-            return offsetReefPose(drive.getPose().nearest(getAllianceReefList()), side);
+            return offsetReefPose(drive.getPose().nearest(getAllReefLists()), side);
+        }
+
+        public static List<Pose2d> getAllReefLists() {
+            return Stream.concat(Arrays.stream(blueCenterFaces), Arrays.stream(redCenterFaces))
+                    .toList();
         }
 
         public static List<Pose2d> getAllianceReefList() {
