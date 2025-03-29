@@ -16,8 +16,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructure.AlgaeLevel;
+import frc.robot.util.CoordinateUtils;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -26,8 +28,8 @@ import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
 public class FieldConstants {
-    public static final double fieldLength = Units.inchesToMeters(690.876);
-    public static final double fieldWidth = Units.inchesToMeters(317);
+    public static final Distance fieldLength = Inches.of(690.876);
+    public static final Distance fieldWidth = Inches.of(317);
 
     public enum Side {
         LEFT,
@@ -137,7 +139,7 @@ public class FieldConstants {
             return faceIndex % 2 == 1 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
         }
 
-        public static Pose2d getAllianceReefBranch(int faceIndex, Side side) {
+        public static Pose2d getAllianceReefBranch(int blueFaceIndex, Side side) {
             return FieldMirroringUtils.toCurrentAlliancePose(offsetReefPose(blueCenterFaces[faceIndex], side));
         }
 
@@ -192,30 +194,18 @@ public class FieldConstants {
         // distance from arena wall to net
         public static final Distance yOffset = Inches.of(6.243 - 0.83);
         public static final Distance netWidth = Inches.of(148.130);
+        public static final Distance maxY =
+                fieldWidth.minus(yOffset.plus(netWidth).minus(Meters.of(0.48)));
         public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(0);
 
-        public static Pose2d getNetPose(Pose2d drivePose) {
-            boolean isRed = DriverStation.getAlliance().isPresent()
-                    && DriverStation.getAlliance().get() == Alliance.Red;
-
-            Distance netEnd = Meters.of(fieldWidth).minus(yOffset.plus(netWidth).minus(Meters.of(0.48)));
-            netEnd = isRed
-                    ? FieldMirroringUtils.flip(new Translation2d(Meters.of(0), netEnd))
-                            .getMeasureY()
-                    : netEnd;
-
-            Distance absoluteXOffset = isRed ? Meters.of(fieldLength).minus(xOffset) : xOffset;
-
-            // clamp pose
-            Distance yDistance = isRed
-                    ? Meters.of(
-                            Math.min(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)))
-                    : Meters.of(
-                            Math.max(netEnd.in(Meters), drivePose.getMeasureY().in(Meters)));
-
+        public static Pose2d getNetPose(Pose2d drivePose, Optional<Distance> blueYDistance) {
+            blueYDistance.ifPresent((distance) -> CoordinateUtils.getAllianceY(blueYDistance.get()));
             return new Pose2d(
-                    new Translation2d(absoluteXOffset, yDistance),
-                    isRed ? FieldMirroringUtils.flip(rotationOffset) : rotationOffset);
+                    new Translation2d(
+                        CoordinateUtils.getAllianceX(xOffset),
+                        blueYDistance.orElse(
+                                CoordinateUtils.clampAllianceDistance(drivePose.getMeasureY(), maxY, fieldWidth, false))),
+                        CoordinateUtils.getAllianceRotation(rotationOffset));
         }
     }
 }

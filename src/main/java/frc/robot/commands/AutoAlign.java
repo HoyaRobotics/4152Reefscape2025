@@ -39,7 +39,7 @@ import java.util.function.Supplier;
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
-    private static final Distance ThrowNetTolerance = Inches.of(14); // 12
+    public static final Distance ThrowNetTolerance = Inches.of(14); // 12
     private static final double L2DelaySeconds = 0.075; // 0.125
 
     // if player lets go of back buttons finish moving to pose but dont outtake
@@ -128,7 +128,7 @@ public class AutoAlign {
     }
 
     public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
-        Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose());
+        Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), Optional.empty());
         return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
                 .andThen(superStructure
                         .moveToPose(SuperStructurePose.ALGAE_NET)

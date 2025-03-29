@@ -36,7 +36,7 @@ public class Coral3Piece extends PoserAuto {
         final Side branchSide3 = autoSide == Side.RIGHT ? Side.LEFT : Side.RIGHT;
         final Side branchSide4 = autoSide == Side.RIGHT ? Side.RIGHT : Side.LEFT;
 
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace1, branchSide1));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace1, branchSide1, false));
 
         Supplier<Pose2d> waypointPose = () -> {
             var branchPose = Reef.getAllianceReefBranch(reefFace1, branchSide1);
@@ -52,13 +52,13 @@ public class Coral3Piece extends PoserAuto {
                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide2));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide2, false));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide3));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide3, false));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace3, branchSide4));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace3, branchSide4, false));
         // autoCommand.addCommands(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
 
         return autoCommand;
