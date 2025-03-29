@@ -194,18 +194,22 @@ public class FieldConstants {
         // distance from arena wall to net
         public static final Distance yOffset = Inches.of(6.243 - 0.83);
         public static final Distance netWidth = Inches.of(148.130);
-        public static final Distance maxY =
+        public static final Distance bargeCenter =
                 fieldWidth.minus(yOffset.plus(netWidth).minus(Meters.of(0.48)));
         public static final Rotation2d rotationOffset = Rotation2d.fromDegrees(0);
 
-        public static Pose2d getNetPose(Pose2d drivePose, Optional<Distance> blueYDistance) {
-            blueYDistance.ifPresent((distance) -> CoordinateUtils.getAllianceY(blueYDistance.get()));
-            return new Pose2d(
+        public static Pose2d getNetPose(Pose2d drivePose, Optional<Distance> bargeCenterOffset) {
+            var finalpose = new Pose2d(
                     new Translation2d(
                             CoordinateUtils.getAllianceX(xOffset),
-                            blueYDistance.orElse(CoordinateUtils.clampAllianceDistance(
-                                    drivePose.getMeasureY(), maxY, fieldWidth, false))),
+                            bargeCenterOffset
+                                    .map(offset -> CoordinateUtils.getAllianceY(bargeCenter.plus(offset)))
+                                    .orElseGet(() -> CoordinateUtils.clampAllianceDistance(
+                                            drivePose.getMeasureY(), bargeCenter, fieldWidth, false))),
                     CoordinateUtils.getAllianceRotation(rotationOffset));
+
+            Logger.recordOutput("Auto/bargePose", finalpose);
+            return finalpose;
         }
     }
 }

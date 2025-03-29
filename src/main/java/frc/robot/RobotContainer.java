@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
+import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.Coral3Piece;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
@@ -250,6 +251,9 @@ public class RobotContainer {
                 new Coral3Piece(Side.RIGHT, drive, superStructure, intake, algaeIntake).getAutoCommand());
         autoChooser.addOption(
                 "3PieceLeft", new Coral3Piece(Side.LEFT, drive, superStructure, intake, algaeIntake).getAutoCommand());
+        autoChooser.addOption(
+                "algaeCenter",
+                new AlgaeCenter(Side.RIGHT, drive, superStructure, intake, algaeIntake).getAutoCommand());
         /*
         autoChooser.addOption(
                 "4PieceFarRIght",
