@@ -4,23 +4,17 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
 import frc.robot.constants.FieldConstants.CoralStation;
-import frc.robot.constants.FieldConstants.Net;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
-import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
-import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
@@ -84,29 +78,13 @@ public abstract class PoserAuto {
                 };
     }
 
-    public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
-        return Commands.sequence(
-                new DriveToPose(drive, () -> Net.getNetPose(drive.getPose(), Optional.of(bargeCenterOffset))),
-                superStructure
-                        .moveToPose(SuperStructurePose.ALGAE_NET)
-                        .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
-                                        .elevatorPosition
-                                        .minus(superStructure.elevator.getPosition())
-                                        .lt(AutoAlign.ThrowNetTolerance))
-                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))),
-                algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
+    public Command alignAndPickAlgae(int faceIndex) {
+        return AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.of(faceIndex));
     }
 
-    public Command alignAndTakeAlgae(int reefFaceIndex) {
-        Supplier<Pose2d> reefSupplier = () -> Reef.getAllianceReefBranch(reefFaceIndex, Side.CENTER);
-        Supplier<Pose2d> transitionPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, Side.CENTER)
-                .transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
-        return Commands.sequence(
-                new DriveToPose(drive, transitionPose)
-                        .alongWith(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)),
-                new DriveToPose(drive, reefSupplier),
-                AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
-                new DriveToPose(drive, transitionPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))));
+    public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
+        return AutoAlign.autoScoreBarge(
+                drive, superStructure, algaeIntake, Optional.of(bargeCenterOffset), () -> 0.0, () -> 0.0);
     }
 
     public Command alignAndPlaceCoral(
@@ -123,7 +101,7 @@ public abstract class PoserAuto {
                                 .andThen(superStructure.moveToPose(superStructurePose))),
                 superStructure.moveToPose(superStructurePose),
                 AutoAlign.placingSequence(superStructure, intake, () -> superStructurePose, true),
-                AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
+                AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.of(reefFaceIndex))
                         .onlyIf(() -> removeAlgae));
     }
 

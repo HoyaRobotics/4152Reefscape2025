@@ -96,11 +96,10 @@ public class DriveToPose extends Command {
                 .transformBy(new Transform2d(driveVelocityScalar, 0.0, Rotation2d.kZero))
                 .getTranslation();
 
-        final double linearScale = linearFF.get().getNorm() * 3.0;
-        driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearScale);
-
         // interpolate drive velocity towards joystick direction
         // by feed forward magnitude?
+        final double linearScale = linearFF.get().getNorm() * 3.0;
+        driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearScale);
 
         Logger.recordOutput("DriveToPose/driveAtGoal", driveController.atSetpoint());
         Logger.recordOutput("DriveToPose/angleAtGoal", angleController.atGoal());

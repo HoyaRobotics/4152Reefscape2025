@@ -326,7 +326,8 @@ public class RobotContainer {
             default:
                 driveController
                         .removeAlgae()
-                        .whileTrue(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
+                        .whileTrue(
+                                AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.empty()));
 
                 driveController
                         .scoreBarge()
@@ -334,6 +335,7 @@ public class RobotContainer {
                                 drive,
                                 superStructure,
                                 algaeIntake,
+                                Optional.empty(),
                                 () -> -driveController.xboxController.getLeftY(),
                                 () -> -driveController.xboxController.getLeftX()));
 

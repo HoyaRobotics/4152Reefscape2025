@@ -73,7 +73,7 @@ public class AutoAlign {
                                 intake,
                                 () -> superStructurePose.orElse(buttonWatcher.getSelectedPose()),
                                 false),
-                        autoAlignAndPickAlgae(drive, superStructure, algaeIntake)
+                        autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.empty())
                                 .onlyIf(() -> removeAlgae))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
@@ -114,38 +114,40 @@ public class AutoAlign {
                                 .withTimeout(AlgaeIntakeConstants.PlacingTimeout)));
     }
 
-    public static Command autoAlignAndPickAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
-        Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, Side.CENTER);
-        Supplier<Pose2d> movingPose = () ->
-                Reef.getClosestBranchPose(drive, Side.CENTER).transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
-
-        return new DriveToPose(drive, movingPose::get)
-                .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
-                .andThen(Commands.sequence(
-                        new DriveToPose(drive, drivePose::get),
-                        AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
-                        new DriveToPose(drive, movingPose::get),
-                        superStructure.arm.moveToAngle(Degrees.of(130))));
+    public static Command autoAlignAndPickAlgae(
+            Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake, Optional<Integer> faceIndex) {
+        Supplier<Pose2d> grabPose = () -> faceIndex
+                .map(index -> Reef.getAllianceReefBranch(index, Side.CENTER))
+                .orElse(Reef.getClosestBranchPose(drive, Side.CENTER));
+        Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
+        return Commands.sequence(
+                new DriveToPose(drive, offsetPose)
+                        .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive))),
+                new DriveToPose(drive, grabPose),
+                AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
+                new DriveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))));
     }
 
     public static Command autoScoreBarge(
             Drive drive,
             SuperStructure superStructure,
             AlgaeIntake algaeIntake,
+            Optional<Distance> bargeCenterOffset,
             DoubleSupplier inputX,
             DoubleSupplier inputY) {
-        Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), Optional.empty());
-        return new DriveToPose(
+        Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), bargeCenterOffset);
+        return Commands.sequence(
+                new DriveToPose(
                         drive,
                         drivePose::get,
-                        () -> DriveCommands.getLinearVelocityFromJoysticks(inputX.getAsDouble(), inputY.getAsDouble()))
-                .andThen(superStructure
+                        () -> DriveCommands.getLinearVelocityFromJoysticks(inputX.getAsDouble(), inputY.getAsDouble())),
+                superStructure
                         .moveToPose(SuperStructurePose.ALGAE_NET)
-                        .alongWith(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
+                        .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
                                         .elevatorPosition
                                         .minus(superStructure.elevator.getPosition())
                                         .lt(ThrowNetTolerance))
-                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))))
-                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
+                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))),
+                algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 }

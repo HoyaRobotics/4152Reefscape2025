@@ -37,7 +37,7 @@ public class AlgaeCenter extends PoserAuto {
 
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), true));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(0)));
-        autoCommand.addCommands(alignAndTakeAlgae(reefFaces.get(1)));
+        autoCommand.addCommands(alignAndPickAlgae(reefFaces.get(1)));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(1)));
 
         Supplier<Pose2d> translationPoint = () -> {
@@ -47,7 +47,7 @@ public class AlgaeCenter extends PoserAuto {
         };
         autoCommand.addCommands(transitionWaypoint(translationPoint, Meters.of(0.5))
                 .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake)));
-        autoCommand.addCommands(alignAndTakeAlgae(reefFaces.get(2)));
+        autoCommand.addCommands(alignAndPickAlgae(reefFaces.get(2)));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(2)));
 
         return autoCommand;

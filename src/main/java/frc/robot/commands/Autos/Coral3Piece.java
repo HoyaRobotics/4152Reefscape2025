@@ -39,6 +39,14 @@ public class Coral3Piece extends PoserAuto {
 
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), false));
 
+        /* Pseudocode for moving target:
+
+        Supplier<Pose2d> test = () -> {
+            // if distance between me and the waypoint pose is less than tolerance,
+            // return waypoint pose
+
+            // otherwise return final pose!!
+        };*/
         Supplier<Pose2d> waypointPose = () -> {
             var branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), branchSides.get(0));
             var coralStationPose = CoralStation.getCoralStationPose(autoSide);
