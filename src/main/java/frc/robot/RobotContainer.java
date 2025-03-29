@@ -328,7 +328,14 @@ public class RobotContainer {
                         .removeAlgae()
                         .whileTrue(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
 
-                driveController.scoreBarge().whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake));
+                driveController
+                        .scoreBarge()
+                        .whileTrue(AutoAlign.autoScoreBarge(
+                                drive,
+                                superStructure,
+                                algaeIntake,
+                                () -> -driveController.xboxController.getLeftY(),
+                                () -> -driveController.xboxController.getLeftX()));
 
                 driveController
                         .scoreProcessor()

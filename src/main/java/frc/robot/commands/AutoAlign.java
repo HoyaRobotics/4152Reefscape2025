@@ -34,6 +34,7 @@ import frc.robot.util.ButtonWatcher;
 import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class AutoAlign {
@@ -57,7 +58,7 @@ public class AutoAlign {
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return Commands.sequence(
-                        new DriveToPoseHeading(drive, drivePose::get, Optional.of(Degrees.of(360)))
+                        new DriveToPose(drive, drivePose::get)
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
                                         new WaitUntilCommand(
@@ -101,8 +102,8 @@ public class AutoAlign {
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
         return superStructure
                 .moveToPose(SuperStructurePose.PROCESSOR)
-                .deadlineFor(new DriveToPose(drive, movingPose::get, Optional.of(Degrees.of(360))))
-                .andThen(new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
+                .deadlineFor(new DriveToPose(drive, movingPose::get))
+                .andThen(new DriveToPose(drive, drivePose::get)
                         .alongWith(Commands.sequence(
                                 new WaitUntilCommand(
                                         () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
@@ -118,18 +119,26 @@ public class AutoAlign {
         Supplier<Pose2d> movingPose = () ->
                 Reef.getClosestBranchPose(drive, Side.CENTER).transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
 
-        return new DriveToPose(drive, movingPose::get, Optional.empty())
+        return new DriveToPose(drive, movingPose::get)
                 .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)))
                 .andThen(Commands.sequence(
-                        new DriveToPose(drive, drivePose::get, Optional.empty()),
+                        new DriveToPose(drive, drivePose::get),
                         AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
-                        new DriveToPose(drive, movingPose::get, Optional.empty()),
+                        new DriveToPose(drive, movingPose::get),
                         superStructure.arm.moveToAngle(Degrees.of(130))));
     }
 
-    public static Command autoScoreBarge(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+    public static Command autoScoreBarge(
+            Drive drive,
+            SuperStructure superStructure,
+            AlgaeIntake algaeIntake,
+            DoubleSupplier inputX,
+            DoubleSupplier inputY) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), Optional.empty());
-        return new DriveToPose(drive, drivePose::get, Optional.of(Degrees.of(360)))
+        return new DriveToPose(
+                        drive,
+                        drivePose::get,
+                        () -> DriveCommands.getLinearVelocityFromJoysticks(inputX.getAsDouble(), inputY.getAsDouble()))
                 .andThen(superStructure
                         .moveToPose(SuperStructurePose.ALGAE_NET)
                         .alongWith(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET

@@ -27,8 +27,9 @@ public class AlgaeCenter extends PoserAuto {
     public Command getAutoCommand() {
         SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
-        List<Integer> reefFaces =
-                List.of(3, 2, 1).stream().map((index) -> sideRelativeIndex(index)).toList();
+        List<Integer> reefFaces = List.of(3, 2, 1).stream()
+                .map((index) -> sideRelativeIndex(index))
+                .toList();
 
         List<Side> branchSides = List.of(Side.RIGHT).stream()
                 .map((side) -> sideRelativeBranch(side))
@@ -45,7 +46,7 @@ public class AlgaeCenter extends PoserAuto {
             return branchPose.transformBy(new Transform2d(1.0, 0.0, Rotation2d.kZero));
         };
         autoCommand.addCommands(transitionWaypoint(translationPoint, Meters.of(0.5))
-            .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake)));
+                .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake)));
         autoCommand.addCommands(alignAndTakeAlgae(reefFaces.get(2)));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(2)));
 

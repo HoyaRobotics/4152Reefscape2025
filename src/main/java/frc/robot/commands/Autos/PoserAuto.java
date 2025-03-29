@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.DriveToPoseHeading;
+import frc.robot.commands.DriveToPose;
 import frc.robot.commands.HoldPosition;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Net;
@@ -55,6 +55,8 @@ public abstract class PoserAuto {
         this.intake = intake;
         this.algaeIntake = algaeIntake;
     }
+    // instead of adding waypoint poses, just change the pose in the drive to pose supplier,
+    // make it a moving pose?
 
     // place barge at given pose
     protected int sideRelativeIndex(int rightFaceIndex) {
@@ -84,8 +86,7 @@ public abstract class PoserAuto {
 
     public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
         return Commands.sequence(
-                new DriveToPoseHeading(
-                        drive, () -> Net.getNetPose(drive.getPose(), Optional.of(bargeCenterOffset)), Optional.empty()),
+                new DriveToPose(drive, () -> Net.getNetPose(drive.getPose(), Optional.of(bargeCenterOffset))),
                 superStructure
                         .moveToPose(SuperStructurePose.ALGAE_NET)
                         .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
@@ -101,19 +102,18 @@ public abstract class PoserAuto {
         Supplier<Pose2d> transitionPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, Side.CENTER)
                 .transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
-                new DriveToPoseHeading(drive, transitionPose, Optional.empty())
+                new DriveToPose(drive, transitionPose)
                         .alongWith(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)),
-                new DriveToPoseHeading(drive, reefSupplier, Optional.empty()),
+                new DriveToPose(drive, reefSupplier),
                 AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
-                new DriveToPoseHeading(drive, transitionPose, Optional.empty())
-                        .alongWith(superStructure.arm.moveToAngle(Degrees.of(130))));
+                new DriveToPose(drive, transitionPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))));
     }
 
     public Command alignAndPlaceCoral(
             SuperStructurePose superStructurePose, int reefFaceIndex, Side side, boolean removeAlgae) {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
-                new DriveToPoseHeading(drive, targetPose, Optional.of(PlacingAngleDeltaTolerance))
+                new DriveToPose(drive, targetPose)
                         .alongWith(Commands.defer(
                                         () -> Commands.waitUntil(
                                                 PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance)),
@@ -128,14 +128,13 @@ public abstract class PoserAuto {
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
-        return new DriveToPoseHeading(drive, targetPose, Optional.of(Degrees.of(360)))
-                .until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
+        return new DriveToPose(drive, targetPose).until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
     }
 
     public Command alignAndReceiveCoral(Side side) {
         Supplier<Pose2d> targetPose = () -> CoralStation.getCoralStationPose(side);
         return intake.runWithSensor(IntakeAction.INTAKING)
-                .deadlineFor(new DriveToPoseHeading(drive, targetPose, Optional.of(CoralStationAngleDelta))
+                .deadlineFor(new DriveToPose(drive, targetPose)
                         .alongWith(superStructure
                                 .arm
                                 .moveToAngle(SuperStructurePose.BASE.armAngle)
