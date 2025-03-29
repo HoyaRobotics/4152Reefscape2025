@@ -43,5 +43,5 @@ public final class Constants {
         V2
     }
 
-    public static final boolean useVariableIntakeHeight = false;
+    public static final boolean useVariableIntakeHeight = true;
 }

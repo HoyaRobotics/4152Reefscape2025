@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 public class ArmIOReal implements ArmIO {
     final TalonFX armMotor = new TalonFX(32, "rio");
     final CANcoder armEncoder = new CANcoder(33, "rio");
-    double armRatio = 185.7143;
+    double armRatio = 119.5887; // 185.7143;
 
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
     private final PositionVoltage positionRequest = new PositionVoltage(0.0);
@@ -63,17 +63,17 @@ public class ArmIOReal implements ArmIO {
         armConfig.Feedback.FeedbackRemoteSensorID = 33;
         armConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         armConfig.Feedback.RotorToSensorRatio = armRatio;
-        armConfig.MotionMagic.MotionMagicAcceleration = 3.0; // 2.0
-        armConfig.MotionMagic.MotionMagicCruiseVelocity = 0.8;
-        armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        armConfig.MotionMagic.MotionMagicAcceleration = 6.0; // 2.0
+        armConfig.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+        armConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         armConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        // armConfig.Slot0.kG = 0.01;
-        armConfig.Slot0.kS = 0.15;
-        armConfig.Slot0.kD = 0.08;
-        armConfig.Slot0.kV = 23.0; // 21.04111;
+        armConfig.Slot0.kG = 0.15; // 0.0
+        armConfig.Slot0.kS = 0.1; // 0.15;
+        armConfig.Slot0.kD = 2.0; // 0.08;
+        armConfig.Slot0.kV = 14.2222; // 23.0; // 21.04111;
         armConfig.Slot0.kA = 0.0;
-        armConfig.Slot0.kP = 80; // 45
+        armConfig.Slot0.kP = 80.0; // 80; // 45
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(200.0);
         armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;

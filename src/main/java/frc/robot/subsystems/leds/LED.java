@@ -13,6 +13,15 @@ import org.littletonrobotics.junction.Logger;
 public class LED extends SubsystemBase {
     private final LEDIO io;
     private final LEDInputsAutoLogged inputs;
+
+    public enum LEDState {
+        HOLDING_CORAL,
+        ALIGNING,
+        AUTO,
+        PLACING,
+        EMPTY
+    }
+
     /** Creates a new LED. */
     public LED(LEDIO io) {
         this.io = io;

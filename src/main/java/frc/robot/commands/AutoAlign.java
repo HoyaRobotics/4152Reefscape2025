@@ -53,12 +53,18 @@ public class AutoAlign {
             AlgaeIntake algaeIntake,
             Side side,
             Optional<SuperStructurePose> superStructurePose,
-            boolean removeAlgae) {
+            boolean removeAlgae,
+            DoubleSupplier inputX,
+            DoubleSupplier inputY) {
         Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return Commands.sequence(
-                        new DriveToPose(drive, drivePose::get)
+                        new DriveToPose(
+                                        drive,
+                                        drivePose::get,
+                                        () -> DriveCommands.getLinearVelocityFromJoysticks(
+                                                inputX.getAsDouble(), inputY.getAsDouble()))
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
                                         new WaitUntilCommand(

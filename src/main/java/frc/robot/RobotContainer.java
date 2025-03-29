@@ -34,6 +34,7 @@ import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.Coral3Piece;
+import frc.robot.commands.Autos.ProfileTesting;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.LEDSequence;
@@ -84,6 +85,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -254,6 +256,10 @@ public class RobotContainer {
         autoChooser.addOption(
                 "algaeCenter",
                 new AlgaeCenter(Side.RIGHT, drive, superStructure, intake, algaeIntake).getAutoCommand());
+
+        autoChooser.addOption(
+                "profileTest",
+                new ProfileTesting(Side.RIGHT, drive, superStructure, intake, algaeIntake).getAutoCommand());
         /*
         autoChooser.addOption(
                 "4PieceFarRIght",
@@ -280,11 +286,12 @@ public class RobotContainer {
      */
     private void configureDriverButtonBindings() {
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive,
-                () -> -driveController.xboxController.getLeftY(),
-                () -> -driveController.xboxController.getLeftX(),
-                () -> -driveController.xboxController.getRightX()));
+
+        DoubleSupplier driveX = () -> -driveController.xboxController.getLeftY();
+        DoubleSupplier driveY = () -> -driveController.xboxController.getLeftX();
+
+        drive.setDefaultCommand(
+                DriveCommands.joystickDrive(drive, driveX, driveY, () -> -driveController.xboxController.getRightX()));
 
         elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake, algaeIntake));
 
@@ -332,12 +339,7 @@ public class RobotContainer {
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive,
-                                superStructure,
-                                algaeIntake,
-                                Optional.empty(),
-                                () -> -driveController.xboxController.getLeftY(),
-                                () -> -driveController.xboxController.getLeftX()));
+                                drive, superStructure, algaeIntake, Optional.empty(), driveX, driveY));
 
                 driveController
                         .scoreProcessor()
@@ -384,7 +386,9 @@ public class RobotContainer {
                         algaeIntake,
                         Side.LEFT,
                         Optional.empty(),
-                        true));
+                        true,
+                        driveX,
+                        driveY));
 
         driveController
                 .alignRightBranch()
@@ -396,7 +400,9 @@ public class RobotContainer {
                         algaeIntake,
                         Side.RIGHT,
                         Optional.empty(),
-                        true));
+                        true,
+                        driveX,
+                        driveY));
     }
 
     /**

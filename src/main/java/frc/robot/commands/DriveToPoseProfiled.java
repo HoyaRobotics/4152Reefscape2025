@@ -111,6 +111,7 @@ public class DriveToPoseProfiled extends Command {
         Pose2d currentPose = drive.getPose();
         Pose2d targetPose = poseSupplier.get();
 
+        Logger.recordOutput("DriveToPose/targetPose", targetPose);
         Logger.recordOutput(
                 "DriveToPose/targetDistance", currentPose.getTranslation().getDistance(targetPose.getTranslation()));
 
