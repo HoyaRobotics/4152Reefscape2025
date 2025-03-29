@@ -27,6 +27,9 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.util.PoseUtils;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -45,7 +48,11 @@ public abstract class PoserAuto {
     protected final Intake intake;
     protected final AlgaeIntake algaeIntake;
 
-    public PoserAuto(Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
+    protected final Side autoSide;
+
+    public PoserAuto(
+            Side autoSide, Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
+        this.autoSide = autoSide;
         this.drive = drive;
         this.superStructure = superStructure;
         this.intake = intake;
@@ -53,23 +60,51 @@ public abstract class PoserAuto {
     }
 
     // place barge at given pose
+    protected int sideRelativeIndex(int rightFaceIndex) {
+        return autoSide == Side.RIGHT
+                ? rightFaceIndex
+                : switch (rightFaceIndex) {
+                    case 0 -> 0;
+                    case 1 -> 5;
+                    case 2 -> 4;
+                    case 3 -> 3;
+                    case 4 -> 2;
+                    case 5 -> 1;
+                    default -> 3;
+                };
+    }
+
+    protected Side sideRelativeBranch(Side rightBranchSide) {
+        return autoSide == Side.RIGHT
+                ? rightBranchSide
+                : switch (rightBranchSide) {
+                    case RIGHT -> Side.LEFT;
+                    case LEFT -> Side.RIGHT;
+                    case CENTER -> Side.CENTER;
+                    default -> Side.CENTER;
+                };
+    }
 
     public Command alignAndPlaceBarge(Distance yDistance) {
         return Commands.sequence(
-                new DriveToPoseHeading(drive, () -> Net.getNetPose(drive.getPose(), Optional.of(yDistance)), Optional.empty()),
-                superStructure.moveToPose(SuperStructurePose.ALGAE_NET)
+                new DriveToPoseHeading(
+                        drive, () -> Net.getNetPose(drive.getPose(), Optional.of(yDistance)), Optional.empty()),
+                superStructure
+                        .moveToPose(SuperStructurePose.ALGAE_NET)
                         .alongWith(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
-                        .elevatorPosition
-                        .minus(superStructure.elevator.getPosition())
-                        .lt(AutoAlign.ThrowNetTolerance))
-                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))),
+                                        .elevatorPosition
+                                        .minus(superStructure.elevator.getPosition())
+                                        .lt(AutoAlign.ThrowNetTolerance))
+                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))),
                 algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 
     public Command alignAndTakeAlgae(int reefFaceIndex) {
+
         Supplier<Pose2d> reefSupplier = () -> Reef.getAllianceReefBranch(reefFaceIndex, Side.CENTER);
-        Supplier<Pose2d> transitionPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, Side.CENTER)
-                .transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
+        Supplier<Pose2d> transitionPose =
+                () -> Reef.getAllianceReefBranch(reefFaceIndex, Side.CENTER)
+                        .transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
                 new DriveToPoseHeading(drive, transitionPose, Optional.empty())
                         .alongWith(AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)),
@@ -81,7 +116,8 @@ public abstract class PoserAuto {
 
     public Command alignAndPlaceCoral(
             SuperStructurePose superStructurePose, int reefFaceIndex, Side side, boolean removeAlgae) {
-        Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
+        Supplier<Pose2d> targetPose =
+                () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
                 new DriveToPoseHeading(drive, targetPose, Optional.of(PlacingAngleDeltaTolerance))
                         .alongWith(Commands.defer(

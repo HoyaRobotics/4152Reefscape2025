@@ -15,51 +15,55 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+
+import java.util.List;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 public class Coral3Piece extends PoserAuto {
 
-    public Coral3Piece(Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
-        super(drive, superStructure, intake, algaeIntake);
+    public Coral3Piece(
+            Side autoSide, Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
+        super(autoSide, drive, superStructure, intake, algaeIntake);
     }
 
-    public Command getAutoCommand(Side autoSide) {
+    public Command getAutoCommand() {
         // coral object class / enum?, superstructure pose, branch side and reef face
         SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 
-        final int reefFace1 = autoSide == Side.RIGHT ? 4 : 2;
-        final int reefFace2 = autoSide == Side.RIGHT ? 5 : 1;
-        final int reefFace3 = autoSide == Side.RIGHT ? 0 : 5;
+        final List<Integer> reefFaces = List.of(4, 5, 0)
+            .stream().map((index) -> sideRelativeIndex(index)).toList();
 
-        final Side branchSide1 = autoSide == Side.RIGHT ? Side.LEFT : Side.RIGHT;
-        final Side branchSide2 = autoSide == Side.RIGHT ? Side.RIGHT : Side.LEFT;
-        final Side branchSide3 = autoSide == Side.RIGHT ? Side.LEFT : Side.RIGHT;
-        final Side branchSide4 = autoSide == Side.RIGHT ? Side.RIGHT : Side.LEFT;
+        final List<Side> branchSides = List.of(Side.LEFT, Side.RIGHT, Side.LEFT, Side.RIGHT)
+            .stream().map((side) -> sideRelativeBranch(side)).toList();
 
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace1, branchSide1, false));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), false));
 
         Supplier<Pose2d> waypointPose = () -> {
-            var branchPose = Reef.getAllianceReefBranch(reefFace1, branchSide1);
+            var branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), branchSides.get(0));
             var coralStationPose = CoralStation.getCoralStationPose(autoSide);
-            return new Pose2d(
+            var finalPose =  new Pose2d(
                     branchPose
                             .transformBy(new Transform2d(0.25, autoSide == Side.RIGHT ? -2.75 : 2.75, Rotation2d.kZero))
                             .getTranslation(),
                     branchPose.interpolate(coralStationPose, 0.5).getRotation());
+            Logger.recordOutput("Auto/WayPoint", finalPose);
+            return finalPose;
         };
+
 
         autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(1.75))
                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide2, false));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(1), branchSides.get(1), false));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace2, branchSide3, false));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(1), branchSides.get(2), false));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFace3, branchSide4, false));
-        // autoCommand.addCommands(AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake));
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(2), branchSides.get(3), false));
 
         return autoCommand;
     }

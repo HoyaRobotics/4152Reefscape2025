@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.Coral3Piece;
-import frc.robot.commands.Autos.Coral4PieceFar;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.LEDSequence;
@@ -247,12 +246,14 @@ public class RobotContainer {
 
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser.addOption(
-                "3PieceRight", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
+                "3PieceRight",
+                new Coral3Piece(Side.RIGHT, drive, superStructure, intake, algaeIntake).getAutoCommand());
         autoChooser.addOption(
-                "3PieceLeft", new Coral3Piece(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.LEFT));
+                "3PieceLeft", new Coral3Piece(Side.LEFT, drive, superStructure, intake, algaeIntake).getAutoCommand());
+        /*
         autoChooser.addOption(
                 "4PieceFarRIght",
-                new Coral4PieceFar(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));
+                new Coral4PieceFar(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));*/
         /*
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));

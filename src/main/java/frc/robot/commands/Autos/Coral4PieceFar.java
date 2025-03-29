@@ -18,11 +18,12 @@ import java.util.function.Supplier;
 
 public class Coral4PieceFar extends PoserAuto {
 
-    public Coral4PieceFar(Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
-        super(drive, superStructure, intake, algaeIntake);
+    public Coral4PieceFar(
+            Side autoSide, Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
+        super(autoSide, drive, superStructure, intake, algaeIntake);
     }
 
-    public Command getAutoCommand(Side autoSide) {
+    public Command getAutoCommand() {
         // coral object class / enum?, superstructure pose, branch side and reef face
         SequentialCommandGroup autoCommand = new SequentialCommandGroup();
 

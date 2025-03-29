@@ -139,7 +139,7 @@ public class FieldConstants {
             return faceIndex % 2 == 1 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
         }
 
-        public static Pose2d getAllianceReefBranch(int blueFaceIndex, Side side) {
+        public static Pose2d getAllianceReefBranch(int faceIndex, Side side) {
             return FieldMirroringUtils.toCurrentAlliancePose(offsetReefPose(blueCenterFaces[faceIndex], side));
         }
 
@@ -202,10 +202,10 @@ public class FieldConstants {
             blueYDistance.ifPresent((distance) -> CoordinateUtils.getAllianceY(blueYDistance.get()));
             return new Pose2d(
                     new Translation2d(
-                        CoordinateUtils.getAllianceX(xOffset),
-                        blueYDistance.orElse(
-                                CoordinateUtils.clampAllianceDistance(drivePose.getMeasureY(), maxY, fieldWidth, false))),
-                        CoordinateUtils.getAllianceRotation(rotationOffset));
+                            CoordinateUtils.getAllianceX(xOffset),
+                            blueYDistance.orElse(CoordinateUtils.clampAllianceDistance(
+                                    drivePose.getMeasureY(), maxY, fieldWidth, false))),
+                    CoordinateUtils.getAllianceRotation(rotationOffset));
         }
     }
 }
