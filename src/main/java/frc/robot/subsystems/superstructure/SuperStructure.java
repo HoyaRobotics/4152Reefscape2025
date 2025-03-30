@@ -3,12 +3,14 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.FieldConstants.CoralStation;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
@@ -137,18 +139,31 @@ public class SuperStructure {
                 });
     }
 
-    public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
+    public Command moveToLoadingPose(Drive drive) {
         return Commands.run(
                 () -> {
-                    Pose2d currentPose = drivePose.get();
+                    Pose2d currentPose = drive.getPose();
+                    Pose2d targetPose = CoralStation.getClosestCoralStation(currentPose);
+
+                    final var fieldVelocity = new Translation2d(drive.getFieldChassisSpeeds().vxMetersPerSecond, drive.getFieldChassisSpeeds().vyMetersPerSecond);
+
                     final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
                     final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
                     final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
                     final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
+
+                    final double predictionGain = 2.5;
+
+                    // we get the negated angle of the vector pointing from the robot to the target pose
+                    var targetRelVelocity = 
+                        Math.max(0.0, fieldVelocity.rotateBy(targetPose.getTranslation().minus(currentPose.getTranslation()).getAngle().unaryMinus())
+                            .getX());
+
                     Distance xOffset = currentPose
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
                             .getMeasureX()
-                            .minus(Meters.of(0.48));
+                            .minus(Meters.of(0.48))
+                            .minus(Meters.of(targetRelVelocity * predictionGain));
                     // Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
 
                     Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 4.5 / 4.5));

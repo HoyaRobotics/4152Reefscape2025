@@ -316,7 +316,7 @@ public class RobotContainer {
             driveController
                     .runIntake()
                     .whileTrue(superStructure
-                            .moveToLoadingPose(drive::getPose)
+                            .moveToLoadingPose(drive)
                             .alongWith(intake.run(IntakeAction.INTAKING)));
         }
 
