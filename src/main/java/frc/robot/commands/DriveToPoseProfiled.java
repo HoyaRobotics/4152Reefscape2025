@@ -14,11 +14,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
-import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -35,11 +33,14 @@ public class DriveToPoseProfiled extends Command {
     private static final double thetaMaxVelocity = 10.0;
     private static final double thetaMaxAcceleration = 15.0;
 
-    private final Angle angleDeltaTolerance;
+    private static final double linearFFGain = 3.0;
+
+    private Translation2d lastSetpointTranslation = Translation2d.kZero;
 
     private final Drive drive;
 
     private final Supplier<Pose2d> poseSupplier;
+    private Supplier<Translation2d> linearFF = () -> Translation2d.kZero;
 
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             driveKp, 0.0, driveKd, new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration));
@@ -48,11 +49,17 @@ public class DriveToPoseProfiled extends Command {
             thetaKp, 0.0, thetaKd, new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
 
     /** Creates a new DriveToPose. */
-    public DriveToPoseProfiled(Drive drive, Supplier<Pose2d> poseSupplier, Optional<Angle> angleDeltaTolerance) {
+    public DriveToPoseProfiled(Drive drive, Supplier<Pose2d> poseSupplier) {
         addRequirements(drive);
         this.drive = drive;
-        this.angleDeltaTolerance = angleDeltaTolerance.orElse(Degrees.of(5.0));
         this.poseSupplier = poseSupplier;
+    }
+
+    public DriveToPoseProfiled(Drive drive, Supplier<Pose2d> poseSupplier, Supplier<Translation2d> linearFF) {
+        addRequirements(drive);
+        this.drive = drive;
+        this.poseSupplier = poseSupplier;
+        this.linearFF = linearFF;
     }
 
     // Called when the command is initially scheduled.
@@ -69,29 +76,10 @@ public class DriveToPoseProfiled extends Command {
 
         // vector from robot to target
         var targetRelative = targetPose.getTranslation().minus(currentPose.getTranslation());
-        // we want velocities to be in robot coordinate frame
-        // velocity should be negative because we are minimizing process variable
-        // the velocity should be away from the target
-
-        // if we project the field relative velocity of the robot
-        // onto a unit vector pointing from the robot to the target
-        // the magnitude should be the amount of the robots
-        // velocity in the targets direction
-
-        // do we need to negate that to get the amount of robot velocity away from the target?
-        // we definetely want to clamp it because if the velocity is not in the targets direction
-        // at all the diff delta can be 0?
-
-        // a negative rate of change represents a decrease in the distance between the robot and the target,
-        // the output should represent
 
         // velocity should represent the rate of change of the distance between robot and target,
         // which would decrease over time
         // double diffDelta = Math.min(0.0, -fieldVelocity.dot(targetRelative));
-
-        var fieldVelocityVector = fieldVelocity.toVector().unit();
-        var targetVector = targetRelative.toVector();
-        // double diffDelta = Math.min(0.0, -fieldVelocityVector.dot(targetVector));
         double diffDelta = Math.min(
                 0.0,
                 -fieldVelocity.rotateBy(targetRelative.getAngle().unaryMinus()).getX());
@@ -115,6 +103,10 @@ public class DriveToPoseProfiled extends Command {
         Logger.recordOutput(
                 "DriveToPose/targetDistance", currentPose.getTranslation().getDistance(targetPose.getTranslation()));
 
+        driveController.reset(
+                lastSetpointTranslation.getDistance(targetPose.getTranslation()),
+                driveController.getSetpoint().velocity);
+
         double thetaVelocity = angleController.calculate(
                 currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
         double driveVelocityScalar =
@@ -131,6 +123,19 @@ public class DriveToPoseProfiled extends Command {
                                 currentPose.getTranslation().getX()
                                         - targetPose.getTranslation().getX())))
                 .transformBy(new Transform2d(driveVelocityScalar, 0.0, Rotation2d.kZero))
+                .getTranslation();
+
+        var linearT = linearFF.get().getNorm() * linearFFGain;
+        driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearT);
+
+        lastSetpointTranslation = new Pose2d(
+                        targetPose.getTranslation(),
+                        new Rotation2d(Math.atan2(
+                                currentPose.getTranslation().getY()
+                                        - targetPose.getTranslation().getY(),
+                                currentPose.getTranslation().getX()
+                                        - targetPose.getTranslation().getX())))
+                .transformBy(new Transform2d(driveController.getSetpoint().position, 0.0, Rotation2d.kZero))
                 .getTranslation();
 
         Logger.recordOutput("DriveToPose/driveAtGoal", driveController.atGoal());
