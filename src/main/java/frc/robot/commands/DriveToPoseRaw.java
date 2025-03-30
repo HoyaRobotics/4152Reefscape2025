@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class DriveToPose extends Command {
+public class DriveToPoseRaw extends Command {
     private static double driveKp = 0.43 * TunerConstants.kDriveGearRatio;
     private static double driveKd = 0.1;
 
@@ -45,13 +45,13 @@ public class DriveToPose extends Command {
             thetaKp, 0.0, thetaKd, new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
 
     /** Creates a new DriveToPose. */
-    public DriveToPose(Drive drive, Supplier<Pose2d> targetPose) {
+    public DriveToPoseRaw(Drive drive, Supplier<Pose2d> targetPose) {
         addRequirements(drive);
         this.drive = drive;
         this.targetPose = targetPose;
     }
 
-    public DriveToPose(Drive drive, Supplier<Pose2d> targetPose, Supplier<Translation2d> linearFF) {
+    public DriveToPoseRaw(Drive drive, Supplier<Pose2d> targetPose, Supplier<Translation2d> linearFF) {
         this.drive = drive;
         this.targetPose = targetPose;
         this.linearFF = linearFF;

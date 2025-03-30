@@ -45,6 +45,7 @@ public class Coral3Piece extends PoserAuto {
 
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), false));
 
+        /*
         Supplier<Pose2d> waypointPose = () -> {
             var branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), branchSides.get(0));
             var coralStationPose = CoralStation.getCoralStationPose(autoSide);
@@ -57,8 +58,30 @@ public class Coral3Piece extends PoserAuto {
 
         autoCommand.addCommands(transitionWaypoint(waypointPose, Meters.of(1.75))
                 .deadlineFor(superStructure.moveToPose(SuperStructurePose.LOADING)));
+        */
+        Supplier<Pose2d> targetPose = () -> {
+            // once we are within y tolerance switch
+            Pose2d branchPose = Reef.getAllianceReefBranch(4, autoSide);
+            Pose2d coralStationPose = CoralStation.getCoralStationPose(autoSide);
+            Pose2d transitionPose = branchPose.transformBy(new Transform2d(
+                    0.25,
+                    autoSide == Side.RIGHT ? -2.75 : 2.75,
+                    branchPose.interpolate(coralStationPose, 0.5).getRotation()));
 
-        autoCommand.addCommands(alignAndReceiveCoral(autoSide));
+            Pose2d currentPose = drive.getPose();
+            double tolerance = 1.75;
+
+            /*
+            Logger.recordOutput("Testing/transitionPose", transitionPose);
+            Logger.recordOutput(
+                    "Testing/yOffset", currentPose.relativeTo(transitionPose).getX() + tolerance);*/
+            boolean pastTransitionTolerance =
+                    currentPose.relativeTo(transitionPose).getX() + tolerance > 0;
+
+            return pastTransitionTolerance ? coralStationPose : transitionPose;
+        };
+
+        autoCommand.addCommands(alignAndReceiveCoral(targetPose));
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(1), branchSides.get(1), false));
 
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));

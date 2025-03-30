@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.DriveToPose;
+import frc.robot.commands.DriveToPoseRaw;
 import frc.robot.commands.HoldPosition;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef;
@@ -102,7 +102,7 @@ public abstract class PoserAuto {
             SuperStructurePose superStructurePose, int reefFaceIndex, Side side, boolean removeAlgae) {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
-                        new DriveToPose(drive, targetPose)
+                        AutoAlign.driveToPose(drive, targetPose)
                                 .alongWith(Commands.defer(
                                                 () -> Commands.waitUntil(PoseUtils.poseInRange(
                                                         drive::getPose, targetPose, PlacingDistance)),
@@ -120,7 +120,7 @@ public abstract class PoserAuto {
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
-        return new DriveToPose(drive, targetPose).until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
+        return AutoAlign.driveToPose(drive, targetPose).until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
     }
 
     public Command alignAndReceiveCoral(Side side) {
@@ -131,7 +131,7 @@ public abstract class PoserAuto {
 
     public Command alignAndReceiveCoral(Supplier<Pose2d> targetPose) {
         return intake.runWithSensor(IntakeAction.INTAKING)
-                .deadlineFor(new DriveToPose(drive, targetPose)
+                .deadlineFor(AutoAlign.driveToPose(drive, targetPose)
                         .alongWith(superStructure
                                 .arm
                                 .moveToAngle(SuperStructurePose.BASE.armAngle)

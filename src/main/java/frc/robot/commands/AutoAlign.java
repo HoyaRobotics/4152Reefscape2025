@@ -11,13 +11,16 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
+import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.Processor;
 import frc.robot.constants.FieldConstants.Reef;
@@ -45,6 +48,24 @@ public class AutoAlign {
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
     private static final double L2DelaySeconds = 0.075; // 0.125
 
+    public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
+        return Commands.either(
+                new DriveToPoseProfiled(drive, targetPose),
+                new DriveToPoseRaw(drive, targetPose),
+                () -> DriverStation.isAutonomous() ?
+                        Constants.AutoMotionProfiling :
+                        Constants.TeleopMotionProfiling);
+    }
+
+    public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose, Supplier<Translation2d> linearFF) {
+        return Commands.either(
+                new DriveToPoseProfiled(drive, targetPose, linearFF),
+                new DriveToPoseRaw(drive, targetPose, linearFF),
+                () -> DriverStation.isAutonomous() ?
+                        Constants.AutoMotionProfiling :
+                        Constants.TeleopMotionProfiling);
+    }
+
     // if player lets go of back buttons finish moving to pose but dont outtake
     // switch while moving ifn ew level chosen
     public static Command autoAlignAndPlace(
@@ -63,7 +84,7 @@ public class AutoAlign {
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         // drive to reef, once level is selected
         return Commands.sequence(
-                        new DriveToPose(
+                        driveToPose(
                                         drive,
                                         drivePose::get,
                                         () -> DriveCommands.getLinearVelocityFromJoysticks(
@@ -121,8 +142,8 @@ public class AutoAlign {
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
         return superStructure
                 .moveToPose(SuperStructurePose.PROCESSOR)
-                .deadlineFor(new DriveToPose(drive, movingPose::get))
-                .andThen(new DriveToPose(drive, drivePose::get)
+                .deadlineFor(driveToPose(drive, movingPose::get))
+                .andThen(driveToPose(drive, drivePose::get)
                         .alongWith(Commands.sequence(
                                 new WaitUntilCommand(
                                         () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
@@ -148,13 +169,13 @@ public class AutoAlign {
         Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
                         AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)
-                                .deadlineFor(new DriveToPose(drive, offsetPose)),
-                        new DriveToPose(drive, grabPose),
+                                .deadlineFor(driveToPose(drive, offsetPose)),
+                        driveToPose(drive, grabPose),
                         AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)
                                 .deadlineFor(Commands.startEnd(
                                         () -> leds.requestState(LEDState.PLACING),
                                         () -> leds.requestState(LEDState.ALIGNING))),
-                        new DriveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))))
+                        driveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
@@ -169,7 +190,7 @@ public class AutoAlign {
             DoubleSupplier inputY) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), bargeCenterOffset);
         return Commands.sequence(
-                        new DriveToPose(
+                        driveToPose(
                                 drive,
                                 drivePose::get,
                                 () -> DriveCommands.getLinearVelocityFromJoysticks(
