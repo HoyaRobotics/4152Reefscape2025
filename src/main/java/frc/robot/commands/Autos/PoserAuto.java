@@ -126,7 +126,7 @@ public abstract class PoserAuto {
     public Command alignAndReceiveCoral(Side side) {
         // align to closest side of coral station
         return alignAndReceiveCoral(() -> CoralStation.getCoralStationPose(side)
-                .transformBy(new Transform2d(0.0, side == Side.RIGHT ? 0.75 : -0.75, Rotation2d.kZero)));
+                .transformBy(new Transform2d(0.0, side == Side.RIGHT ? 0.5 : -0.5, Rotation2d.kZero)));
     }
 
     public Command alignAndReceiveCoral(Supplier<Pose2d> targetPose) {
