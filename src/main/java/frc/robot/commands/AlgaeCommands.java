@@ -37,7 +37,6 @@ public class AlgaeCommands {
                     List<SuperStructurePose> algaePoses =
                             SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
 
-                    // is this correct?
                     return superStructure
                             .moveToPose(algaePoses.get(0))
                             .andThen(superStructure.moveToPose(algaePoses.get(1)))
@@ -55,7 +54,6 @@ public class AlgaeCommands {
                             SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
 
                     SuperStructurePose prePose = algaePoses.get(0);
-                    // is this correct?
                     return superStructure
                             .moveToPose(prePose)
                             .until(() -> superStructure.arm.withinTolerance(prePose.armAngle, Degrees.of(5))) // 5

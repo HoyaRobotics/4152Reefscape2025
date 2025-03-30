@@ -11,7 +11,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.DriveToPoseRaw;
 import frc.robot.commands.HoldPosition;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef;
@@ -120,7 +119,8 @@ public abstract class PoserAuto {
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
-        return AutoAlign.driveToPose(drive, targetPose).until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
+        return AutoAlign.driveToPose(drive, targetPose)
+                .until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
     }
 
     public Command alignAndReceiveCoral(Side side) {

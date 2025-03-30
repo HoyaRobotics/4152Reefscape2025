@@ -20,6 +20,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
+import frc.robot.commands.DriveCommands.DriveCommands;
+import frc.robot.commands.DriveCommands.DriveToPoseProfiled;
+import frc.robot.commands.DriveCommands.DriveToPoseRaw;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.Processor;
@@ -46,28 +49,21 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
-    private static final double L2DelaySeconds = 0.075; // 0.125
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
                 new DriveToPoseProfiled(drive, targetPose),
                 new DriveToPoseRaw(drive, targetPose),
-                () -> DriverStation.isAutonomous() ?
-                        Constants.AutoMotionProfiling :
-                        Constants.TeleopMotionProfiling);
+                () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose, Supplier<Translation2d> linearFF) {
         return Commands.either(
                 new DriveToPoseProfiled(drive, targetPose, linearFF),
                 new DriveToPoseRaw(drive, targetPose, linearFF),
-                () -> DriverStation.isAutonomous() ?
-                        Constants.AutoMotionProfiling :
-                        Constants.TeleopMotionProfiling);
+                () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
-    // if player lets go of back buttons finish moving to pose but dont outtake
-    // switch while moving ifn ew level chosen
     public static Command autoAlignAndPlace(
             DriveMap driveController,
             Drive drive,
@@ -98,7 +94,7 @@ public class AutoAlign {
                                                 () -> superStructure.moveToPose(
                                                         superStructurePose.orElse(buttonWatcher.getSelectedPose())),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
-                        placingSequence(
+                        PlacingCommands.reefPlacingSequence(
                                 superStructure,
                                 intake,
                                 leds,
@@ -110,29 +106,6 @@ public class AutoAlign {
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-    }
-
-    public static Command placingSequence(
-            SuperStructure superStructure,
-            Intake intake,
-            LED leds,
-            Supplier<SuperStructurePose> currentPose,
-            boolean isAuto) {
-        return Commands.sequence(
-                        Commands.waitSeconds(L2DelaySeconds)
-                                .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
-                                        || currentPose.get() == SuperStructurePose.L3),
-                        intake.runWithSensor(IntakeAction.PLACING),
-                        Commands.either(
-                                        superStructure
-                                                .arm
-                                                .moveToAngle(SuperStructurePose.BASE.armAngle)
-                                                .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false)),
-                                        superStructure.arm.moveToAngle(Degrees.of(103)),
-                                        () -> isAuto)
-                                .deadlineFor(intake.run(IntakeAction.PLACING)))
-                .deadlineFor(Commands.startEnd(
-                        () -> leds.requestState(LEDState.PLACING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
     public static Command autoAlignLoadProcessor(

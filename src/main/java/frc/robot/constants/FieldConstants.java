@@ -1,19 +1,17 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -27,7 +25,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly.CoralStationsSide;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -74,8 +71,7 @@ public class FieldConstants {
                         FieldMirroringUtils.flip(rightSidePose.getRotation()));
             }
 
-            Transform2d poseDiff =
-                    robotPose.minus(rightSidePose);
+            Transform2d poseDiff = robotPose.minus(rightSidePose);
             Distance robotDistance = robotPose.relativeTo(rightSidePose).getMeasureX();
 
             boolean enteredRange = robotDistance.lt(Meters.of(1.5));
@@ -84,27 +80,30 @@ public class FieldConstants {
                 inCoralStationRange = true;
                 // right side station not field relative??
 
-
                 // drop at center of robot
-                var robotCenterYOffset = robotPose.relativeTo(rightSidePose)
+                var robotCenterYOffset = robotPose.relativeTo(rightSidePose).getMeasureY();
+                var targetRelVelocity = new Translation2d(
+                                robotContainer.driveSimulation.getLinearVelocity().x,
+                                robotContainer.driveSimulation.getLinearVelocity().y)
+                        .rotateBy(rightSidePose
+                                .getTranslation()
+                                .minus(robotPose.getTranslation())
+                                .getAngle()
+                                .unaryMinus())
                         .getMeasureY();
-                var targetRelVelocity = new Translation2d(robotContainer.driveSimulation.getLinearVelocity().x,
-                robotContainer.driveSimulation.getLinearVelocity().y)
-                        .rotateBy(rightSidePose.getTranslation().minus(robotPose.getTranslation()).getAngle().unaryMinus()).getMeasureY();
 
                 robotCenterYOffset = robotCenterYOffset.plus(targetRelVelocity.times(0.25));
 
                 var station = rightSidePose;
                 SimulatedArena.getInstance()
-                        .addGamePieceProjectile(
-                                new ReefscapeCoralOnFly(
-                                        rightSidePose.getTranslation(),
-                                        new Translation2d(0.0, robotCenterYOffset.in(Meters)),
-                                        new ChassisSpeeds(),
-                                        rightSidePose.getRotation(),
-                                        Centimeters.of(98),
-                                        MetersPerSecond.of(3),
-                                        Degrees.of(-40)));
+                        .addGamePieceProjectile(new ReefscapeCoralOnFly(
+                                rightSidePose.getTranslation(),
+                                new Translation2d(0.0, robotCenterYOffset.in(Meters)),
+                                new ChassisSpeeds(),
+                                rightSidePose.getRotation(),
+                                Centimeters.of(98),
+                                MetersPerSecond.of(3),
+                                Degrees.of(-40)));
                 /*
                 SimulatedArena.getInstance()
                         .addGamePieceProjectile(ReefscapeCoralOnFly.DropFromCoralStation(

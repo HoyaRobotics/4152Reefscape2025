@@ -44,6 +44,6 @@ public final class Constants {
     }
 
     public static final boolean useVariableIntakeHeight = true;
-    public static final boolean TeleopMotionProfiling = false;
-    public static final boolean AutoMotionProfiling = false;
+    public static final boolean TeleopMotionProfiling = true;
+    public static final boolean AutoMotionProfiling = true;
 }

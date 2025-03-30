@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public interface DriveMap {
     Trigger deployClimber();
@@ -38,6 +39,9 @@ public interface DriveMap {
     Trigger resetGyro();
 
     Trigger zeroElevator();
+
+    DoubleSupplier driveX();
+    DoubleSupplier driveY();
 
     BooleanSupplier ejectCoral();
 }
@@ -131,5 +135,15 @@ class DriverXbox implements DriveMap {
     @Override
     public BooleanSupplier ejectCoral() {
         return moveToTrough(false);
+    }
+
+    @Override
+    public DoubleSupplier driveX() {
+        return () -> -xboxController.getLeftY();
+    }
+
+    @Override
+    public DoubleSupplier driveY() {
+        return () -> -xboxController.getLeftX();
     }
 }

@@ -34,11 +34,9 @@ import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.Coral3Piece;
-import frc.robot.commands.Autos.ProfileTesting;
-import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveCommands.DriveCommands;
 import frc.robot.commands.HoldPosition;
-import frc.robot.commands.PlacingCommand;
-import frc.robot.commands.PlacingCommandTrough;
+import frc.robot.commands.PlacingCommands;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.constants.VisionConstants;
@@ -108,9 +106,6 @@ public class RobotContainer {
     public final DriverXbox driveController = new DriverXbox(0);
 
     public SwerveDriveSimulation driveSimulation = null;
-
-    // Controller
-    // public final CommandXboxController driveController = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -248,19 +243,13 @@ public class RobotContainer {
         autoChooser.addOption(
                 "3PieceLeft",
                 new Coral3Piece(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                /*
         autoChooser.addOption(
                 "algaeCenter",
-                new AlgaeCenter(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                new AlgaeCenter(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());*/
 
-        autoChooser.addOption(
-                "profileTest",
-                new ProfileTesting(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
-        /*
-        autoChooser.addOption(
-                "4PieceFarRIght",
-                new Coral4PieceFar(drive, superStructure, intake, algaeIntake).getAutoCommand(Side.RIGHT));*/
-        /*
         // Set up SysId routines
+        /*
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
         autoChooser.addOption(
@@ -268,8 +257,7 @@ public class RobotContainer {
         autoChooser.addOption(
                 "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        */
+        autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));*/
         // Configure the button bindings
         configureDriverButtonBindings();
     }
@@ -282,11 +270,11 @@ public class RobotContainer {
     private void configureDriverButtonBindings() {
         // Default command, normal field-relative drive
 
-        DoubleSupplier driveX = () -> -driveController.xboxController.getLeftY();
-        DoubleSupplier driveY = () -> -driveController.xboxController.getLeftX();
-
         drive.setDefaultCommand(
-                DriveCommands.joystickDrive(drive, driveX, driveY, () -> -driveController.xboxController.getRightX()));
+                DriveCommands.joystickDrive(drive,
+                        driveController.driveX(),
+                        driveController.driveY(),
+                        () -> -driveController.xboxController.getRightX()));
 
         elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake, algaeIntake));
 
@@ -332,7 +320,9 @@ public class RobotContainer {
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive, superStructure, algaeIntake, led, Optional.empty(), driveX, driveY));
+                                drive, superStructure, algaeIntake, led, Optional.empty(),
+                                driveController.driveX(),
+                                driveController.driveY()));
 
                 driveController
                         .scoreProcessor()
@@ -342,20 +332,17 @@ public class RobotContainer {
 
         driveController
                 .moveToL4(false)
-                .onTrue(new PlacingCommand(
-                        superStructure, intake, SuperStructurePose.L4, driveController.ejectCoral()));
+                .onTrue(superStructure.moveToPose(SuperStructurePose.L4));
         driveController
                 .moveToL3(false)
-                .onTrue(new PlacingCommand(
-                        superStructure, intake, SuperStructurePose.L3, driveController.ejectCoral()));
+                .onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController
                 .moveToL2(false)
-                .onTrue(new PlacingCommand(
-                        superStructure, intake, SuperStructurePose.L2, driveController.ejectCoral()));
+                .onTrue(superStructure.moveToPose(SuperStructurePose.L2));
 
         driveController
                 .moveToTrough(false)
-                .onTrue(new PlacingCommandTrough(superStructure, intake, driveController.ejectCoral()));
+                .onTrue(PlacingCommands.troughPlacingSequence(superStructure, intake, driveController.ejectCoral()));
 
         driveController
                 .deployClimber()
@@ -381,8 +368,8 @@ public class RobotContainer {
                         Side.LEFT,
                         Optional.empty(),
                         true,
-                        driveX,
-                        driveY));
+                        driveController.driveX(),
+                        driveController.driveY()));
 
         driveController
                 .alignRightBranch()
@@ -396,8 +383,8 @@ public class RobotContainer {
                         Side.RIGHT,
                         Optional.empty(),
                         true,
-                        driveX,
-                        driveY));
+                        driveController.driveX(),
+                        driveController.driveY()));
     }
 
     /**
