@@ -147,8 +147,8 @@ public class AutoAlign {
                 .orElse(Reef.getClosestBranchPose(drive, Side.CENTER));
         Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
-                        new DriveToPose(drive, offsetPose)
-                                .deadlineFor((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive))),
+                        AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)
+                                .deadlineFor(new DriveToPose(drive, offsetPose)),
                         new DriveToPose(drive, grabPose),
                         AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)
                                 .deadlineFor(Commands.startEnd(

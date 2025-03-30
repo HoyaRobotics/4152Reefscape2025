@@ -315,9 +315,7 @@ public class RobotContainer {
         } else {
             driveController
                     .runIntake()
-                    .whileTrue(superStructure
-                            .moveToLoadingPose(drive)
-                            .alongWith(intake.run(IntakeAction.INTAKING)));
+                    .whileTrue(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
         }
 
         switch (Constants.intakeVersion) {

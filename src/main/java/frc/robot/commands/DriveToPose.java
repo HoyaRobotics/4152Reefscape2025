@@ -77,6 +77,8 @@ public class DriveToPose extends Command {
         Pose2d currentPose = drive.getPose();
         Pose2d target = targetPose.get();
 
+        Logger.recordOutput("DriveToPose/targetPose", target);
+
         Logger.recordOutput(
                 "DriveToPose/targetDistance", currentPose.getTranslation().getDistance(target.getTranslation()));
 

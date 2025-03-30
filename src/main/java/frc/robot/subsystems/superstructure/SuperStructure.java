@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 // would be nice to alway know what level we are at?
 public class SuperStructure {
@@ -145,26 +146,35 @@ public class SuperStructure {
                     Pose2d currentPose = drive.getPose();
                     Pose2d targetPose = CoralStation.getClosestCoralStation(currentPose);
 
-                    final var fieldVelocity = new Translation2d(drive.getFieldChassisSpeeds().vxMetersPerSecond, drive.getFieldChassisSpeeds().vyMetersPerSecond);
+                    final var fieldVelocity = new Translation2d(
+                            drive.getFieldChassisSpeeds().vxMetersPerSecond,
+                            drive.getFieldChassisSpeeds().vyMetersPerSecond);
 
                     final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
                     final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
                     final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
                     final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
 
-                    final double predictionGain = 2.5;
+                    final double predictionGain = 0.08;
 
                     // we get the negated angle of the vector pointing from the robot to the target pose
-                    var targetRelVelocity = 
-                        Math.max(0.0, fieldVelocity.rotateBy(targetPose.getTranslation().minus(currentPose.getTranslation()).getAngle().unaryMinus())
-                            .getX());
+                    var targetRelVelocity = Math.max(
+                            0.0,
+                            fieldVelocity
+                                    .rotateBy(targetPose
+                                            .getTranslation()
+                                            .minus(currentPose.getTranslation())
+                                            .getAngle()
+                                            .unaryMinus())
+                                    .getX());
 
                     Distance xOffset = currentPose
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
                             .getMeasureX()
                             .minus(Meters.of(0.48))
                             .minus(Meters.of(targetRelVelocity * predictionGain));
-                    // Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
+                    Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
+                    Logger.recordOutput("Loading/xOffset", xOffset.in(Meters));
 
                     Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 4.5 / 4.5));
                     Distance inputHeight = height.gt(minHeight) ? height : minHeight;

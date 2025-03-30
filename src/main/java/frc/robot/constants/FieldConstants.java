@@ -3,11 +3,15 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -61,37 +65,53 @@ public class FieldConstants {
             boolean isRed = DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red;
             Pose2d rightSidePose = new Pose2d(0.89, 0.6, Rotation2d.fromDegrees(54));
-            Angle angleDiff = robotContainer
-                    .driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .getRotation()
-                    .minus(Rotation2d.fromDegrees(54))
-                    .getMeasure()
-                    .plus(Degrees.of(180));
+
             Pose2d robotPose = robotContainer.driveSimulation.getSimulatedDriveTrainPose();
-            Logger.recordOutput("CoralStation/RightSidePose", rightSidePose);
+
             if (isRed) {
                 rightSidePose = new Pose2d(
                         FieldMirroringUtils.flip(rightSidePose.getTranslation()),
                         FieldMirroringUtils.flip(rightSidePose.getRotation()));
             }
-            Logger.recordOutput("CoralStation/RightSidePoseAdjusted", rightSidePose);
-            Transform2d poseDiff =
-                    robotContainer.driveSimulation.getSimulatedDriveTrainPose().minus(rightSidePose);
-            Distance difference =
-                    Meters.of(Math.sqrt((poseDiff.getX() * poseDiff.getX()) + (poseDiff.getY() * poseDiff.getY())));
 
-            boolean enteredRange = difference.lt(Meters.of(1.25));
+            Transform2d poseDiff =
+                    robotPose.minus(rightSidePose);
+            Distance robotDistance = robotPose.relativeTo(rightSidePose).getMeasureX();
+
+            boolean enteredRange = robotDistance.lt(Meters.of(1.5));
             // && Math.abs(angleDiff.in(Degrees)) < 10.0;
             if (enteredRange && !inCoralStationRange) {
                 inCoralStationRange = true;
                 // right side station not field relative??
+
+
+                // drop at center of robot
+                var robotCenterYOffset = robotPose.relativeTo(rightSidePose)
+                        .getMeasureY();
+                var targetRelVelocity = new Translation2d(robotContainer.driveSimulation.getLinearVelocity().x,
+                robotContainer.driveSimulation.getLinearVelocity().y)
+                        .rotateBy(rightSidePose.getTranslation().minus(robotPose.getTranslation()).getAngle().unaryMinus()).getMeasureY();
+
+                robotCenterYOffset = robotCenterYOffset.plus(targetRelVelocity.times(0.25));
+
+                var station = rightSidePose;
+                SimulatedArena.getInstance()
+                        .addGamePieceProjectile(
+                                new ReefscapeCoralOnFly(
+                                        rightSidePose.getTranslation(),
+                                        new Translation2d(0.0, robotCenterYOffset.in(Meters)),
+                                        new ChassisSpeeds(),
+                                        rightSidePose.getRotation(),
+                                        Centimeters.of(98),
+                                        MetersPerSecond.of(3),
+                                        Degrees.of(-40)));
+                /*
                 SimulatedArena.getInstance()
                         .addGamePieceProjectile(ReefscapeCoralOnFly.DropFromCoralStation(
                                 CoralStationsSide.RIGHT_STATION,
                                 DriverStation.getAlliance().get(),
-                                false));
-            } else if (difference.gt(Meters.of(1.25))) {
+                                false));*/
+            } else if (robotDistance.gt(Meters.of(1.5))) {
                 inCoralStationRange = false;
             }
         }

@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
-import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
