@@ -57,8 +57,10 @@ public class Coral3Piece extends PoserAuto {
             boolean pastTransitionTolerance =
                     currentPose.relativeTo(transitionPose).getX() + tolerance > 0;
 
-            return pastTransitionTolerance ? coralStationPose
-                .transformBy(new Transform2d(0.0, autoSide == Side.RIGHT ? 0.5 : -0.5, Rotation2d.kZero)) : transitionPose;
+            return pastTransitionTolerance
+                    ? coralStationPose.transformBy(
+                            new Transform2d(0.0, autoSide == Side.RIGHT ? 0.5 : -0.5, Rotation2d.kZero))
+                    : transitionPose;
         };
 
         autoCommand.addCommands(alignAndReceiveCoral(targetPose));

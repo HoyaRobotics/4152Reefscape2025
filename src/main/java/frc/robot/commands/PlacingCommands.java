@@ -1,9 +1,7 @@
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
 import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
@@ -13,6 +11,8 @@ import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class PlacingCommands {
     private static final double L2DelaySeconds = 0.075; // 0.125
@@ -40,14 +40,14 @@ public class PlacingCommands {
                         () -> leds.requestState(LEDState.PLACING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
-    public static Command troughPlacingSequence(SuperStructure superStructure, Intake intake, BooleanSupplier placeObject) {
+    public static Command troughPlacingSequence(
+            SuperStructure superStructure, Intake intake, BooleanSupplier placeObject) {
         return Commands.sequence(
-            superStructure.moveToPose(SuperStructurePose.TROUGH),
-            Commands.waitUntil(placeObject),
-            intake.runWithSensor(IntakeAction.TROUGH),
-            intake.run(IntakeAction.TROUGH)
-                .withDeadline(superStructure.moveToPose(SuperStructurePose.POST_TROUGH)),
-            Commands.waitSeconds(IntakeConstants.PostPlacingTimeout),
-            superStructure.moveToPose(SuperStructurePose.POST_POST_TROUGH));
+                superStructure.moveToPose(SuperStructurePose.TROUGH),
+                Commands.waitUntil(placeObject),
+                intake.runWithSensor(IntakeAction.TROUGH),
+                intake.run(IntakeAction.TROUGH).withDeadline(superStructure.moveToPose(SuperStructurePose.POST_TROUGH)),
+                Commands.waitSeconds(IntakeConstants.PostPlacingTimeout),
+                superStructure.moveToPose(SuperStructurePose.POST_POST_TROUGH));
     }
 }

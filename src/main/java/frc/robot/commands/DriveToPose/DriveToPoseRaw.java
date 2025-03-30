@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.DriveCommands;
+package frc.robot.commands.DriveToPose;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -77,11 +77,6 @@ public class DriveToPoseRaw extends Command {
         Pose2d currentPose = drive.getPose();
         Pose2d target = targetPose.get();
 
-        Logger.recordOutput("DriveToPose/targetPose", target);
-
-        Logger.recordOutput(
-                "DriveToPose/targetDistance", currentPose.getTranslation().getDistance(target.getTranslation()));
-
         double thetaVelocity = angleController.calculate(
                 currentPose.getRotation().getRadians(), target.getRotation().getRadians());
         double driveVelocityScalar =
@@ -103,6 +98,7 @@ public class DriveToPoseRaw extends Command {
         final double linearScale = linearFF.get().getNorm() * 3.0;
         driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearScale);
 
+        Logger.recordOutput("DriveToPose/targetPose", target);
         Logger.recordOutput("DriveToPose/driveAtGoal", driveController.atSetpoint());
         Logger.recordOutput("DriveToPose/angleAtGoal", angleController.atGoal());
         // Convert to field relative speeds & send command

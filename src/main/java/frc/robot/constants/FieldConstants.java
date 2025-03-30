@@ -71,14 +71,12 @@ public class FieldConstants {
                         FieldMirroringUtils.flip(rightSidePose.getRotation()));
             }
 
-            Transform2d poseDiff = robotPose.minus(rightSidePose);
             Distance robotDistance = robotPose.relativeTo(rightSidePose).getMeasureX();
 
             boolean enteredRange = robotDistance.lt(Meters.of(1.5));
-            // && Math.abs(angleDiff.in(Degrees)) < 10.0;
+
             if (enteredRange && !inCoralStationRange) {
                 inCoralStationRange = true;
-                // right side station not field relative??
 
                 // drop at center of robot
                 var robotCenterYOffset = robotPose.relativeTo(rightSidePose).getMeasureY();
@@ -94,7 +92,6 @@ public class FieldConstants {
 
                 robotCenterYOffset = robotCenterYOffset.plus(targetRelVelocity.times(0.25));
 
-                var station = rightSidePose;
                 SimulatedArena.getInstance()
                         .addGamePieceProjectile(new ReefscapeCoralOnFly(
                                 rightSidePose.getTranslation(),
@@ -104,12 +101,7 @@ public class FieldConstants {
                                 Centimeters.of(98),
                                 MetersPerSecond.of(3),
                                 Degrees.of(-40)));
-                /*
-                SimulatedArena.getInstance()
-                        .addGamePieceProjectile(ReefscapeCoralOnFly.DropFromCoralStation(
-                                CoralStationsSide.RIGHT_STATION,
-                                DriverStation.getAlliance().get(),
-                                false));*/
+
             } else if (robotDistance.gt(Meters.of(1.5))) {
                 inCoralStationRange = false;
             }

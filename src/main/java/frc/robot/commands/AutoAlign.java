@@ -17,12 +17,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
-import frc.robot.commands.DriveCommands.DriveCommands;
-import frc.robot.commands.DriveCommands.DriveToPoseProfiled;
-import frc.robot.commands.DriveCommands.DriveToPoseRaw;
+import frc.robot.commands.DriveToPose.DriveToPoseProfiled;
+import frc.robot.commands.DriveToPose.DriveToPoseRaw;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.Processor;
@@ -33,7 +31,6 @@ import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
@@ -69,39 +66,30 @@ public class AutoAlign {
             Drive drive,
             SuperStructure superStructure,
             Intake intake,
+            Side side,
             AlgaeIntake algaeIntake,
             LED leds,
-            Side side,
-            Optional<SuperStructurePose> superStructurePose,
-            boolean removeAlgae,
             DoubleSupplier inputX,
             DoubleSupplier inputY) {
-        Supplier<Pose2d> drivePose = () -> Reef.getClosestBranchPose(drive, side);
+
+        Supplier<Pose2d> targetPose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
-        // drive to reef, once level is selected
+
+        // make a within range, facing for driving around corners??
         return Commands.sequence(
-                        driveToPose(
-                                        drive,
-                                        drivePose::get,
-                                        () -> DriveCommands.getLinearVelocityFromJoysticks(
+                        driveToPose(drive, targetPose,
+                        () -> DriveCommands.getLinearVelocityFromJoysticks(
                                                 inputX.getAsDouble(), inputY.getAsDouble()))
                                 .alongWith(Commands.sequence(
-                                        buttonWatcher.WaitSelectPose().onlyIf(() -> superStructurePose.isEmpty()),
-                                        new WaitUntilCommand(
-                                                () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                                        .lt(AutoAlign.StartSuperStructureRange)),
-                                        new DeferredCommand(
-                                                () -> superStructure.moveToPose(
-                                                        superStructurePose.orElse(buttonWatcher.getSelectedPose())),
+                                        buttonWatcher.WaitSelectPose(),
+                                        Commands.waitUntil(PoseUtils.poseInRange(
+                                                drive::getPose, targetPose, StartSuperStructureRange)),
+                                        Commands.defer(
+                                                () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
                         PlacingCommands.reefPlacingSequence(
-                                superStructure,
-                                intake,
-                                leds,
-                                () -> superStructurePose.orElse(buttonWatcher.getSelectedPose()),
-                                false),
-                        autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty())
-                                .onlyIf(() -> removeAlgae))
+                                superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false),
+                        autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty()))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())

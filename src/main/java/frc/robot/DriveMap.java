@@ -41,6 +41,7 @@ public interface DriveMap {
     Trigger zeroElevator();
 
     DoubleSupplier driveX();
+
     DoubleSupplier driveY();
 
     BooleanSupplier ejectCoral();

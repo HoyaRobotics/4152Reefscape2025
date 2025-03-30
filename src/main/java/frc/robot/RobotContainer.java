@@ -32,9 +32,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.Coral3Piece;
-import frc.robot.commands.DriveCommands.DriveCommands;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommands;
 import frc.robot.constants.Constants;
@@ -79,7 +78,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.Optional;
-import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -243,7 +241,7 @@ public class RobotContainer {
         autoChooser.addOption(
                 "3PieceLeft",
                 new Coral3Piece(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
-                /*
+        /*
         autoChooser.addOption(
                 "algaeCenter",
                 new AlgaeCenter(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());*/
@@ -270,11 +268,11 @@ public class RobotContainer {
     private void configureDriverButtonBindings() {
         // Default command, normal field-relative drive
 
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(drive,
-                        driveController.driveX(),
-                        driveController.driveY(),
-                        () -> -driveController.xboxController.getRightX()));
+        drive.setDefaultCommand(DriveCommands.joystickDrive(
+                drive,
+                driveController.driveX(),
+                driveController.driveY(),
+                () -> -driveController.xboxController.getRightX()));
 
         elevator.setDefaultCommand(new HoldPosition(elevator, arm, intake, algaeIntake));
 
@@ -320,7 +318,11 @@ public class RobotContainer {
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive, superStructure, algaeIntake, led, Optional.empty(),
+                                drive,
+                                superStructure,
+                                algaeIntake,
+                                led,
+                                Optional.empty(),
                                 driveController.driveX(),
                                 driveController.driveY()));
 
@@ -330,15 +332,9 @@ public class RobotContainer {
                 break;
         }
 
-        driveController
-                .moveToL4(false)
-                .onTrue(superStructure.moveToPose(SuperStructurePose.L4));
-        driveController
-                .moveToL3(false)
-                .onTrue(superStructure.moveToPose(SuperStructurePose.L3));
-        driveController
-                .moveToL2(false)
-                .onTrue(superStructure.moveToPose(SuperStructurePose.L2));
+        driveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
+        driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
+        driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
 
         driveController
                 .moveToTrough(false)
@@ -363,11 +359,9 @@ public class RobotContainer {
                         drive,
                         superStructure,
                         intake,
+                        Side.LEFT,
                         algaeIntake,
                         led,
-                        Side.LEFT,
-                        Optional.empty(),
-                        true,
                         driveController.driveX(),
                         driveController.driveY()));
 
@@ -378,11 +372,9 @@ public class RobotContainer {
                         drive,
                         superStructure,
                         intake,
+                        Side.RIGHT,
                         algaeIntake,
                         led,
-                        Side.RIGHT,
-                        Optional.empty(),
-                        true,
                         driveController.driveX(),
                         driveController.driveY()));
     }

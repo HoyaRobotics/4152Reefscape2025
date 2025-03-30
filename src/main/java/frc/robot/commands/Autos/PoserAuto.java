@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.HoldPosition;
+import frc.robot.commands.PlacingCommands;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
@@ -25,7 +26,6 @@ import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.util.PoseUtils;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 // each auto node includes: target pose, tolerance, list of command, distance pairs which will schedule the
@@ -59,10 +59,7 @@ public abstract class PoserAuto {
         this.algaeIntake = algaeIntake;
         this.leds = leds;
     }
-    // instead of adding waypoint poses, just change the pose in the drive to pose supplier,
-    // make it a moving pose?
 
-    // place barge at given pose
     protected int sideRelativeIndex(int rightFaceIndex) {
         return autoSide == Side.RIGHT
                 ? rightFaceIndex
@@ -102,15 +99,13 @@ public abstract class PoserAuto {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
                         AutoAlign.driveToPose(drive, targetPose)
-                                .alongWith(Commands.defer(
-                                                () -> Commands.waitUntil(PoseUtils.poseInRange(
-                                                        drive::getPose, targetPose, PlacingDistance)),
-                                                Set.of())
+                                .alongWith(Commands.waitUntil(
+                                                PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance))
                                         .deadlineFor(new HoldPosition(
                                                 superStructure.elevator, superStructure.arm, intake, algaeIntake))
                                         .andThen(superStructure.moveToPose(superStructurePose))),
-                        superStructure.moveToPose(superStructurePose),
-                        AutoAlign.placingSequence(superStructure, intake, leds, () -> superStructurePose, true),
+                        PlacingCommands.reefPlacingSequence(
+                                superStructure, intake, leds, () -> superStructurePose, true),
                         AutoAlign.autoAlignAndPickAlgae(
                                         drive, superStructure, leds, algaeIntake, Optional.of(reefFaceIndex))
                                 .onlyIf(() -> removeAlgae))
@@ -124,7 +119,6 @@ public abstract class PoserAuto {
     }
 
     public Command alignAndReceiveCoral(Side side) {
-        // align to closest side of coral station
         return alignAndReceiveCoral(() -> CoralStation.getCoralStationPose(side)
                 .transformBy(new Transform2d(0.0, side == Side.RIGHT ? 0.5 : -0.5, Rotation2d.kZero)));
     }
