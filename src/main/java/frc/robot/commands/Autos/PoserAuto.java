@@ -18,6 +18,8 @@ import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
+import frc.robot.subsystems.leds.LED;
+import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.util.PoseUtils;
@@ -38,16 +40,23 @@ public abstract class PoserAuto {
     protected final SuperStructure superStructure;
     protected final Intake intake;
     protected final AlgaeIntake algaeIntake;
+    protected final LED leds;
 
     protected final Side autoSide;
 
     public PoserAuto(
-            Side autoSide, Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
+            Side autoSide,
+            Drive drive,
+            SuperStructure superStructure,
+            Intake intake,
+            AlgaeIntake algaeIntake,
+            LED leds) {
         this.autoSide = autoSide;
         this.drive = drive;
         this.superStructure = superStructure;
         this.intake = intake;
         this.algaeIntake = algaeIntake;
+        this.leds = leds;
     }
     // instead of adding waypoint poses, just change the pose in the drive to pose supplier,
     // make it a moving pose?
@@ -79,30 +88,33 @@ public abstract class PoserAuto {
     }
 
     public Command alignAndPickAlgae(int faceIndex) {
-        return AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.of(faceIndex));
+        return AutoAlign.autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.of(faceIndex));
     }
 
     public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
         return AutoAlign.autoScoreBarge(
-                drive, superStructure, algaeIntake, Optional.of(bargeCenterOffset), () -> 0.0, () -> 0.0);
+                drive, superStructure, algaeIntake, leds, Optional.of(bargeCenterOffset), () -> 0.0, () -> 0.0);
     }
 
     public Command alignAndPlaceCoral(
             SuperStructurePose superStructurePose, int reefFaceIndex, Side side, boolean removeAlgae) {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
-                new DriveToPose(drive, targetPose)
-                        .alongWith(Commands.defer(
-                                        () -> Commands.waitUntil(
-                                                PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance)),
-                                        Set.of())
-                                .deadlineFor(new HoldPosition(
-                                        superStructure.elevator, superStructure.arm, intake, algaeIntake))
-                                .andThen(superStructure.moveToPose(superStructurePose))),
-                superStructure.moveToPose(superStructurePose),
-                AutoAlign.placingSequence(superStructure, intake, () -> superStructurePose, true),
-                AutoAlign.autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.of(reefFaceIndex))
-                        .onlyIf(() -> removeAlgae));
+                        new DriveToPose(drive, targetPose)
+                                .alongWith(Commands.defer(
+                                                () -> Commands.waitUntil(PoseUtils.poseInRange(
+                                                        drive::getPose, targetPose, PlacingDistance)),
+                                                Set.of())
+                                        .deadlineFor(new HoldPosition(
+                                                superStructure.elevator, superStructure.arm, intake, algaeIntake))
+                                        .andThen(superStructure.moveToPose(superStructurePose))),
+                        superStructure.moveToPose(superStructurePose),
+                        AutoAlign.placingSequence(superStructure, intake, leds, () -> superStructurePose, true),
+                        AutoAlign.autoAlignAndPickAlgae(
+                                        drive, superStructure, leds, algaeIntake, Optional.of(reefFaceIndex))
+                                .onlyIf(() -> removeAlgae))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {

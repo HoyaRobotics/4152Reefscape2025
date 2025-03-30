@@ -13,6 +13,7 @@ import frc.robot.constants.FieldConstants.Side;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import java.util.List;
@@ -21,8 +22,13 @@ import java.util.function.Supplier;
 public class Coral3Piece extends PoserAuto {
 
     public Coral3Piece(
-            Side autoSide, Drive drive, SuperStructure superStructure, Intake intake, AlgaeIntake algaeIntake) {
-        super(autoSide, drive, superStructure, intake, algaeIntake);
+            Side autoSide,
+            Drive drive,
+            SuperStructure superStructure,
+            Intake intake,
+            AlgaeIntake algaeIntake,
+            LED leds) {
+        super(autoSide, drive, superStructure, intake, algaeIntake, leds);
     }
 
     public Command getAutoCommand() {
@@ -39,14 +45,6 @@ public class Coral3Piece extends PoserAuto {
 
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), false));
 
-        /* Pseudocode for moving target:
-
-        Supplier<Pose2d> test = () -> {
-            // if distance between me and the waypoint pose is less than tolerance,
-            // return waypoint pose
-
-            // otherwise return final pose!!
-        };*/
         Supplier<Pose2d> waypointPose = () -> {
             var branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), branchSides.get(0));
             var coralStationPose = CoralStation.getCoralStationPose(autoSide);

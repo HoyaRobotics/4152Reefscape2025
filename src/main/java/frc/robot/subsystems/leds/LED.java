@@ -4,17 +4,20 @@
 
 package frc.robot.subsystems.leds;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdle.LEDStripType;
+import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix.led.SingleFadeAnimation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.leds.LEDConstants.LEDColors;
 import org.littletonrobotics.junction.Logger;
 
 public class LED extends SubsystemBase {
-    private final LEDIO io;
-    private final LEDInputsAutoLogged inputs;
+    private final CANdle leds = new CANdle(3);
+
+    private LEDState currentState = LEDState.NOTHING;
 
     public enum LEDState {
+        NOTHING,
         HOLDING_CORAL,
         ALIGNING,
         AUTO,
@@ -23,23 +26,43 @@ public class LED extends SubsystemBase {
     }
 
     /** Creates a new LED. */
-    public LED(LEDIO io) {
-        this.io = io;
-        this.inputs = new LEDInputsAutoLogged();
+    public LED() {
+        leds.configFactoryDefault();
+        leds.configStatusLedState(false);
+        leds.configLOSBehavior(false);
+        leds.configV5Enabled(true);
+        leds.configVBatOutput(VBatOutputMode.Off);
+        leds.configBrightnessScalar(1.0);
+        leds.configLEDType(LEDStripType.GRB);
     }
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
-        this.io.updateInputs(inputs);
-        Logger.processInputs("LED", inputs);
+        Logger.recordOutput("LED/currentState", currentState.toString());
     }
 
-    public void setLEDs(LEDColors colors) {
-        io.setLED(colors.r, colors.g, colors.b, 8, 64);
-    }
+    public void requestState(LEDState nextState) {
+        // define state priority ex. only show coral sensor status
+        // if nothing else happening
+        if (currentState == nextState) return;
 
-    public Command LEDCommand(LEDColors colors) {
-        return Commands.runOnce(() -> setLEDs(colors), this);
+        if ((nextState == LEDState.EMPTY || nextState == LEDState.HOLDING_CORAL)
+                && (currentState != LEDState.EMPTY
+                        && currentState != LEDState.HOLDING_CORAL
+                        && currentState != LEDState.NOTHING)) return;
+
+        leds.clearAnimation(0);
+        leds.configBrightnessScalar(1);
+
+        switch (nextState) {
+            case EMPTY -> leds.setLEDs(255, 0, 0);
+            case HOLDING_CORAL -> leds.setLEDs(0, 255, 0);
+            case ALIGNING -> leds.setLEDs(0, 0, 255);
+                // case AUTO -> leds.animate(new RainbowAnimation(1.0, 0.5, 64));
+            case PLACING -> leds.animate(new SingleFadeAnimation(0, 255, 255, 0, 0.75, 64));
+            case NOTHING -> leds.setLEDs(255, 255, 255);
+            default -> {}
+        }
+        currentState = nextState;
     }
 }

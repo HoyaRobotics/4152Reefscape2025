@@ -11,6 +11,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.leds.LED;
+import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -34,15 +36,17 @@ public class Intake extends SubsystemBase {
     private final IntakeIO io;
     private Supplier<SuperStructurePose> poseSupplier;
     private IntakeInputsAutoLogged inputs;
-    private Elevator elevator;
-    private Arm arm;
+    private final Elevator elevator;
+    private final Arm arm;
+    private final LED leds;
 
     private Current currentLimit = Amps.of(0);
     /** Creates a new Intake. */
-    public Intake(IntakeIO io, Elevator elevator, Arm arm) {
+    public Intake(IntakeIO io, Elevator elevator, Arm arm, LED leds) {
         this.io = io;
         this.elevator = elevator;
         this.arm = arm;
+        this.leds = leds;
         inputs = new IntakeInputsAutoLogged();
     }
 
@@ -54,6 +58,11 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         this.io.updateInputs(inputs);
+        if (inputs.hasCoral) {
+            leds.requestState(LEDState.HOLDING_CORAL);
+        } else {
+            leds.requestState(LEDState.EMPTY);
+        }
         Logger.processInputs("Intake", inputs);
         // Pose3d coralPose = new Pose3d(0, 0, 0, new Rotation3d(Degrees.of(0), arm.getArmPosition(), Degrees.of(0)));
         // Logger.recordOutput("IntakeCoral", coralPose);

@@ -28,6 +28,8 @@ import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
+import frc.robot.subsystems.leds.LED;
+import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.util.ButtonWatcher;
@@ -51,6 +53,7 @@ public class AutoAlign {
             SuperStructure superStructure,
             Intake intake,
             AlgaeIntake algaeIntake,
+            LED leds,
             Side side,
             Optional<SuperStructurePose> superStructurePose,
             boolean removeAlgae,
@@ -77,32 +80,42 @@ public class AutoAlign {
                         placingSequence(
                                 superStructure,
                                 intake,
+                                leds,
                                 () -> superStructurePose.orElse(buttonWatcher.getSelectedPose()),
                                 false),
-                        autoAlignAndPickAlgae(drive, superStructure, algaeIntake, Optional.empty())
+                        autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty())
                                 .onlyIf(() -> removeAlgae))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public static Command placingSequence(
-            SuperStructure superStructure, Intake intake, Supplier<SuperStructurePose> currentPose, boolean isAuto) {
+            SuperStructure superStructure,
+            Intake intake,
+            LED leds,
+            Supplier<SuperStructurePose> currentPose,
+            boolean isAuto) {
         return Commands.sequence(
-                Commands.waitSeconds(L2DelaySeconds)
-                        .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
-                                || currentPose.get() == SuperStructurePose.L3),
-                intake.runWithSensor(IntakeAction.PLACING),
-                Commands.either(
-                                superStructure
-                                        .arm
-                                        .moveToAngle(SuperStructurePose.BASE.armAngle)
-                                        .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false)),
-                                superStructure.arm.moveToAngle(Degrees.of(103)),
-                                () -> isAuto)
-                        .deadlineFor(intake.run(IntakeAction.PLACING)));
+                        Commands.waitSeconds(L2DelaySeconds)
+                                .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
+                                        || currentPose.get() == SuperStructurePose.L3),
+                        intake.runWithSensor(IntakeAction.PLACING),
+                        Commands.either(
+                                        superStructure
+                                                .arm
+                                                .moveToAngle(SuperStructurePose.BASE.armAngle)
+                                                .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false)),
+                                        superStructure.arm.moveToAngle(Degrees.of(103)),
+                                        () -> isAuto)
+                                .deadlineFor(intake.run(IntakeAction.PLACING)))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.PLACING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
-    public static Command autoAlignLoadProcessor(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+    public static Command autoAlignLoadProcessor(
+            Drive drive, SuperStructure superStructure, LED leds, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> movingPose =
                 () -> Processor.getProcessorPose().transformBy(new Transform2d(-0.35, 0.0, new Rotation2d()));
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
@@ -117,43 +130,60 @@ public class AutoAlign {
                                 superStructure.moveToPose(SuperStructurePose.PROCESSOR)))
                         .andThen(algaeIntake
                                 .run(AlgaeIntakeAction.PROCESSOR)
-                                .withTimeout(AlgaeIntakeConstants.PlacingTimeout)));
+                                .withTimeout(AlgaeIntakeConstants.PlacingTimeout))
+                        .beforeStarting(() -> leds.requestState(LEDState.PLACING)))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
     public static Command autoAlignAndPickAlgae(
-            Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake, Optional<Integer> faceIndex) {
+            Drive drive,
+            SuperStructure superStructure,
+            LED leds,
+            AlgaeIntake algaeIntake,
+            Optional<Integer> faceIndex) {
         Supplier<Pose2d> grabPose = () -> faceIndex
                 .map(index -> Reef.getAllianceReefBranch(index, Side.CENTER))
                 .orElse(Reef.getClosestBranchPose(drive, Side.CENTER));
         Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
-                new DriveToPose(drive, offsetPose)
-                        .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive))),
-                new DriveToPose(drive, grabPose),
-                AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive),
-                new DriveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))));
+                        new DriveToPose(drive, offsetPose)
+                                .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive))),
+                        new DriveToPose(drive, grabPose),
+                        AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)
+                                .deadlineFor(Commands.startEnd(
+                                        () -> leds.requestState(LEDState.PLACING),
+                                        () -> leds.requestState(LEDState.ALIGNING))),
+                        new DriveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
     public static Command autoScoreBarge(
             Drive drive,
             SuperStructure superStructure,
             AlgaeIntake algaeIntake,
+            LED leds,
             Optional<Distance> bargeCenterOffset,
             DoubleSupplier inputX,
             DoubleSupplier inputY) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), bargeCenterOffset);
         return Commands.sequence(
-                new DriveToPose(
-                        drive,
-                        drivePose::get,
-                        () -> DriveCommands.getLinearVelocityFromJoysticks(inputX.getAsDouble(), inputY.getAsDouble())),
-                superStructure
-                        .moveToPose(SuperStructurePose.ALGAE_NET)
-                        .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
-                                        .elevatorPosition
-                                        .minus(superStructure.elevator.getPosition())
-                                        .lt(ThrowNetTolerance))
-                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET))),
-                algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
+                        new DriveToPose(
+                                drive,
+                                drivePose::get,
+                                () -> DriveCommands.getLinearVelocityFromJoysticks(
+                                        inputX.getAsDouble(), inputY.getAsDouble())),
+                        superStructure
+                                .moveToPose(SuperStructurePose.ALGAE_NET)
+                                .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
+                                                .elevatorPosition
+                                                .minus(superStructure.elevator.getPosition())
+                                                .lt(ThrowNetTolerance))
+                                        .andThen(algaeIntake.run(AlgaeIntakeAction.NET))
+                                        .beforeStarting(() -> leds.requestState(LEDState.PLACING))),
+                        algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 }
