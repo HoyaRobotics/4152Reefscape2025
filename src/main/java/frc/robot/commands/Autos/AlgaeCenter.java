@@ -41,7 +41,9 @@ public class AlgaeCenter extends PoserAuto {
                 .map((side) -> sideRelativeBranch(side))
                 .toList();
 
-        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), true));
+        // look at picking up algae before placing?
+
+        autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L3, reefFaces.get(0), branchSides.get(0), true));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(0)));
         autoCommand.addCommands(alignAndPickAlgae(reefFaces.get(1)));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(1)));

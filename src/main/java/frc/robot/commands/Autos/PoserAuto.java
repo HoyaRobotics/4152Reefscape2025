@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -122,7 +124,12 @@ public abstract class PoserAuto {
     }
 
     public Command alignAndReceiveCoral(Side side) {
-        Supplier<Pose2d> targetPose = () -> CoralStation.getCoralStationPose(side);
+        // align to closest side of coral station
+        return alignAndReceiveCoral(() -> CoralStation.getCoralStationPose(side)
+            .transformBy(new Transform2d(side == Side.RIGHT ? 0.75 : -0.75, 0.0, Rotation2d.kZero)));
+    }
+
+    public Command alignAndReceiveCoral(Supplier<Pose2d> targetPose) {
         return intake.runWithSensor(IntakeAction.INTAKING)
                 .deadlineFor(new DriveToPose(drive, targetPose)
                         .alongWith(superStructure

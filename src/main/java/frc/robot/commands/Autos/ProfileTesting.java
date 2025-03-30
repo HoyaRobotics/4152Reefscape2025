@@ -4,8 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.DriveToPoseProfiled;
-import frc.robot.commands.HoldPosition;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
@@ -15,7 +13,6 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -56,8 +53,7 @@ public class ProfileTesting extends PoserAuto {
             return pastTransitionTolerance ? coralStationPose : transitionPose;
         };
 
-        autoCommand.addCommands(new DriveToPoseProfiled(drive, targetPose, Optional.empty())
-                .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake)));
+        autoCommand.addCommands(alignAndReceiveCoral(targetPose));
 
         return autoCommand;
     }

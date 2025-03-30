@@ -148,7 +148,7 @@ public class AutoAlign {
         Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
                         new DriveToPose(drive, offsetPose)
-                                .alongWith((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive))),
+                                .deadlineFor((AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive))),
                         new DriveToPose(drive, grabPose),
                         AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)
                                 .deadlineFor(Commands.startEnd(

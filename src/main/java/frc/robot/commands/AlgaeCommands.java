@@ -44,9 +44,6 @@ public class AlgaeCommands {
                             .andThen(superStructure.moveToPose(algaePoses.get(1)))
                             .withTimeout(0.5)
                             .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
-                    /*
-                    .andThen(superStructure.moveToPose(algaePoses.get(2)))
-                    .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));*/
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
     }
@@ -66,11 +63,5 @@ public class AlgaeCommands {
                             .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
-    }
-
-    public static Command scoreAlgaeInNet(SuperStructure superStructure, AlgaeIntake algaeIntake) {
-        return superStructure
-                .moveToPose(SuperStructurePose.ALGAE_NET)
-                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout));
     }
 }
