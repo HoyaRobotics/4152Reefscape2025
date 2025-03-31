@@ -41,13 +41,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
+    public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
+        return Commands.either(
+                new DriveToPoseProfiled(drive, targetPose),
+                new DriveToPoseRaw(drive, targetPose),
+                () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
+    }
+
+    public static Command driveToPose(Drive drive, Pose2d targetPose) {
         return Commands.either(
                 new DriveToPoseProfiled(drive, targetPose),
                 new DriveToPoseRaw(drive, targetPose),
@@ -72,14 +81,57 @@ public class AutoAlign {
             DoubleSupplier inputX,
             DoubleSupplier inputY) {
 
-        Supplier<Pose2d> targetPose = () -> Reef.getClosestBranchPose(drive, side);
+        // Supplier<Pose2d> targetPose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
 
+        Supplier<Pose2d> targetPose = () -> {
+            // only switch faces if farther than certain distance away
+
+            // find closest 3 faces
+            // get velocity vector
+            // if latidonal megnitude of vector
+            // relative to closest face is less then some tolerance
+            // just go to that face, otherwise align to face in the latiudonal
+            // direction??
+            var reefFaces = Reef.getAllianceReefList();
+            var closestFace = drive.getPose().nearest(reefFaces);
+            var closestIndex = reefFaces.indexOf(closestFace);
+
+            var fieldVelocity = new Translation2d(
+                    drive.getFieldChassisSpeeds().vxMetersPerSecond, drive.getFieldChassisSpeeds().vyMetersPerSecond);
+
+            // robots field relative velocity vector,
+            // rotated to face the target (unary minus because not clockwise??)
+            // and then reduced to the scalar value of y offset
+            //
+            // how much horizontal velocity is the drive currently experiencing
+            // relative to the closest reef face?
+            var horizontalVelocity = fieldVelocity
+                    .rotateBy(closestFace
+                            .getTranslation()
+                            .minus(drive.getPose().getTranslation())
+                            .getAngle()
+                            .unaryMinus())
+                    .getY();
+
+            Logger.recordOutput("DriveToPose/closestFace", closestFace);
+            Logger.recordOutput("DriveToPose/horizontalVelocity", horizontalVelocity);
+
+            if (Math.abs(horizontalVelocity) < HorizontalVelocityPredictionTolerance
+                    || drive.getPose()
+                                    .getTranslation()
+                                    .getDistance(Reef.offsetReefPose(closestFace, side)
+                                            .getTranslation())
+                            < 0.85) return Reef.offsetReefPose(closestFace, side);
+
+            var leftFace = Reef.getAllianceReefBranch(closestIndex == 0 ? 5 : closestIndex - 1, side);
+            var rightFace = Reef.getAllianceReefBranch(closestIndex == 5 ? 0 : closestIndex + 1, side);
+
+            return horizontalVelocity > 0 ? rightFace : leftFace;
+        };
         // make a within range, facing for driving around corners??
         return Commands.sequence(
-                        driveToPose(drive, targetPose,
-                        () -> DriveCommands.getLinearVelocityFromJoysticks(
-                                                inputX.getAsDouble(), inputY.getAsDouble()))
+                        Commands.defer(() -> driveToPose(drive, targetPose.get()), Set.of(drive))
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
                                         Commands.waitUntil(PoseUtils.poseInRange(

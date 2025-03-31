@@ -41,6 +41,7 @@ public class LED extends SubsystemBase {
         Logger.recordOutput("LED/currentState", currentState.toString());
     }
 
+    // make commands to do things like flashing transition
     public void requestState(LEDState nextState) {
         // define state priority ex. only show coral sensor status
         // if nothing else happening

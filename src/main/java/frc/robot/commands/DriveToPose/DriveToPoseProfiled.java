@@ -55,6 +55,12 @@ public class DriveToPoseProfiled extends Command {
         this.poseSupplier = poseSupplier;
     }
 
+    public DriveToPoseProfiled(Drive drive, Pose2d pose) {
+        addRequirements(drive);
+        this.drive = drive;
+        this.poseSupplier = () -> pose;
+    }
+
     public DriveToPoseProfiled(Drive drive, Supplier<Pose2d> poseSupplier, Supplier<Translation2d> linearFF) {
         addRequirements(drive);
         this.drive = drive;

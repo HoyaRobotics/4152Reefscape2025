@@ -51,6 +51,12 @@ public class DriveToPoseRaw extends Command {
         this.targetPose = targetPose;
     }
 
+    public DriveToPoseRaw(Drive drive, Pose2d targetPose) {
+        addRequirements(drive);
+        this.drive = drive;
+        this.targetPose = () -> targetPose;
+    }
+
     public DriveToPoseRaw(Drive drive, Supplier<Pose2d> targetPose, Supplier<Translation2d> linearFF) {
         this.drive = drive;
         this.targetPose = targetPose;
