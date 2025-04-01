@@ -155,7 +155,7 @@ public class SuperStructure {
                     final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
                     final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
 
-                    final double predictionGain = 0.12;
+                    final double predictionGain = 0.2;
 
                     // we get the negated angle of the vector pointing from the robot to the target pose
                     var targetRelVelocity = Math.max(
@@ -168,19 +168,20 @@ public class SuperStructure {
                                             .unaryMinus())
                                     .getX());
 
-                    Distance xOffset = currentPose
+                    double xOffset = currentPose
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
                             .getMeasureX()
                             .minus(Meters.of(0.48))
-                            .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain));
+                            .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
+                            .abs(Inches);
                     Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
-                    Logger.recordOutput("Loading/xOffset", xOffset.in(Meters));
+                    Logger.recordOutput("Loading/xOffset", xOffset);
 
-                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 4.5 / 4.5));
+                    Distance height = maxHeight.minus(Inches.of(xOffset * 4.5 / 4.5));
                     Distance inputHeight = height.gt(minHeight) ? height : minHeight;
                     // inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
 
-                    Angle angle = maxAngle.plus(Degrees.of(xOffset.in(Inches) * 2.5 / 4.5));
+                    Angle angle = maxAngle.plus(Degrees.of(xOffset * 2.5 / 4.5));
                     Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
 
                     // Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));

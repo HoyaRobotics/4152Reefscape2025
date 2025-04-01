@@ -7,6 +7,7 @@ package frc.robot.subsystems.leds;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -58,8 +59,7 @@ public class LED extends SubsystemBase {
         switch (nextState) {
             case EMPTY -> leds.setLEDs(255, 0, 0);
             case HOLDING_CORAL -> leds.setLEDs(0, 255, 0);
-            case ALIGNING -> leds.setLEDs(0, 0, 255); // leds.animate(new RainbowAnimation(1.0, 0.5, 64));
-                // case AUTO -> leds.animate(new RainbowAnimation(1.0, 0.5, 64));
+            case ALIGNING -> leds.animate(new RainbowAnimation(1.0, 1.0, 64));
             case PLACING -> leds.animate(new SingleFadeAnimation(255, 0, 255, 0, 0.75, 64));
             default -> {}
         }

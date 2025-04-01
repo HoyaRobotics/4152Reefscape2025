@@ -131,7 +131,7 @@ public abstract class PoserAuto {
     public Command alignAndReceiveCoral(Supplier<Pose2d> targetPose) {
         return intake.runWithSensor(IntakeAction.INTAKING)
                 .deadlineFor(AutoAlign.driveToPose(drive, targetPose)
-                        .alongWith(superStructure
+                        .deadlineFor(superStructure
                                 .arm
                                 .moveToAngle(SuperStructurePose.BASE.armAngle)
                                 .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false))

@@ -49,7 +49,7 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
-    public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
+    public static final double HorizontalVelocityPredictionTolerance = 2.0; // m/s
     public static final LinearVelocity HorizontalVelocityRisingTolerance = MetersPerSecond.of(2.0); // m/s
     public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
     public static final Distance LockingDistance = Meters.of(0.75);
@@ -84,7 +84,7 @@ public class AutoAlign {
                                 drive,
                                 targetPose,
                                 () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
-                        .alongWith((Commands.either(
+                        .deadlineFor((Commands.either(
                                 superStructure.moveToLoadingPose(drive),
                                 superStructure.moveToPose(SuperStructurePose.LOADING),
                                 () -> Constants.useVariableIntakeHeight))));
@@ -127,7 +127,7 @@ public class AutoAlign {
                         driveToPose(drive, targetPose)
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
-                                        buttonWatcher.WaitSelectPose(),
+                                        // buttonWatcher.WaitSelectPose(),
                                         Commands.waitUntil(
                                                         () -> PoseUtils.poseInRange(
                                                                         drive::getPose,
@@ -162,7 +162,7 @@ public class AutoAlign {
                                 superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
-                .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
+                // .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
                 .finallyDo(() -> targetPose.unlock())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
