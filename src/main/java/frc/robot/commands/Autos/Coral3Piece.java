@@ -44,7 +44,7 @@ public class Coral3Piece extends PoserAuto {
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(0), branchSides.get(0), false));
 
         Supplier<Pose2d> targetPose = () -> {
-            Pose2d branchPose = Reef.getAllianceReefBranch(4, autoSide);
+            Pose2d branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), autoSide);
             Pose2d coralStationPose = CoralStation.getCoralStationPose(autoSide);
             Pose2d transitionPose = branchPose.transformBy(new Transform2d(
                     0.25,

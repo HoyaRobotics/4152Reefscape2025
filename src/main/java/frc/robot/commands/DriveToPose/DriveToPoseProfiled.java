@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.Supplier;
@@ -77,18 +78,14 @@ public class DriveToPoseProfiled extends Command {
         Pose2d currentPose = drive.getPose();
         Pose2d targetPose = poseSupplier.get();
         // this is not robot relative?
-        var fieldVelocity = new Translation2d(
-                drive.getFieldChassisSpeeds().vxMetersPerSecond, drive.getFieldChassisSpeeds().vyMetersPerSecond);
-
-        // vector from robot to target
-        var targetRelative = targetPose.getTranslation().minus(currentPose.getTranslation());
 
         // velocity should represent the rate of change of the distance between robot and target,
         // which would decrease over time
         // double diffDelta = Math.min(0.0, -fieldVelocity.dot(targetRelative));
         double diffDelta = Math.min(
                 0.0,
-                -fieldVelocity.rotateBy(targetRelative.getAngle().unaryMinus()).getX());
+                -DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose)
+                        .getX());
 
         Logger.recordOutput("DriveToPose/diffDelta", diffDelta);
 

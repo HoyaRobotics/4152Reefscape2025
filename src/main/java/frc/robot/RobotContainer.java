@@ -318,13 +318,7 @@ public class RobotContainer {
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive,
-                                superStructure,
-                                algaeIntake,
-                                led,
-                                Optional.empty(),
-                                driveController.driveX(),
-                                driveController.driveY()));
+                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));
 
                 driveController
                         .scoreProcessor()

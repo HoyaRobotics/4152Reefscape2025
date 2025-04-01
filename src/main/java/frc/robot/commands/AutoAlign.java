@@ -23,6 +23,7 @@ import frc.robot.commands.DriveToPose.DriveToPoseProfiled;
 import frc.robot.commands.DriveToPose.DriveToPoseRaw;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Processor;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
@@ -31,11 +32,13 @@ import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.util.ButtonWatcher;
+import frc.robot.util.LockableSupplier;
 import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +51,7 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
     public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
+    public static final double HorizontalVelocityRisingTolerance = 2.0; // m/s
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
@@ -70,6 +74,19 @@ public class AutoAlign {
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
+    public static Command alignAndReceiveCoral(Drive drive, SuperStructure superStructure, LED leds, Intake intake) {
+        Supplier<Pose2d> targetPose = () -> {
+            Pose2d closestStation = CoralStation.getClosestCoralStation(drive.getPose());
+
+            double yOffset = drive.getPose().relativeTo(closestStation).getY();
+            yOffset = Math.max(-0.5, Math.min(0.5, yOffset));
+            // clamp y to go to closest position
+            return closestStation.transformBy(new Transform2d(0.0, yOffset, Rotation2d.kZero));
+        };
+        return Commands.defer(() -> driveToPose(drive, targetPose.get()), Set.of(drive))
+                .deadlineFor(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
+    }
+
     public static Command autoAlignAndPlace(
             DriveMap driveController,
             Drive drive,
@@ -81,41 +98,15 @@ public class AutoAlign {
             DoubleSupplier inputX,
             DoubleSupplier inputY) {
 
-        // Supplier<Pose2d> targetPose = () -> Reef.getClosestBranchPose(drive, side);
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
 
-        Supplier<Pose2d> targetPose = () -> {
-            // only switch faces if farther than certain distance away
-
-            // find closest 3 faces
-            // get velocity vector
-            // if latidonal megnitude of vector
-            // relative to closest face is less then some tolerance
-            // just go to that face, otherwise align to face in the latiudonal
-            // direction??
+        LockableSupplier<Pose2d> targetPose = new LockableSupplier<>(() -> {
             var reefFaces = Reef.getAllianceReefList();
             var closestFace = drive.getPose().nearest(reefFaces);
             var closestIndex = reefFaces.indexOf(closestFace);
 
-            var fieldVelocity = new Translation2d(
-                    drive.getFieldChassisSpeeds().vxMetersPerSecond, drive.getFieldChassisSpeeds().vyMetersPerSecond);
-
-            // robots field relative velocity vector,
-            // rotated to face the target (unary minus because not clockwise??)
-            // and then reduced to the scalar value of y offset
-            //
-            // how much horizontal velocity is the drive currently experiencing
-            // relative to the closest reef face?
-            var horizontalVelocity = fieldVelocity
-                    .rotateBy(closestFace
-                            .getTranslation()
-                            .minus(drive.getPose().getTranslation())
-                            .getAngle()
-                            .unaryMinus())
+            var horizontalVelocity = DriveCommands.getTargetRelativeLinearVelocity(drive, closestFace)
                     .getY();
-
-            Logger.recordOutput("DriveToPose/closestFace", closestFace);
-            Logger.recordOutput("DriveToPose/horizontalVelocity", horizontalVelocity);
 
             if (Math.abs(horizontalVelocity) < HorizontalVelocityPredictionTolerance
                     || drive.getPose()
@@ -124,18 +115,28 @@ public class AutoAlign {
                                             .getTranslation())
                             < 0.85) return Reef.offsetReefPose(closestFace, side);
 
-            var leftFace = Reef.getAllianceReefBranch(closestIndex == 0 ? 5 : closestIndex - 1, side);
-            var rightFace = Reef.getAllianceReefBranch(closestIndex == 5 ? 0 : closestIndex + 1, side);
-
-            return horizontalVelocity > 0 ? rightFace : leftFace;
-        };
+            return horizontalVelocity > 0
+                    ? Reef.getAllianceReefBranch(closestIndex == 5 ? 0 : closestIndex + 1, side)
+                    : Reef.getAllianceReefBranch(closestIndex == 0 ? 5 : closestIndex - 1, side);
+        });
         // make a within range, facing for driving around corners??
         return Commands.sequence(
-                        Commands.defer(() -> driveToPose(drive, targetPose.get()), Set.of(drive))
+                        driveToPose(drive, targetPose)
+                                .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
-                                        Commands.waitUntil(PoseUtils.poseInRange(
-                                                drive::getPose, targetPose, StartSuperStructureRange)),
+                                        Commands.waitUntil(() -> {
+                                            Logger.recordOutput("LatestPose/output", targetPose.get());
+                                            Logger.recordOutput("LatestPose/horizontalVel",
+                                                Math.abs(DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose.get()).getY()));
+
+                                            return PoseUtils.poseInRange(
+                                                            drive::getPose, targetPose, StartSuperStructureRange)
+                                                    && Math.abs(DriveCommands.getTargetRelativeLinearVelocity(
+                                                                            drive, targetPose.get())
+                                                                    .getY())
+                                                            < HorizontalVelocityRisingTolerance;
+                                        }),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
@@ -145,6 +146,7 @@ public class AutoAlign {
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
+                .finallyDo(() -> targetPose.unlock())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
@@ -199,15 +201,13 @@ public class AutoAlign {
             AlgaeIntake algaeIntake,
             LED leds,
             Optional<Distance> bargeCenterOffset,
-            DoubleSupplier inputX,
             DoubleSupplier inputY) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), bargeCenterOffset);
         return Commands.sequence(
                         driveToPose(
                                 drive,
                                 drivePose::get,
-                                () -> DriveCommands.getLinearVelocityFromJoysticks(
-                                        inputX.getAsDouble(), inputY.getAsDouble())),
+                                () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble())),
                         superStructure
                                 .moveToPose(SuperStructurePose.ALGAE_NET)
                                 .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET

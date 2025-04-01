@@ -91,7 +91,7 @@ public abstract class PoserAuto {
 
     public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
         return AutoAlign.autoScoreBarge(
-                drive, superStructure, algaeIntake, leds, Optional.of(bargeCenterOffset), () -> 0.0, () -> 0.0);
+                drive, superStructure, algaeIntake, leds, Optional.of(bargeCenterOffset), () -> 0.0);
     }
 
     public Command alignAndPlaceCoral(
@@ -99,7 +99,7 @@ public abstract class PoserAuto {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
                         AutoAlign.driveToPose(drive, targetPose)
-                                .alongWith(Commands.waitUntil(
+                                .alongWith(Commands.waitUntil(() ->
                                                 PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance))
                                         .deadlineFor(new HoldPosition(
                                                 superStructure.elevator, superStructure.arm, intake, algaeIntake))
@@ -115,7 +115,7 @@ public abstract class PoserAuto {
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
         return AutoAlign.driveToPose(drive, targetPose)
-                .until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
+                .until(() -> PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
     }
 
     public Command alignAndReceiveCoral(Side side) {

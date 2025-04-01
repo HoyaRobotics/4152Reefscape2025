@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /** Add your docs here. */
@@ -17,9 +16,8 @@ public class PoseUtils {
         return Meters.of(pose1.getTranslation().getDistance(pose2.getTranslation()));
     }
 
-    public static BooleanSupplier poseInRange(
-            Supplier<Pose2d> referencePose, Supplier<Pose2d> targetPose, Distance range) {
-        return () -> PoseUtils.distanceBetweenPoses(referencePose.get(), targetPose.get())
+    public static boolean poseInRange(Supplier<Pose2d> referencePose, Supplier<Pose2d> targetPose, Distance range) {
+        return PoseUtils.distanceBetweenPoses(referencePose.get(), targetPose.get())
                 .lt(range);
     }
 }

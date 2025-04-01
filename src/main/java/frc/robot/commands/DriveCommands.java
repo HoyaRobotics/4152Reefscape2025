@@ -62,6 +62,16 @@ public class DriveCommands {
 
     private DriveCommands() {}
 
+    public static Translation2d getTargetRelativeLinearVelocity(Drive drive, Pose2d target) {
+        Translation2d fieldVelocity = new Translation2d(
+                drive.getFieldChassisSpeeds().vxMetersPerSecond, drive.getFieldChassisSpeeds().vyMetersPerSecond);
+
+        return fieldVelocity.rotateBy(target.getTranslation()
+                .minus(drive.getPose().getTranslation())
+                .getAngle()
+                .unaryMinus());
+    }
+
     public static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
         // Apply deadband
         double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
