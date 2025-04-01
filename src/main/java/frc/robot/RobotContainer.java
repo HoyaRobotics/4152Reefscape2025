@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.Autos.Coral3Piece;
+import frc.robot.commands.Autos.CoralClose;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommands;
@@ -237,10 +237,10 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser.addOption(
                 "3PieceRight",
-                new Coral3Piece(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                new CoralClose(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
         autoChooser.addOption(
                 "3PieceLeft",
-                new Coral3Piece(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                new CoralClose(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
         /*
         autoChooser.addOption(
                 "algaeCenter",
@@ -304,6 +304,11 @@ public class RobotContainer {
                     .whileTrue(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
         }
 
+        driveController
+                .runIntakeAlign()
+                .whileTrue(
+                        AutoAlign.alignAndReceiveCoral(drive, superStructure, led, intake, driveController.driveY()));
+
         switch (Constants.intakeVersion) {
             case V1:
                 driveController.removeAlgae().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));
@@ -318,13 +323,7 @@ public class RobotContainer {
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive,
-                                superStructure,
-                                algaeIntake,
-                                led,
-                                Optional.empty(),
-                                driveController.driveX(),
-                                driveController.driveY()));
+                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));
 
                 driveController
                         .scoreProcessor()
@@ -332,9 +331,12 @@ public class RobotContainer {
                 break;
         }
 
+        // auto place on last button clicked
+        /*
         driveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
         driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
+        */
 
         driveController
                 .moveToTrough(false)

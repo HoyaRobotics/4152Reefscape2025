@@ -1,5 +1,6 @@
 package frc.robot.commands.Autos;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
@@ -34,6 +35,7 @@ public abstract class PoserAuto {
 
     static final Distance PlacingDistance = Inches.of(70); // 35
     static final Angle PlacingAngleDeltaTolerance = Degrees.of(360);
+    static final Distance CoralStationYOffset = Meters.of(0.5);
 
     static final Angle CoralStationAngleDelta = Degrees.of(360);
 
@@ -91,7 +93,7 @@ public abstract class PoserAuto {
 
     public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
         return AutoAlign.autoScoreBarge(
-                drive, superStructure, algaeIntake, leds, Optional.of(bargeCenterOffset), () -> 0.0, () -> 0.0);
+                drive, superStructure, algaeIntake, leds, Optional.of(bargeCenterOffset), () -> 0.0);
     }
 
     public Command alignAndPlaceCoral(
@@ -99,7 +101,7 @@ public abstract class PoserAuto {
         Supplier<Pose2d> targetPose = () -> Reef.getAllianceReefBranch(reefFaceIndex, side);
         return Commands.sequence(
                         AutoAlign.driveToPose(drive, targetPose)
-                                .alongWith(Commands.waitUntil(
+                                .alongWith(Commands.waitUntil(() ->
                                                 PoseUtils.poseInRange(drive::getPose, targetPose, PlacingDistance))
                                         .deadlineFor(new HoldPosition(
                                                 superStructure.elevator, superStructure.arm, intake, algaeIntake))
@@ -115,18 +117,21 @@ public abstract class PoserAuto {
 
     public Command transitionWaypoint(Supplier<Pose2d> targetPose, Distance tolerance) {
         return AutoAlign.driveToPose(drive, targetPose)
-                .until(PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
+                .until(() -> PoseUtils.poseInRange(drive::getPose, targetPose, tolerance));
     }
 
     public Command alignAndReceiveCoral(Side side) {
         return alignAndReceiveCoral(() -> CoralStation.getCoralStationPose(side)
-                .transformBy(new Transform2d(0.0, side == Side.RIGHT ? 0.5 : -0.5, Rotation2d.kZero)));
+                .transformBy(new Transform2d(
+                        0.0,
+                        side == Side.RIGHT ? CoralStationYOffset.in(Meters) : -CoralStationYOffset.in(Meters),
+                        Rotation2d.kZero)));
     }
 
     public Command alignAndReceiveCoral(Supplier<Pose2d> targetPose) {
         return intake.runWithSensor(IntakeAction.INTAKING)
                 .deadlineFor(AutoAlign.driveToPose(drive, targetPose)
-                        .alongWith(superStructure
+                        .deadlineFor(superStructure
                                 .arm
                                 .moveToAngle(SuperStructurePose.BASE.armAngle)
                                 .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false))

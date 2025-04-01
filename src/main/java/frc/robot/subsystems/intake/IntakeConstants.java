@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.Current;
 /** Add your docs here. */
 public class IntakeConstants {
     public enum IntakeAction {
-        HOLDING(Amps.of(20), RevolutionsPerSecond.of(4.0)), // 15
+        HOLDING(Amps.of(15), RevolutionsPerSecond.of(4.0)), // 15
         INTAKING(Amps.of(20), RevolutionsPerSecond.of(15.0)),
         TROUGH(Amps.of(30), RevolutionsPerSecond.of(-8.0)),
         PLACING(Amps.of(40), RevolutionsPerSecond.of(-25.0)),

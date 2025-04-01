@@ -51,7 +51,7 @@ public class SuperStructure {
         PROCESSOR(Inches.of(0.0), Degrees.of(0)),
         L2(Inches.of(11.5), Degrees.of(135.0)), // 13.0
         L3(Inches.of(27.25), Degrees.of(135.0)), // 15.75 more than L2
-        L4(Inches.of(52.7), Degrees.of(143.0)), // 140
+        L4(Inches.of(52.7), Degrees.of(146.0)), // 143
 
         L2_ALGAE(Inches.of(4.0), Degrees.of(160)),
         L2_ALGAE_GRAB(Inches.of(7.25), Degree.of(160)),
@@ -155,7 +155,7 @@ public class SuperStructure {
                     final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
                     final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
 
-                    final double predictionGain = 0.08;
+                    final double predictionGain = 0.24;
 
                     // we get the negated angle of the vector pointing from the robot to the target pose
                     var targetRelVelocity = Math.max(
@@ -168,19 +168,20 @@ public class SuperStructure {
                                             .unaryMinus())
                                     .getX());
 
-                    Distance xOffset = currentPose
+                    double xOffset = currentPose
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
                             .getMeasureX()
                             .minus(Meters.of(0.48))
-                            .minus(Meters.of(targetRelVelocity * predictionGain));
+                            .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
+                            .abs(Inches);
                     Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
-                    Logger.recordOutput("Loading/xOffset", xOffset.in(Meters));
+                    Logger.recordOutput("Loading/xOffset", xOffset);
 
-                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 4.5 / 4.5));
+                    Distance height = maxHeight.minus(Inches.of(xOffset * 4.5 / 4.5));
                     Distance inputHeight = height.gt(minHeight) ? height : minHeight;
                     // inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
 
-                    Angle angle = maxAngle.plus(Degrees.of(xOffset.in(Inches) * 2.5 / 4.5));
+                    Angle angle = maxAngle.plus(Degrees.of(xOffset * 2.5 / 4.5));
                     Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
 
                     // Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));

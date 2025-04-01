@@ -10,5 +10,5 @@ import edu.wpi.first.units.measure.Distance;
 /** Add your docs here. */
 public class ElevatorConstants {
     public static final Distance positionError = Inches.of(0.75);
-    public static final Distance tiltingDistance = Inches.of(18); // 25
+    public static final Distance tiltingDistance = Inches.of(10); // 18
 }

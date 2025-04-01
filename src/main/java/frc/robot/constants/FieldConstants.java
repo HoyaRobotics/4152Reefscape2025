@@ -50,6 +50,10 @@ public class FieldConstants {
                     FieldMirroringUtils.toCurrentAlliancePose(LeftSidePose)));
         }
 
+        public static Pose2d offsetCoralStationPose(Pose2d rawPose) {
+            return rawPose.transformBy(new Transform2d(0.4825, Units.inchesToMeters(2.5), Rotation2d.fromDegrees(180)));
+        }
+
         public static Pose2d getCoralStationPose(Side side) {
             Pose2d coralStation = side == Side.RIGHT ? RightSidePose : LeftSidePose;
             coralStation = FieldMirroringUtils.toCurrentAlliancePose(coralStation);

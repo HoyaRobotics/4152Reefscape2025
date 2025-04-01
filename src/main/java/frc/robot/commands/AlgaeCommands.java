@@ -40,7 +40,7 @@ public class AlgaeCommands {
                     return superStructure
                             .moveToPose(algaePoses.get(0))
                             .andThen(superStructure.moveToPose(algaePoses.get(1)))
-                            .withTimeout(0.5)
+                            .withTimeout(0.25)
                             .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
