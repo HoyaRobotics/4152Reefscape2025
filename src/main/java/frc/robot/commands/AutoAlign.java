@@ -49,7 +49,7 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
-    public static final double HorizontalVelocityPredictionTolerance = 2.0; // m/s
+    public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
     public static final LinearVelocity HorizontalVelocityRisingTolerance = MetersPerSecond.of(2.0); // m/s
     public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
     public static final Distance LockingDistance = Meters.of(0.75);
@@ -68,6 +68,7 @@ public class AutoAlign {
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
+    // allow movement along coral station plane
     public static Command alignAndReceiveCoral(
             Drive drive, SuperStructure superStructure, LED leds, Intake intake, DoubleSupplier inputY) {
         Supplier<Pose2d> targetPose = () -> {
@@ -102,6 +103,7 @@ public class AutoAlign {
             DoubleSupplier inputY) {
 
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
+        buttonWatcher.selectedPose = Optional.of(SuperStructurePose.L4);
 
         LockableSupplier<Pose2d> targetPose = new LockableSupplier<>(() -> {
             var reefFaces = Reef.getAllianceReefList();
@@ -202,11 +204,13 @@ public class AutoAlign {
                         AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)
                                 .deadlineFor(driveToPose(drive, offsetPose)),
                         driveToPose(drive, grabPose),
-                        AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)
-                                .deadlineFor(Commands.startEnd(
-                                        () -> leds.requestState(LEDState.PLACING),
-                                        () -> leds.requestState(LEDState.ALIGNING))),
-                        driveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))))
+                        driveToPose(drive, offsetPose))
+                /*
+                AlgaeCommands.removeAlgaeV2(superStructure, algaeIntake, drive)
+                        .deadlineFor(Commands.startEnd(
+                                () -> leds.requestState(LEDState.PLACING),
+                                () -> leds.requestState(LEDState.ALIGNING))),
+                driveToPose(drive, offsetPose).alongWith(superStructure.arm.moveToAngle(Degrees.of(130))))*/
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
