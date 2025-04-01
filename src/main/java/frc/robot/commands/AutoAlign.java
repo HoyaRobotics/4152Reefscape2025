@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,15 +53,9 @@ public class AutoAlign {
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
     public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
     public static final double HorizontalVelocityRisingTolerance = 2.0; // m/s
+    public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
-        return Commands.either(
-                new DriveToPoseProfiled(drive, targetPose),
-                new DriveToPoseRaw(drive, targetPose),
-                () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
-    }
-
-    public static Command driveToPose(Drive drive, Pose2d targetPose) {
         return Commands.either(
                 new DriveToPoseProfiled(drive, targetPose),
                 new DriveToPoseRaw(drive, targetPose),
@@ -74,6 +69,7 @@ public class AutoAlign {
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
+    /*
     public static Command alignAndReceiveCoral(Drive drive, SuperStructure superStructure, LED leds, Intake intake) {
         Supplier<Pose2d> targetPose = () -> {
             Pose2d closestStation = CoralStation.getClosestCoralStation(drive.getPose());
@@ -83,9 +79,9 @@ public class AutoAlign {
             // clamp y to go to closest position
             return closestStation.transformBy(new Transform2d(0.0, yOffset, Rotation2d.kZero));
         };
-        return Commands.defer(() -> driveToPose(drive, targetPose.get()), Set.of(drive))
+        return driveToPose(drive, targetPose)
                 .deadlineFor(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
-    }
+    }*/
 
     public static Command autoAlignAndPlace(
             DriveMap driveController,
@@ -125,18 +121,18 @@ public class AutoAlign {
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
-                                        Commands.waitUntil(() -> {
-                                            Logger.recordOutput("LatestPose/output", targetPose.get());
-                                            Logger.recordOutput("LatestPose/horizontalVel",
-                                                Math.abs(DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose.get()).getY()));
-
-                                            return PoseUtils.poseInRange(
+                                        Commands.waitUntil(() ->
+                                                PoseUtils.poseInRange(
                                                             drive::getPose, targetPose, StartSuperStructureRange)
-                                                    && Math.abs(DriveCommands.getTargetRelativeLinearVelocity(
+                                                    && (buttonWatcher.getSelectedPose() == SuperStructurePose.L2
+                                                        || buttonWatcher.getSelectedPose() == SuperStructurePose.L3
+                                                        || (Math.abs(DriveCommands.getTargetRelativeLinearVelocity(
                                                                             drive, targetPose.get())
                                                                     .getY())
-                                                            < HorizontalVelocityRisingTolerance;
-                                        }),
+                                                            < HorizontalVelocityRisingTolerance
+                                                            && drive.getPose().getRotation().minus(targetPose.get().getRotation())
+                                                                .getMeasure().lt(AngleDifferenceRisingTolerance)))
+                                        ),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
