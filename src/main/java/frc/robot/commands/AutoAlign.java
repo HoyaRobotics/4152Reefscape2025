@@ -45,7 +45,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
@@ -69,7 +68,6 @@ public class AutoAlign {
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
-    /*
     public static Command alignAndReceiveCoral(Drive drive, SuperStructure superStructure, LED leds, Intake intake) {
         Supplier<Pose2d> targetPose = () -> {
             Pose2d closestStation = CoralStation.getClosestCoralStation(drive.getPose());
@@ -81,7 +79,7 @@ public class AutoAlign {
         };
         return driveToPose(drive, targetPose)
                 .deadlineFor(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
-    }*/
+    }
 
     public static Command autoAlignAndPlace(
             DriveMap driveController,
@@ -121,18 +119,23 @@ public class AutoAlign {
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
-                                        Commands.waitUntil(() ->
-                                                PoseUtils.poseInRange(
-                                                            drive::getPose, targetPose, StartSuperStructureRange)
-                                                    && (buttonWatcher.getSelectedPose() == SuperStructurePose.L2
+                                        Commands.waitUntil(() -> PoseUtils.poseInRange(
+                                                        drive::getPose, targetPose, StartSuperStructureRange)
+                                                && (buttonWatcher.getSelectedPose() == SuperStructurePose.L2
                                                         || buttonWatcher.getSelectedPose() == SuperStructurePose.L3
                                                         || (Math.abs(DriveCommands.getTargetRelativeLinearVelocity(
-                                                                            drive, targetPose.get())
-                                                                    .getY())
-                                                            < HorizontalVelocityRisingTolerance
-                                                            && drive.getPose().getRotation().minus(targetPose.get().getRotation())
-                                                                .getMeasure().lt(AngleDifferenceRisingTolerance)))
-                                        ),
+                                                                                        drive, targetPose.get())
+                                                                                .getY())
+                                                                        < HorizontalVelocityRisingTolerance
+                                                                && drive.getPose()
+                                                                        .getRotation()
+                                                                        .getMeasure()
+                                                                        .isNear(
+                                                                                targetPose
+                                                                                        .get()
+                                                                                        .getRotation()
+                                                                                        .getMeasure(),
+                                                                                AngleDifferenceRisingTolerance)))),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),

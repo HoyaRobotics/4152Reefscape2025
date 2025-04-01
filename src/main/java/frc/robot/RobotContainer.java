@@ -304,6 +304,11 @@ public class RobotContainer {
                     .whileTrue(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
         }
 
+        driveController
+                .runIntakeAlign()
+                .whileTrue(AutoAlign.alignAndReceiveCoral(drive, superStructure, led, intake));
+
+
         switch (Constants.intakeVersion) {
             case V1:
                 driveController.removeAlgae().onTrue(AlgaeCommands.removeL2AlgaeV1(superStructure, intake));

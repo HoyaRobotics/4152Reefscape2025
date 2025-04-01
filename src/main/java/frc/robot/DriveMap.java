@@ -26,6 +26,8 @@ public interface DriveMap {
 
     Trigger runIntake();
 
+    Trigger runIntakeAlign();
+
     Trigger scoreProcessor();
 
     Trigger removeAlgae();
@@ -105,7 +107,14 @@ class DriverXbox implements DriveMap {
 
     @Override
     public Trigger runIntake() {
-        return xboxController.rightTrigger(0.3);
+        return xboxController.rightTrigger(0.3)
+            .and(xboxController.leftTrigger().negate());
+    }
+
+    @Override
+    public Trigger runIntakeAlign() {
+        return xboxController.rightTrigger(0.3)
+            .and(xboxController.leftTrigger());
     }
 
     @Override
@@ -125,7 +134,8 @@ class DriverXbox implements DriveMap {
 
     @Override
     public Trigger scoreProcessor() {
-        return xboxController.leftTrigger();
+        return xboxController.leftTrigger()
+            .and(xboxController.rightTrigger().negate());
     }
 
     @Override
