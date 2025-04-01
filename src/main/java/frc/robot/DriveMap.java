@@ -107,14 +107,12 @@ class DriverXbox implements DriveMap {
 
     @Override
     public Trigger runIntake() {
-        return xboxController.rightTrigger(0.3)
-            .and(xboxController.leftTrigger().negate());
+        return xboxController.rightTrigger(0.3).and(xboxController.leftTrigger().negate());
     }
 
     @Override
     public Trigger runIntakeAlign() {
-        return xboxController.rightTrigger(0.3)
-            .and(xboxController.leftTrigger());
+        return xboxController.rightTrigger(0.3).and(xboxController.leftTrigger());
     }
 
     @Override
@@ -134,8 +132,7 @@ class DriverXbox implements DriveMap {
 
     @Override
     public Trigger scoreProcessor() {
-        return xboxController.leftTrigger()
-            .and(xboxController.rightTrigger().negate());
+        return xboxController.leftTrigger().and(xboxController.rightTrigger().negate());
     }
 
     @Override

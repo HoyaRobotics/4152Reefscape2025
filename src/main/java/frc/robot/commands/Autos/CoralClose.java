@@ -17,9 +17,9 @@ import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Coral3Piece extends PoserAuto {
+public class CoralClose extends PoserAuto {
 
-    public Coral3Piece(
+    public CoralClose(
             Side autoSide,
             Drive drive,
             SuperStructure superStructure,

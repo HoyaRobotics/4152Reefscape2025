@@ -5,8 +5,7 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,11 +13,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.DriveMap;
 import frc.robot.commands.DriveToPose.DriveToPoseProfiled;
 import frc.robot.commands.DriveToPose.DriveToPoseRaw;
@@ -51,8 +50,9 @@ public class AutoAlign {
     private static final Distance StartSuperStructureRangeAlgae = Inches.of(65);
     public static final Distance ThrowNetTolerance = Inches.of(14); // 12
     public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
-    public static final double HorizontalVelocityRisingTolerance = 2.0; // m/s
+    public static final LinearVelocity HorizontalVelocityRisingTolerance = MetersPerSecond.of(2.0); // m/s
     public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
+    public static final Distance LockingDistance = Meters.of(0.85);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
@@ -107,7 +107,7 @@ public class AutoAlign {
                                     .getTranslation()
                                     .getDistance(Reef.offsetReefPose(closestFace, side)
                                             .getTranslation())
-                            < 0.85) return Reef.offsetReefPose(closestFace, side);
+                            < LockingDistance.in(Meters)) return Reef.offsetReefPose(closestFace, side);
 
             return horizontalVelocity > 0
                     ? Reef.getAllianceReefBranch(closestIndex == 5 ? 0 : closestIndex + 1, side)
@@ -115,8 +115,11 @@ public class AutoAlign {
         });
         // make a within range, facing for driving around corners??
         return Commands.sequence(
-                        driveToPose(drive, targetPose,
-                                () -> DriveCommands.getLinearVelocityFromJoysticks(inputX.getAsDouble(), inputY.getAsDouble()))
+                        driveToPose(
+                                        drive,
+                                        targetPose,
+                                        () -> DriveCommands.getLinearVelocityFromJoysticks(
+                                                inputX.getAsDouble(), inputY.getAsDouble()))
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
@@ -127,7 +130,8 @@ public class AutoAlign {
                                                         || (Math.abs(DriveCommands.getTargetRelativeLinearVelocity(
                                                                                         drive, targetPose.get())
                                                                                 .getY())
-                                                                        < HorizontalVelocityRisingTolerance
+                                                                        < HorizontalVelocityRisingTolerance.in(
+                                                                                MetersPerSecond)
                                                                 && drive.getPose()
                                                                         .getRotation()
                                                                         .getMeasure()
@@ -160,9 +164,8 @@ public class AutoAlign {
                 .deadlineFor(driveToPose(drive, movingPose::get))
                 .andThen(driveToPose(drive, drivePose::get)
                         .alongWith(Commands.sequence(
-                                new WaitUntilCommand(
-                                        () -> PoseUtils.distanceBetweenPoses(drive.getPose(), drivePose.get())
-                                                .lt(AutoAlign.StartSuperStructureRange)),
+                                Commands.waitUntil(() -> PoseUtils.poseInRange(
+                                        drive::getPose, drivePose, StartSuperStructureRangeAlgae)),
                                 superStructure.moveToPose(SuperStructurePose.PROCESSOR)))
                         .andThen(algaeIntake
                                 .run(AlgaeIntakeAction.PROCESSOR)

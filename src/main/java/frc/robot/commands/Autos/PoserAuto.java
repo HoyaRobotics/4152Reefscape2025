@@ -1,5 +1,6 @@
 package frc.robot.commands.Autos;
 
+import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
@@ -34,6 +35,7 @@ public abstract class PoserAuto {
 
     static final Distance PlacingDistance = Inches.of(70); // 35
     static final Angle PlacingAngleDeltaTolerance = Degrees.of(360);
+    static final Distance CoralStationYOffset = Meters.of(0.5);
 
     static final Angle CoralStationAngleDelta = Degrees.of(360);
 
@@ -120,7 +122,10 @@ public abstract class PoserAuto {
 
     public Command alignAndReceiveCoral(Side side) {
         return alignAndReceiveCoral(() -> CoralStation.getCoralStationPose(side)
-                .transformBy(new Transform2d(0.0, side == Side.RIGHT ? 0.5 : -0.5, Rotation2d.kZero)));
+                .transformBy(new Transform2d(
+                        0.0,
+                        side == Side.RIGHT ? CoralStationYOffset.in(Meters) : -CoralStationYOffset.in(Meters),
+                        Rotation2d.kZero)));
     }
 
     public Command alignAndReceiveCoral(Supplier<Pose2d> targetPose) {

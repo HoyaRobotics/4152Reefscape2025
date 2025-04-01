@@ -17,9 +17,9 @@ import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import java.util.function.Supplier;
 
-public class Coral4PieceFar extends PoserAuto {
+public class CoralFinalFar extends PoserAuto {
 
-    public Coral4PieceFar(
+    public CoralFinalFar(
             Side autoSide,
             Drive drive,
             SuperStructure superStructure,

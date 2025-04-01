@@ -126,8 +126,8 @@ public class DriveToPoseProfiled extends Command {
                 .getTranslation();
 
         if (Constants.FuseDriverInputs) {
-                var linearT = linearFF.get().getNorm() * linearFFGain;
-                driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearT);
+            var linearT = linearFF.get().getNorm() * linearFFGain;
+            driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearT);
         }
 
         lastSetpointTranslation = new Pose2d(
