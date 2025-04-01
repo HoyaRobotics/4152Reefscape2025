@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.Supplier;
@@ -101,8 +102,11 @@ public class DriveToPoseRaw extends Command {
 
         // interpolate drive velocity towards joystick direction
         // by feed forward magnitude?
-        final double linearScale = linearFF.get().getNorm() * 3.0;
-        driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearScale);
+
+        if (Constants.FuseDriverInputs) {
+            final double linearScale = linearFF.get().getNorm() * 3.0;
+            driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearScale);
+        }
 
         Logger.recordOutput("DriveToPose/targetPose", target);
         Logger.recordOutput("DriveToPose/driveAtGoal", driveController.atSetpoint());

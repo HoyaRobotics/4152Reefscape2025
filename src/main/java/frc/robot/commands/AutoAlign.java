@@ -115,7 +115,8 @@ public class AutoAlign {
         });
         // make a within range, facing for driving around corners??
         return Commands.sequence(
-                        driveToPose(drive, targetPose)
+                        driveToPose(drive, targetPose,
+                                () -> DriveCommands.getLinearVelocityFromJoysticks(inputX.getAsDouble(), inputY.getAsDouble()))
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
