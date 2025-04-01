@@ -155,7 +155,7 @@ public class SuperStructure {
                     final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
                     final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
 
-                    final double predictionGain = 0.08;
+                    final double predictionGain = 0.12;
 
                     // we get the negated angle of the vector pointing from the robot to the target pose
                     var targetRelVelocity = Math.max(
@@ -172,7 +172,7 @@ public class SuperStructure {
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
                             .getMeasureX()
                             .minus(Meters.of(0.48))
-                            .minus(Meters.of(targetRelVelocity * predictionGain));
+                            .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain));
                     Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
                     Logger.recordOutput("Loading/xOffset", xOffset.in(Meters));
 

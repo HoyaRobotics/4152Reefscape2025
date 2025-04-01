@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToPoseRaw extends Command {
     private static double driveKp = 0.43 * TunerConstants.kDriveGearRatio;
-    private static double driveKd = 0.1;
+    private static double driveKd = 0.08; // 0.05;
 
     private static double driveMaxVelocity = 4.73;
     private static final double driveMaxAcceleration = 11.772; // 7.89
@@ -104,7 +104,7 @@ public class DriveToPoseRaw extends Command {
         // by feed forward magnitude?
 
         if (Constants.FuseDriverInputs) {
-            final double linearScale = linearFF.get().getNorm() * 3.0;
+            final double linearScale = linearFF.get().getNorm() * 1.0;
             driveVelocity = driveVelocity.interpolate(linearFF.get().times(driveMaxVelocity), linearScale);
         }
 

@@ -44,9 +44,10 @@ public final class Constants {
     }
 
     public static final boolean useVariableIntakeHeight = true;
+    // DO NOT USE PROFILING RIGHT NOW
     public static final boolean TeleopMotionProfiling = false;
     public static final boolean AutoMotionProfiling = false;
-    public static final boolean FuseDriverInputs = false;
+    public static final boolean FuseDriverInputs = true;
 }
 
 // align to trough and coral station (closest spot along coral station)

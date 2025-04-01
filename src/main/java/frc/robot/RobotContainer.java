@@ -304,7 +304,10 @@ public class RobotContainer {
                     .whileTrue(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
         }
 
-        driveController.runIntakeAlign().whileTrue(AutoAlign.alignAndReceiveCoral(drive, superStructure, led, intake));
+        driveController
+                .runIntakeAlign()
+                .whileTrue(
+                        AutoAlign.alignAndReceiveCoral(drive, superStructure, led, intake, driveController.driveY()));
 
         switch (Constants.intakeVersion) {
             case V1:
@@ -328,9 +331,12 @@ public class RobotContainer {
                 break;
         }
 
+        // auto place on last button clicked
+        /*
         driveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
         driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
+        */
 
         driveController
                 .moveToTrough(false)

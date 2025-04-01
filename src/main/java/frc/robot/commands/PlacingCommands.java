@@ -15,7 +15,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class PlacingCommands {
-    private static final double L2DelaySeconds = 0.075; // 0.125
+    private static final double L2DelaySeconds = 0.1;
 
     public static Command reefPlacingSequence(
             SuperStructure superStructure,

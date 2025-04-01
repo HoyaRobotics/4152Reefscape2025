@@ -52,7 +52,7 @@ public class AutoAlign {
     public static final double HorizontalVelocityPredictionTolerance = 2.5; // m/s
     public static final LinearVelocity HorizontalVelocityRisingTolerance = MetersPerSecond.of(2.0); // m/s
     public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
-    public static final Distance LockingDistance = Meters.of(0.85);
+    public static final Distance LockingDistance = Meters.of(0.75);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
@@ -68,17 +68,26 @@ public class AutoAlign {
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
-    public static Command alignAndReceiveCoral(Drive drive, SuperStructure superStructure, LED leds, Intake intake) {
+    public static Command alignAndReceiveCoral(
+            Drive drive, SuperStructure superStructure, LED leds, Intake intake, DoubleSupplier inputY) {
         Supplier<Pose2d> targetPose = () -> {
-            Pose2d closestStation = CoralStation.getClosestCoralStation(drive.getPose());
+            Pose2d closestStation =
+                    CoralStation.offsetCoralStationPose(CoralStation.getClosestCoralStation(drive.getPose()));
 
             double yOffset = drive.getPose().relativeTo(closestStation).getY();
             yOffset = Math.max(-0.5, Math.min(0.5, yOffset));
             // clamp y to go to closest position
             return closestStation.transformBy(new Transform2d(0.0, yOffset, Rotation2d.kZero));
         };
-        return driveToPose(drive, targetPose)
-                .deadlineFor(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
+        return intake.run(IntakeAction.INTAKING)
+                .alongWith(driveToPose(
+                                drive,
+                                targetPose,
+                                () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
+                        .alongWith((Commands.either(
+                                superStructure.moveToLoadingPose(drive),
+                                superStructure.moveToPose(SuperStructurePose.LOADING),
+                                () -> Constants.useVariableIntakeHeight))));
     }
 
     public static Command autoAlignAndPlace(
@@ -115,38 +124,42 @@ public class AutoAlign {
         });
         // make a within range, facing for driving around corners??
         return Commands.sequence(
-                        driveToPose(
-                                        drive,
-                                        targetPose,
-                                        () -> DriveCommands.getLinearVelocityFromJoysticks(
-                                                inputX.getAsDouble(), inputY.getAsDouble()))
+                        driveToPose(drive, targetPose)
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         buttonWatcher.WaitSelectPose(),
-                                        Commands.waitUntil(() -> PoseUtils.poseInRange(
-                                                        drive::getPose, targetPose, StartSuperStructureRange)
-                                                && (buttonWatcher.getSelectedPose() == SuperStructurePose.L2
-                                                        || buttonWatcher.getSelectedPose() == SuperStructurePose.L3
-                                                        || (Math.abs(DriveCommands.getTargetRelativeLinearVelocity(
-                                                                                        drive, targetPose.get())
-                                                                                .getY())
-                                                                        < HorizontalVelocityRisingTolerance.in(
-                                                                                MetersPerSecond)
-                                                                && drive.getPose()
-                                                                        .getRotation()
-                                                                        .getMeasure()
-                                                                        .isNear(
-                                                                                targetPose
-                                                                                        .get()
+                                        Commands.waitUntil(
+                                                        () -> PoseUtils.poseInRange(
+                                                                        drive::getPose,
+                                                                        targetPose,
+                                                                        StartSuperStructureRange)
+                                                                && (buttonWatcher.getSelectedPose()
+                                                                                == SuperStructurePose.L2
+                                                                        || buttonWatcher.getSelectedPose()
+                                                                                == SuperStructurePose.L3
+                                                                        || (Math.abs(DriveCommands
+                                                                                                .getTargetRelativeLinearVelocity(
+                                                                                                        drive,
+                                                                                                        targetPose
+                                                                                                                .get())
+                                                                                                .getY())
+                                                                                        < HorizontalVelocityRisingTolerance
+                                                                                                .in(MetersPerSecond)
+                                                                                && drive.getPose()
                                                                                         .getRotation()
-                                                                                        .getMeasure(),
-                                                                                AngleDifferenceRisingTolerance)))),
+                                                                                        .getMeasure()
+                                                                                        .isNear(
+                                                                                                targetPose
+                                                                                                        .get()
+                                                                                                        .getRotation()
+                                                                                                        .getMeasure(),
+                                                                                                AngleDifferenceRisingTolerance))))
+                                                .finallyDo(() -> leds.requestState(LEDState.PLACING)),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
                         PlacingCommands.reefPlacingSequence(
-                                superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false),
-                        autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty()))
+                                superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
