@@ -339,7 +339,7 @@ public class RobotContainer {
 
         // auto place on last button clicked
         /*
-        driveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
+        riveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
         driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
         */
