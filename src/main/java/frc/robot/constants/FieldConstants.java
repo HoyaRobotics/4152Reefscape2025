@@ -194,8 +194,9 @@ public class FieldConstants {
                 FieldMirroringUtils.flip(processorFaceBlue.getRotation()));
 
         public static Pose2d getProcessorPose(Drive drive) {
-            return drive.getPose().nearest(List.of(processorFaceBlue, processorFaceRed))
-                .transformBy(new Transform2d(0.48 + Units.inchesToMeters(3), 0.0, Rotation2d.fromDegrees(180)));
+            return drive.getPose()
+                    .nearest(List.of(processorFaceBlue, processorFaceRed))
+                    .transformBy(new Transform2d(0.48 + Units.inchesToMeters(3), 0.0, Rotation2d.fromDegrees(180)));
         }
     }
 

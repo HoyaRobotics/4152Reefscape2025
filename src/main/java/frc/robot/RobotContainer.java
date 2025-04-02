@@ -241,6 +241,12 @@ public class RobotContainer {
         autoChooser.addOption(
                 "3PieceLeft",
                 new CoralClose(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+        /*autoChooser.addOption(
+                "4PieceFarRight",
+                new CoralFar(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+        autoChooser.addOption(
+                "4PieceFarLeft",
+                new CoralFar(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());*/
         /*
         autoChooser.addOption(
                 "algaeCenter",

@@ -3,7 +3,6 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -154,8 +153,10 @@ public class SuperStructure {
 
                     final double predictionGain = 0.12;
 
-                    var targetRelVelocity = Math.max(0.0,
-                        DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose).getX());
+                    var targetRelVelocity = Math.max(
+                            0.0,
+                            DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose)
+                                    .getX());
 
                     double xOffset = currentPose
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
