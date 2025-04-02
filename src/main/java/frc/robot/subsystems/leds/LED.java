@@ -59,7 +59,7 @@ public class LED extends SubsystemBase {
         switch (nextState) {
             case EMPTY -> leds.setLEDs(255, 0, 0);
             case HOLDING_CORAL -> leds.setLEDs(0, 255, 0);
-            case ALIGNING -> leds.animate(new RainbowAnimation(1.0, 1.0, 64));
+            case ALIGNING -> leds.animate(new RainbowAnimation(1.0, 0.5, 64));
             case PLACING -> leds.animate(new SingleFadeAnimation(255, 0, 255, 0, 0.75, 64));
             default -> {}
         }

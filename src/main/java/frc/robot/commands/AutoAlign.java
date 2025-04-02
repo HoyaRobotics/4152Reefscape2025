@@ -124,12 +124,11 @@ public class AutoAlign {
                     ? Reef.getAllianceReefBranch(closestIndex == 5 ? 0 : closestIndex + 1, side)
                     : Reef.getAllianceReefBranch(closestIndex == 0 ? 5 : closestIndex - 1, side);
         });
-        // make a within range, facing for driving around corners??
+
         return Commands.sequence(
                         driveToPose(drive, targetPose)
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
-                                        // buttonWatcher.WaitSelectPose(),
                                         Commands.waitUntil(
                                                         () -> PoseUtils.poseInRange(
                                                                         drive::getPose,
@@ -155,16 +154,15 @@ public class AutoAlign {
                                                                                                         .get()
                                                                                                         .getRotation()
                                                                                                         .getMeasure(),
-                                                                                                AngleDifferenceRisingTolerance))))
-                                                .finallyDo(() -> leds.requestState(LEDState.PLACING)),
+                                                                                                AngleDifferenceRisingTolerance)))),
                                         Commands.defer(
-                                                () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
+                                                () -> superStructure.moveToPose(buttonWatcher.getSelectedPose())
+                                                        .beforeStarting(() -> leds.requestState(LEDState.PLACING)),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
                         PlacingCommands.reefPlacingSequence(
                                 superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
-                // .beforeStarting(() -> buttonWatcher.selectedPose = Optional.empty())
                 .finallyDo(() -> targetPose.unlock())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
@@ -172,8 +170,8 @@ public class AutoAlign {
     public static Command autoAlignLoadProcessor(
             Drive drive, SuperStructure superStructure, LED leds, AlgaeIntake algaeIntake) {
         Supplier<Pose2d> movingPose =
-                () -> Processor.getProcessorPose().transformBy(new Transform2d(-0.35, 0.0, new Rotation2d()));
-        Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose();
+                () -> Processor.getProcessorPose(drive).transformBy(new Transform2d(-0.35, 0.0, new Rotation2d()));
+        Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose(drive);
         return superStructure
                 .moveToPose(SuperStructurePose.PROCESSOR)
                 .deadlineFor(driveToPose(drive, movingPose::get))

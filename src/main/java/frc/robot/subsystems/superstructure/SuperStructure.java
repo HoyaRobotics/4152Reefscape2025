@@ -9,6 +9,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.commands.DriveCommands;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
@@ -146,27 +147,15 @@ public class SuperStructure {
                     Pose2d currentPose = drive.getPose();
                     Pose2d targetPose = CoralStation.getClosestCoralStation(currentPose);
 
-                    final var fieldVelocity = new Translation2d(
-                            drive.getFieldChassisSpeeds().vxMetersPerSecond,
-                            drive.getFieldChassisSpeeds().vyMetersPerSecond);
-
                     final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
                     final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
                     final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
                     final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
 
-                    final double predictionGain = 0.24;
+                    final double predictionGain = 0.12;
 
-                    // we get the negated angle of the vector pointing from the robot to the target pose
-                    var targetRelVelocity = Math.max(
-                            0.0,
-                            fieldVelocity
-                                    .rotateBy(targetPose
-                                            .getTranslation()
-                                            .minus(currentPose.getTranslation())
-                                            .getAngle()
-                                            .unaryMinus())
-                                    .getX());
+                    var targetRelVelocity = Math.max(0.0,
+                        DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose).getX());
 
                     double xOffset = currentPose
                             .relativeTo(CoralStation.getClosestCoralStation(currentPose))
@@ -174,18 +163,16 @@ public class SuperStructure {
                             .minus(Meters.of(0.48))
                             .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
                             .abs(Inches);
+
                     Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
                     Logger.recordOutput("Loading/xOffset", xOffset);
 
                     Distance height = maxHeight.minus(Inches.of(xOffset * 4.5 / 4.5));
                     Distance inputHeight = height.gt(minHeight) ? height : minHeight;
-                    // inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
 
                     Angle angle = maxAngle.plus(Degrees.of(xOffset * 2.5 / 4.5));
                     Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
 
-                    // Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));
-                    // setPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false);
                     elevator.setPosition(inputHeight, false);
                     arm.setArmPosition(inputAngle);
                 },
