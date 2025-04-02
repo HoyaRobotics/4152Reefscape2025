@@ -1,5 +1,7 @@
 package frc.robot.commands.Autos;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -14,10 +16,6 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -75,13 +73,11 @@ public class CoralFar extends PoserAuto {
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
 
         Supplier<Pose2d> targetPose2 = () -> {
-                Pose2d branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), autoSide);
-                Pose2d transitionPose = branchPose.transformBy(new Transform2d(
-                        0.25,
-                        autoSide == Side.RIGHT ? 0.0 : -0.0,
-                        Rotation2d.kZero));
+            Pose2d branchPose = Reef.getAllianceReefBranch(reefFaces.get(0), autoSide);
+            Pose2d transitionPose = branchPose.transformBy(
+                    new Transform2d(0.25, autoSide == Side.RIGHT ? 0.0 : -0.0, Rotation2d.kZero));
 
-                return transitionPose;
+            return transitionPose;
         };
 
         autoCommand.addCommands(transitionWaypoint(targetPose2, Meters.of(0.5)));

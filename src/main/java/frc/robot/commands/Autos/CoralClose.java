@@ -72,6 +72,8 @@ public class CoralClose extends PoserAuto {
         autoCommand.addCommands(alignAndReceiveCoral(autoSide));
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L4, reefFaces.get(2), branchSides.get(3), false));
 
+        autoCommand.addCommands(alignAndReceiveCoral(autoSide));
+
         return autoCommand;
     }
 }
