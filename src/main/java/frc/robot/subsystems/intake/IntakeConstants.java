@@ -15,7 +15,8 @@ public class IntakeConstants {
         HOLDING(Amps.of(15), RevolutionsPerSecond.of(4.0)), // 15
         INTAKING(Amps.of(20), RevolutionsPerSecond.of(15.0)),
         TROUGH(Amps.of(30), RevolutionsPerSecond.of(-8.0)),
-        PLACING(Amps.of(40), RevolutionsPerSecond.of(-25.0)),
+        PLACING(Amps.of(40), RevolutionsPerSecond.of(-12.5)),
+        PLACING_L4(Amps.of(40), RevolutionsPerSecond.of(-25.0)),
         EMPTY(Amps.of(10), RevolutionsPerSecond.of(0.0));
 
         public final Current currentLimit;
