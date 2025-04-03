@@ -38,6 +38,7 @@ import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommands;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants.Side;
+import frc.robot.constants.FieldConstants.StagingPositions;
 import frc.robot.constants.VisionConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;

@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,6 +15,13 @@ public class CoordinateUtils {
     public static boolean isRed() {
         return DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
+    }
+
+    public static Pose2d getAlliancePose(Pose2d pose) {
+        return new Pose2d(
+                getAllianceX(pose.getMeasureX()),
+                getAllianceY(pose.getMeasureY()),
+                getAllianceRotation(pose.getRotation()));
     }
 
     public static Distance getAllianceY(Distance yDist) {

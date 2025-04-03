@@ -200,6 +200,22 @@ public class FieldConstants {
         }
     }
 
+    public static class StagingPositions {
+        // Measured from the center of the ice cream
+        public static final Pose2d leftIceCream =
+                new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
+        public static final Pose2d middleIceCream =
+                new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
+        public static final Pose2d rightIceCream =
+                new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
+
+        public static List<Pose2d> getAllianceStartingAlgaePoses() {
+            return List.of(leftIceCream, middleIceCream, rightIceCream).stream()
+                    .map(pose -> CoordinateUtils.getAlliancePose(pose))
+                    .toList();
+        }
+    }
+
     public static class Net {
         // distance from robot bumper to center -> 0.48 meters?
         public static final Distance xOffset = Inches.of(303.5 + 2.0); // 303.5
