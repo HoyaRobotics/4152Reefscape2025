@@ -11,6 +11,7 @@ import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -35,7 +36,12 @@ public class PlacingCommands {
                                                 .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false)),
                                         superStructure.arm.moveToAngle(Degrees.of(103)),
                                         () -> isAuto)
-                                .deadlineFor(intake.run(IntakeAction.PLACING)))
+                                .deadlineFor(Commands.defer(
+                                        (() -> intake.run(
+                                                currentPose.get() == SuperStructurePose.L4
+                                                        ? IntakeAction.PLACING_L4
+                                                        : IntakeAction.PLACING)),
+                                        Set.of(intake))))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.PLACING), () -> leds.requestState(LEDState.NOTHING)));
     }

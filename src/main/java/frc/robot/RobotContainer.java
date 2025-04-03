@@ -236,10 +236,10 @@ public class RobotContainer {
 
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser.addOption(
-                "3PieceRight",
+                "RightCoralClose",
                 new CoralClose(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
         autoChooser.addOption(
-                "3PieceLeft",
+                "LeftCoralClose",
                 new CoralClose(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
         /*autoChooser.addOption(
                 "4PieceFarRight",
@@ -339,7 +339,7 @@ public class RobotContainer {
 
         // auto place on last button clicked
         /*
-        driveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
+        riveController.moveToL4(false).onTrue(superStructure.moveToPose(SuperStructurePose.L4));
         driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
         */
