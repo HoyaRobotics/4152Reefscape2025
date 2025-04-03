@@ -57,6 +57,8 @@ public class AutoAlign {
     public static final Angle BargeThrowAngleTolerance = Degrees.of(8);
     public static final Angle BargeRaisingRotTolerance = Degrees.of(10);
     public static final Distance ProcessorThrowTolerance = Inches.of(5.0);
+    public static final Angle ProcessorRotTolerance = Degrees.of(8);
+    public static final Distance BargeDistanceTolerance = Inches.of(5.0);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
@@ -173,6 +175,8 @@ public class AutoAlign {
         Supplier<Pose2d> drivePose = () -> Processor.getProcessorPose(drive);
         return superStructure
                 .moveToPose(SuperStructurePose.PROCESSOR)
+                .andThen(Commands.waitUntil(() -> drive.getPose().getRotation().getMeasure().isNear(
+                        movingPose.get().getRotation().getMeasure(), ProcessorRotTolerance)))
                 .deadlineFor(driveToPose(drive, movingPose::get))
                 .andThen(driveToPose(drive, drivePose::get)
                         .alongWith(Commands.waitUntil(
@@ -218,7 +222,8 @@ public class AutoAlign {
                                         drive,
                                         drivePose::get,
                                         () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
-                                .alongWith(Commands.waitUntil(() -> drive.getPose()
+                                .alongWith(Commands.waitUntil(() -> PoseUtils.poseInRange(drive::getPose, drivePose, BargeDistanceTolerance) && 
+                                drive.getPose()
                                                 .getRotation()
                                                 .getMeasure()
                                                 .isNear(
