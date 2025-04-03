@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
+import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.CoralClose;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
@@ -241,6 +242,8 @@ public class RobotContainer {
         autoChooser.addOption(
                 "LeftCoralClose",
                 new CoralClose(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+        autoChooser.addOption(
+                "CenterAlgae", new AlgaeCenter(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
         /*autoChooser.addOption(
                 "4PieceFarRight",
                 new CoralFar(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
@@ -328,11 +331,10 @@ public class RobotContainer {
                         .whileTrue(AutoAlign.autoAlignAndPickAlgae(
                                 drive, superStructure, led, algaeIntake, Optional.empty()));
 
-                /*
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));*/
+                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));
 
                 driveController
                         .scoreProcessor()
