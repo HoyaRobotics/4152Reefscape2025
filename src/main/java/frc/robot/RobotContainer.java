@@ -307,7 +307,9 @@ public class RobotContainer {
         } else {
             driveController
                     .runIntake()
-                    .whileTrue(superStructure.moveToLoadingPose(drive).withDeadline(intake.runWithSensor(IntakeAction.INTAKING)));
+                    .whileTrue(superStructure
+                            .moveToLoadingPose(drive)
+                            .withDeadline(intake.runWithSensor(IntakeAction.INTAKING)));
         }
 
         driveController
@@ -326,10 +328,11 @@ public class RobotContainer {
                         .whileTrue(AutoAlign.autoAlignAndPickAlgae(
                                 drive, superStructure, led, algaeIntake, Optional.empty()));
 
+                /*
                 driveController
                         .scoreBarge()
                         .whileTrue(AutoAlign.autoScoreBarge(
-                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));
+                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));*/
 
                 driveController
                         .scoreProcessor()

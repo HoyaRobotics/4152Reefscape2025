@@ -90,10 +90,11 @@ public abstract class PoserAuto {
         return AutoAlign.autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.of(faceIndex));
     }
 
+    /*
     public Command alignAndPlaceBarge(Distance bargeCenterOffset) {
         return AutoAlign.autoScoreBarge(
                 drive, superStructure, algaeIntake, leds, Optional.of(bargeCenterOffset), () -> 0.0);
-    }
+    }*/
 
     public Command alignAndPlaceCoral(
             SuperStructurePose superStructurePose, int reefFaceIndex, Side side, boolean removeAlgae) {

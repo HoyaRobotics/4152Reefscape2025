@@ -57,7 +57,8 @@ public class Elevator extends SubsystemBase {
 
     public Command moveToPosition(Distance targetPosition, boolean motionMagic, Distance tolerance, Command toRun) {
         return moveToPosition(targetPosition, motionMagic)
-                .alongWith(Commands.waitUntil(() -> getPosition().isNear(targetPosition, tolerance))
+                .alongWith(Commands.waitUntil(
+                                () -> targetPosition.minus(getPosition()).lt(tolerance))
                         .andThen(toRun));
     }
 

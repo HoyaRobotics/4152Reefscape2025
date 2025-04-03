@@ -15,7 +15,6 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.superstructure.SuperStructure;
-import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -43,10 +42,11 @@ public class AlgaeCenter extends PoserAuto {
 
         // look at picking up algae before placing?
 
+        /*
         autoCommand.addCommands(alignAndPlaceCoral(SuperStructurePose.L3, reefFaces.get(0), branchSides.get(0), true));
         autoCommand.addCommands(alignAndPlaceBarge(Meters.of(0)));
         autoCommand.addCommands(alignAndPickAlgae(reefFaces.get(1)));
-        autoCommand.addCommands(alignAndPlaceBarge(Meters.of(1)));
+        autoCommand.addCommands(alignAndPlaceBarge(Meters.of(1)));*/
 
         Supplier<Pose2d> translationPoint = () -> {
             var branchPose = Reef.getAllianceReefBranch(reefFaces.get(2), Side.CENTER);
@@ -56,7 +56,7 @@ public class AlgaeCenter extends PoserAuto {
         autoCommand.addCommands(transitionWaypoint(translationPoint, Meters.of(0.5))
                 .deadlineFor(new HoldPosition(superStructure.elevator, superStructure.arm, intake, algaeIntake)));
         autoCommand.addCommands(alignAndPickAlgae(reefFaces.get(2)));
-        autoCommand.addCommands(alignAndPlaceBarge(Meters.of(2)));
+        // autoCommand.addCommands(alignAndPlaceBarge(Meters.of(2)));
 
         return autoCommand;
     }

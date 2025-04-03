@@ -45,7 +45,8 @@ public class Arm extends SubsystemBase {
 
     public Command moveToAngle(Angle targetAngle, Angle tolerance, Command toRun) {
         return moveToAngle(targetAngle)
-                .alongWith(Commands.waitUntil(() -> getArmPosition().isNear(targetAngle, tolerance)));
+                .alongWith(Commands.waitUntil(
+                        () -> getArmPosition().minus(targetAngle).lt(tolerance)));
     }
 
     public Command moveToAngle(Angle targetAngle) {
