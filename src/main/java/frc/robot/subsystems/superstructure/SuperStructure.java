@@ -32,6 +32,7 @@ public class SuperStructure {
         ALGAE_L2,
         ALGAE_L3
     }
+    // add deadline for intaking so it automatically gpoes to hold for austin
 
     // fix elevaot zeroing, move arm
     public enum SuperStructurePose {
@@ -41,6 +42,7 @@ public class SuperStructure {
         TROUGH(Inches.of(7.5), Degrees.of(-60)),
         POST_TROUGH(Inches.of(12), Degrees.of(-60)),
         POST_POST_TROUGH(Inches.of(16.75), Degrees.of(-60)),
+        STAGED_ALGAE(Inches.of(0.0), Degrees.of(5)),
         // TROUGH(Inches.of(0), Degrees.of(135)),
         // POST_TROUGH(Inches.of(0), Degrees.of(110)),
         // TROUGH(Inches.of(0), Degrees.of(120)),
@@ -141,6 +143,7 @@ public class SuperStructure {
     }
 
     public Command moveToLoadingPose(Drive drive) {
+        // LinearFilter filter = LinearFilter.movingAverage(1);
         return Commands.run(
                 () -> {
                     Pose2d currentPose = drive.getPose();
@@ -164,6 +167,8 @@ public class SuperStructure {
                             .minus(Meters.of(0.48))
                             .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
                             .abs(Inches);
+
+                    // xOffset = filter.calculate(xOffset);
 
                     Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
                     Logger.recordOutput("Loading/xOffset", xOffset);

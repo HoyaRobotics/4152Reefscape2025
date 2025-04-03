@@ -55,6 +55,7 @@ public class AutoAlign {
     public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
     public static final Distance LockingDistance = Meters.of(0.75);
     public static final Angle BargeThrowAngleTolerance = Degrees.of(8);
+    public static final Angle BargeRaisingRotTolerance = Degrees.of(10);
     public static final Distance ProcessorThrowTolerance = Inches.of(5.0);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
@@ -217,15 +218,24 @@ public class AutoAlign {
                                         drive,
                                         drivePose::get,
                                         () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
-                                .alongWith(superStructure.elevator.moveToPosition(
-                                        SuperStructurePose.ALGAE_NET.elevatorPosition,
-                                        true,
-                                        ThrowNetTolerance,
-                                        Commands.runOnce(() -> leds.requestState(LEDState.PLACING))
-                                                .andThen(superStructure.arm.moveToAngle(
-                                                        SuperStructurePose.ALGAE_NET.armAngle,
-                                                        BargeThrowAngleTolerance,
-                                                        algaeIntake.run(AlgaeIntakeAction.NET))))),
+                                .alongWith(Commands.waitUntil(() -> drive.getPose()
+                                                .getRotation()
+                                                .getMeasure()
+                                                .isNear(
+                                                        drivePose
+                                                                .get()
+                                                                .getRotation()
+                                                                .getMeasure(),
+                                                        BargeRaisingRotTolerance))
+                                        .andThen(superStructure.elevator.moveToPosition(
+                                                SuperStructurePose.ALGAE_NET.elevatorPosition,
+                                                true,
+                                                ThrowNetTolerance,
+                                                Commands.runOnce(() -> leds.requestState(LEDState.PLACING))
+                                                        .andThen(superStructure.arm.moveToAngle(
+                                                                SuperStructurePose.ALGAE_NET.armAngle,
+                                                                BargeThrowAngleTolerance,
+                                                                algaeIntake.run(AlgaeIntakeAction.NET)))))),
                         algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));

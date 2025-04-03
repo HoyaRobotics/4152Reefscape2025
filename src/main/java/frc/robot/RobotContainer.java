@@ -38,9 +38,11 @@ import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommands;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants.Side;
+import frc.robot.constants.FieldConstants.StagingPositions;
 import frc.robot.constants.VisionConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeIO;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeIOReal;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeIOSim;
@@ -83,6 +85,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.photonvision.PhotonUtils;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -336,6 +339,26 @@ public class RobotContainer {
                         .whileTrue(AutoAlign.autoAlignLoadProcessor(drive, superStructure, led, algaeIntake));
                 break;
         }
+
+        // we want the rotation of the robot to be such that the algae intake is facing into the staging algae
+
+        // we want the rotation of the robot relative to the algae to be
+        driveController
+                .getStagedAlgae()
+                .whileTrue(AutoAlign.driveToPose(drive, () -> {
+                            Pose2d currentPose = drive.getPose();
+                            var stagingPose = currentPose.nearest(StagingPositions.getAllianceStartingAlgaePoses());
+
+                            var rotationOffset = new Rotation2d(Math.atan2(
+                                currentPose.getTranslation().getY() - stagingPose.getTranslation().getY(),
+                                currentPose.getTranslation().getX() - stagingPose.getTranslation().getX())).unaryMinus();
+
+                            return new Pose2d(
+                                    stagingPose.getTranslation(), rotationOffset);
+                            // we want the relative angle to be zero
+                        })
+                        .alongWith(superStructure.moveToPose(SuperStructurePose.STAGED_ALGAE))
+                        .withDeadline(algaeIntake.runWithSensor(AlgaeIntakeAction.INTAKING)));
 
         // auto place on last button clicked
         /*

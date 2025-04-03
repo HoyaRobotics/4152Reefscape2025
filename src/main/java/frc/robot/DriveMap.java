@@ -16,6 +16,8 @@ public interface DriveMap {
 
     Trigger resetClimber();
 
+    Trigger getStagedAlgae();
+
     Trigger moveToTrough(boolean aligning);
 
     Trigger moveToL2(boolean aligning);
@@ -153,5 +155,10 @@ class DriverXbox implements DriveMap {
     @Override
     public DoubleSupplier driveY() {
         return () -> -xboxController.getLeftX();
+    }
+
+    @Override
+    public Trigger getStagedAlgae() {
+        return xboxController.povRight();
     }
 }
