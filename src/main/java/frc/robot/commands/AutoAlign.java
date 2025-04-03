@@ -54,6 +54,8 @@ public class AutoAlign {
     public static final LinearVelocity HorizontalVelocityRisingTolerance = MetersPerSecond.of(2.0); // m/s
     public static final Angle AngleDifferenceRisingTolerance = Degrees.of(30);
     public static final Distance LockingDistance = Meters.of(0.75);
+    public static final Angle BargeThrowAngleTolerance = Degrees.of(8);
+    public static final Distance ProcessorThrowTolerance = Inches.of(5.0);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
@@ -89,7 +91,9 @@ public class AutoAlign {
                         .deadlineFor((Commands.either(
                                 superStructure.moveToLoadingPose(drive),
                                 superStructure.moveToPose(SuperStructurePose.LOADING),
-                                () -> Constants.useVariableIntakeHeight))));
+                                () -> Constants.useVariableIntakeHeight))))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
     public static Command autoAlignAndPlace(
@@ -171,10 +175,11 @@ public class AutoAlign {
                 .deadlineFor(driveToPose(drive, movingPose::get))
                 .andThen(driveToPose(drive, drivePose::get)
                         .alongWith(Commands.waitUntil(
-                                        () -> PoseUtils.poseInRange(drive::getPose, drivePose, Inches.of(5.0)))
-                                .andThen(algaeIntake
-                                        .run(AlgaeIntakeAction.PROCESSOR)
-                                        .withTimeout(AlgaeIntakeConstants.PlacingTimeout)))
+                                        () -> PoseUtils.poseInRange(drive::getPose, drivePose, ProcessorThrowTolerance))
+                                .andThen(Commands.runOnce(() -> leds.requestState(LEDState.PLACING))
+                                        .andThen(algaeIntake
+                                                .run(AlgaeIntakeAction.PROCESSOR)
+                                                .withTimeout(AlgaeIntakeConstants.PlacingTimeout))))
                         .beforeStarting(() -> leds.requestState(LEDState.PLACING)))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
@@ -212,21 +217,15 @@ public class AutoAlign {
                                         drive,
                                         drivePose::get,
                                         () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
-                                .alongWith(superStructure
-                                        .elevator
-                                        .moveToPosition(SuperStructurePose.ALGAE_NET.elevatorPosition, true)
-                                        .deadlineFor(Commands.waitUntil(() -> SuperStructurePose.ALGAE_NET
-                                                        .elevatorPosition
-                                                        .minus(superStructure.elevator.getPosition())
-                                                        .lt(ThrowNetTolerance))
-                                                .andThen(superStructure
-                                                        .arm
-                                                        .moveToAngle(SuperStructurePose.ALGAE_NET.armAngle)
-                                                        .alongWith(Commands.waitUntil(
-                                                                        () -> superStructure.arm.withinTolerance(
-                                                                                SuperStructurePose.ALGAE_NET.armAngle,
-                                                                                Degrees.of(8)))
-                                                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET)))))),
+                                .alongWith(superStructure.elevator.moveToPosition(
+                                        SuperStructurePose.ALGAE_NET.elevatorPosition,
+                                        true,
+                                        ThrowNetTolerance,
+                                        Commands.runOnce(() -> leds.requestState(LEDState.PLACING))
+                                                .andThen(superStructure.arm.moveToAngle(
+                                                        SuperStructurePose.ALGAE_NET.armAngle,
+                                                        BargeThrowAngleTolerance,
+                                                        algaeIntake.run(AlgaeIntakeAction.NET))))),
                         algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(AlgaeIntakeConstants.PlacingTimeout))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));

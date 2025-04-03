@@ -36,7 +36,6 @@ public abstract class PoserAuto {
     static final Distance PlacingDistance = Inches.of(70); // 35
     static final Angle PlacingAngleDeltaTolerance = Degrees.of(360);
     static final Distance CoralStationYOffset = Meters.of(0.5);
-
     static final Angle CoralStationAngleDelta = Degrees.of(360);
 
     protected final Drive drive;

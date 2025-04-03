@@ -43,6 +43,11 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/ArmPose", armPose);
     }
 
+    public Command moveToAngle(Angle targetAngle, Angle tolerance, Command toRun) {
+        return moveToAngle(targetAngle)
+                .alongWith(Commands.waitUntil(() -> getArmPosition().isNear(targetAngle, tolerance)));
+    }
+
     public Command moveToAngle(Angle targetAngle) {
         return Commands.run(() -> {}, this)
                 .beforeStarting(() -> setArmPosition(targetAngle))

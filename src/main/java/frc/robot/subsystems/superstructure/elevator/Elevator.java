@@ -55,29 +55,11 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/ElevatorPose", this.stage2Pose);
     }
 
-    /*
-    public Command moveToLoadingPose(Supplier<Pose2d> drivePose) {
-        // LinearFilter filter = LinearFilter.movingAverage(1);
-        return Commands.run(
-                () -> {
-                    Pose2d currentPose = drivePose.get();
-                    final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
-                    final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
-                    Distance xOffset = currentPose
-                            .relativeTo(CoralStation.getClosestCoralStation(currentPose))
-                            .getMeasureX()
-                            .minus(Meters.of(0.48));
-                    Logger.recordOutput("Loading/xOffset", xOffset.in(Inches));
-
-                    Distance height = maxHeight.minus(Inches.of(xOffset.in(Inches) * 3.0 / 4.5));
-                    Distance inputHeight = height.gt(minHeight) ? height : minHeight;
-                    inputHeight = inputHeight.lt(maxHeight) ? inputHeight : maxHeight;
-                    Logger.recordOutput("Loading/inputHeight", inputHeight.in(Inches));
-                    // setPosition(Inches.of(filter.calculate(inputHeight.in(Inches))), false);
-                    setPosition(inputHeight, false);
-                },
-                this);
-    }*/
+    public Command moveToPosition(Distance targetPosition, boolean motionMagic, Distance tolerance, Command toRun) {
+        return moveToPosition(targetPosition, motionMagic)
+                .alongWith(Commands.waitUntil(() -> getPosition().isNear(targetPosition, tolerance))
+                        .andThen(toRun));
+    }
 
     public Command moveToPosition(Distance targetPosition, boolean motionMagic) {
         return Commands.run(() -> {}, this)
