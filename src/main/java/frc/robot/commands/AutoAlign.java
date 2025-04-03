@@ -5,7 +5,10 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +30,7 @@ import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.constants.FieldConstants.Processor;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
+import frc.robot.constants.FieldConstants.StagingPositions;
 import frc.robot.subsystems.algaeIntake.AlgaeIntake;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
@@ -72,6 +76,26 @@ public class AutoAlign {
                 new DriveToPoseProfiled(drive, targetPose, linearFF),
                 new DriveToPoseRaw(drive, targetPose, linearFF),
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
+    }
+
+    public static Command alignGetStagedAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+        LockableSupplier<Pose2d> stagingPose = new LockableSupplier<>(() -> {
+            Pose2d currentPose = drive.getPose();
+            var algaePose = currentPose.nearest(StagingPositions.getAllianceStartingAlgaePoses());
+
+            var rotationOffset = new Rotation2d(Math.atan2(
+                    currentPose.getTranslation().getY()
+                            - algaePose.getTranslation().getY(),
+                    currentPose.getTranslation().getX()
+                            - algaePose.getTranslation().getX()));
+
+            return new Pose2d(algaePose.getTranslation(), rotationOffset.plus(Rotation2d.fromDegrees(180)));
+        });
+        return driveToPose(drive, () -> stagingPose.get().transformBy(new Transform2d(-0.75, 0.0, Rotation2d.kZero)))
+                .alongWith(superStructure.moveToPose(SuperStructurePose.STAGED_ALGAE))
+                .andThen(driveToPose(drive, stagingPose)
+                        .withDeadline(algaeIntake.runWithSensor(AlgaeIntakeAction.INTAKING)))
+                .deadlineFor(Commands.startEnd(() -> stagingPose.lock(), () -> stagingPose.unlock()));
     }
 
     // allow movement along coral station plane
