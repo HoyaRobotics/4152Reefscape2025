@@ -306,11 +306,11 @@ public class RobotContainer {
                     .runIntake()
                     .whileTrue(superStructure
                             .moveToPose(SuperStructurePose.LOADING)
-                            .alongWith(intake.run(IntakeAction.INTAKING)));
+                            .withDeadline(intake.runWithSensor(IntakeAction.INTAKING)));
         } else {
             driveController
                     .runIntake()
-                    .whileTrue(superStructure.moveToLoadingPose(drive).alongWith(intake.run(IntakeAction.INTAKING)));
+                    .whileTrue(superStructure.moveToLoadingPose(drive).withDeadline(intake.runWithSensor(IntakeAction.INTAKING)));
         }
 
         driveController

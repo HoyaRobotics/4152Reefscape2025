@@ -84,8 +84,8 @@ public class AutoAlign {
             // clamp y to go to closest position
             return closestStation.transformBy(new Transform2d(0.0, yOffset, Rotation2d.kZero));
         };
-        return intake.run(IntakeAction.INTAKING)
-                .alongWith(driveToPose(
+        return intake.runWithSensor(IntakeAction.INTAKING)
+                .deadlineFor(driveToPose(
                                 drive,
                                 targetPose,
                                 () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
