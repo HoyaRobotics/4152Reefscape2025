@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -36,15 +35,15 @@ public class Vision extends SubsystemBase {
     private final VisionIO[] io;
     private final VisionIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
-    private List<Boolean> ioStatus;
+    private final boolean[] ioStatus;
 
     public Vision(VisionConsumer consumer, VisionIO... io) {
         this.consumer = consumer;
         this.io = io;
 
-        this.ioStatus = Arrays.asList(new Boolean[io.length]);
+        this.ioStatus = new boolean[io.length];
         for (int i = 0; i < io.length; ++i) {
-            ioStatus.set(i, true);
+            ioStatus[i] = true;
         }
 
         // Initialize inputs
@@ -62,11 +61,11 @@ public class Vision extends SubsystemBase {
     }
 
     public void disableCamera(int cameraIndex) {
-        ioStatus.set(cameraIndex, false);
+        ioStatus[cameraIndex] = false;
     }
 
     public void enableCamera(int cameraIndex) {
-        ioStatus.set(cameraIndex, true);
+        ioStatus[cameraIndex] = true;
     }
 
     /**
@@ -85,6 +84,8 @@ public class Vision extends SubsystemBase {
             Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
         }
 
+        Logger.recordOutput("Vision/cameraStates", ioStatus);
+
         // Initialize logging values
         List<Pose3d> allTagPoses = new LinkedList<>();
         List<Pose3d> allRobotPoses = new LinkedList<>();
@@ -93,7 +94,7 @@ public class Vision extends SubsystemBase {
 
         // Loop over cameras
         for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-            if (!ioStatus.get(cameraIndex)) continue;
+            if (!ioStatus[cameraIndex]) continue;
             // Update disconnected alert
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 

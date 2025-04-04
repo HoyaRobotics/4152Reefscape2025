@@ -190,6 +190,7 @@ public class SuperStructure {
                         },
                         arm,
                         elevator)
+                // .beforeStarting(() -> vision.disableCamera(0))
                 .finallyDo(() -> vision.enableCamera(0));
     }
 
