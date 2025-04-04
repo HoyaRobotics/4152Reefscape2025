@@ -170,6 +170,8 @@ public class SuperStructure {
 
                     // xOffset = filter.calculate(xOffset);
 
+                    // start using filter once within 1 corals range??
+
                     Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
                     Logger.recordOutput("Loading/xOffset", xOffset);
 
