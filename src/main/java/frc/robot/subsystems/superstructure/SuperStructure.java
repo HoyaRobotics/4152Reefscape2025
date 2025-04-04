@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +17,7 @@ import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import frc.robot.subsystems.vision.Vision;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -142,50 +144,53 @@ public class SuperStructure {
                 });
     }
 
-    public Command moveToLoadingPose(Drive drive) {
+    public Command moveToLoadingPose(Drive drive, Vision vision) {
         // LinearFilter filter = LinearFilter.movingAverage(1);
         return Commands.run(
-                () -> {
-                    Pose2d currentPose = drive.getPose();
-                    Pose2d targetPose = CoralStation.getClosestCoralStation(currentPose);
+                        () -> {
+                            Pose2d currentPose = drive.getPose();
+                            Pose2d targetPose = CoralStation.getClosestCoralStation(currentPose);
 
-                    final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
-                    final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
-                    final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
-                    final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
+                            final Distance minHeight = SuperStructurePose.MIN_LOADING.elevatorPosition;
+                            final Distance maxHeight = SuperStructurePose.MAX_LOADING.elevatorPosition;
+                            final Angle minAngle = SuperStructurePose.MIN_LOADING.armAngle;
+                            final Angle maxAngle = SuperStructurePose.MAX_LOADING.armAngle;
 
-                    final double predictionGain = 0.12;
+                            final double predictionGain = 0.12;
 
-                    var targetRelVelocity = Math.max(
-                            0.0,
-                            DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose)
-                                    .getX());
+                            var targetRelVelocity = Math.max(
+                                    0.0,
+                                    DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose)
+                                            .getX());
 
-                    double xOffset = currentPose
-                            .relativeTo(CoralStation.getClosestCoralStation(currentPose))
-                            .getMeasureX()
-                            .minus(Meters.of(0.48))
-                            .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
-                            .abs(Inches);
+                            double xOffset = currentPose
+                                    .relativeTo(CoralStation.getClosestCoralStation(currentPose))
+                                    .getMeasureX()
+                                    .minus(Meters.of(0.48))
+                                    .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
+                                    .abs(Inches);
 
-                    // xOffset = filter.calculate(xOffset);
+                            if (xOffset < Units.metersToInches(0.5)) vision.disableCamera(0);
 
-                    // start using filter once within 1 corals range??
+                            // xOffset = filter.calculate(xOffset);
 
-                    Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
-                    Logger.recordOutput("Loading/xOffset", xOffset);
+                            // start using filter once within 1 corals range??
 
-                    Distance height = maxHeight.minus(Inches.of(xOffset * 4.5 / 4.5));
-                    Distance inputHeight = height.gt(minHeight) ? height : minHeight;
+                            Logger.recordOutput("Loading/targetRelVelocity", targetRelVelocity);
+                            Logger.recordOutput("Loading/xOffset", xOffset);
 
-                    Angle angle = maxAngle.plus(Degrees.of(xOffset * 2.5 / 4.5));
-                    Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
+                            Distance height = maxHeight.minus(Inches.of(xOffset * 4.5 / 4.5));
+                            Distance inputHeight = height.gt(minHeight) ? height : minHeight;
 
-                    elevator.setPosition(inputHeight, false);
-                    arm.setArmPosition(inputAngle);
-                },
-                arm,
-                elevator);
+                            Angle angle = maxAngle.plus(Degrees.of(xOffset * 2.5 / 4.5));
+                            Angle inputAngle = angle.lt(minAngle) ? angle : minAngle;
+
+                            elevator.setPosition(inputHeight, false);
+                            arm.setArmPosition(inputAngle);
+                        },
+                        arm,
+                        elevator)
+                .finallyDo(() -> vision.enableCamera(0));
     }
 
     public boolean isAtPosition() {

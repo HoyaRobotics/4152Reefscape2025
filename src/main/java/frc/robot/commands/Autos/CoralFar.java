@@ -16,6 +16,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import frc.robot.subsystems.vision.Vision;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -27,8 +28,9 @@ public class CoralFar extends PoserAuto {
             SuperStructure superStructure,
             Intake intake,
             AlgaeIntake algaeIntake,
-            LED leds) {
-        super(autoSide, drive, superStructure, intake, algaeIntake, leds);
+            LED leds,
+            Vision vision) {
+        super(autoSide, drive, superStructure, intake, algaeIntake, leds, vision);
     }
 
     public Command getAutoCommand() {

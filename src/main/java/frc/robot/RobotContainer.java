@@ -238,13 +238,13 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser.addOption(
                 "RightCoralClose",
-                new CoralClose(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                new CoralClose(Side.RIGHT, drive, superStructure, intake, algaeIntake, led, vision).getAutoCommand());
         autoChooser.addOption(
                 "LeftCoralClose",
-                new CoralClose(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                new CoralClose(Side.LEFT, drive, superStructure, intake, algaeIntake, led, vision).getAutoCommand());
         autoChooser.addOption(
                 "CenterAlgae",
-                new AlgaeCenter(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
+                new AlgaeCenter(Side.LEFT, drive, superStructure, intake, algaeIntake, led, vision).getAutoCommand());
         /*autoChooser.addOption(
                 "4PieceFarRight",
                 new CoralFar(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
@@ -312,14 +312,14 @@ public class RobotContainer {
             driveController
                     .runIntake()
                     .whileTrue(superStructure
-                            .moveToLoadingPose(drive)
+                            .moveToLoadingPose(drive, vision)
                             .withDeadline(intake.runWithSensor(IntakeAction.INTAKING)));
         }
 
         driveController
                 .runIntakeAlign()
-                .whileTrue(
-                        AutoAlign.alignAndReceiveCoral(drive, superStructure, led, intake, driveController.driveY()));
+                .whileTrue(AutoAlign.alignAndReceiveCoral(
+                        drive, superStructure, led, intake, driveController.driveY(), vision));
 
         switch (Constants.intakeVersion) {
             case V1:
@@ -346,7 +346,9 @@ public class RobotContainer {
         // we want the rotation of the robot to be such that the algae intake is facing into the staging algae
 
         // we want the rotation of the robot relative to the algae to be
-        driveController.getStagedAlgae().whileTrue(AutoAlign.alignGetStagedAlgae(drive, superStructure, algaeIntake));
+        driveController
+                .getStagedAlgae()
+                .whileTrue(AutoAlign.alignGetStagedAlgae(drive, superStructure, algaeIntake, led));
 
         // auto place on last button clicked
         /*

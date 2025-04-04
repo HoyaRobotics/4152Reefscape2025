@@ -41,6 +41,7 @@ import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.LockableSupplier;
 import frc.robot.util.PoseUtils;
@@ -78,7 +79,8 @@ public class AutoAlign {
                 () -> DriverStation.isAutonomous() ? Constants.AutoMotionProfiling : Constants.TeleopMotionProfiling);
     }
 
-    public static Command alignGetStagedAlgae(Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake) {
+    public static Command alignGetStagedAlgae(
+            Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake, LED leds) {
         LockableSupplier<Pose2d> stagingPose = new LockableSupplier<>(() -> {
             Pose2d currentPose = drive.getPose();
             var algaePose = currentPose.nearest(StagingPositions.getAllianceStartingAlgaePoses());
@@ -91,8 +93,12 @@ public class AutoAlign {
 
             return new Pose2d(algaePose.getTranslation(), rotationOffset.plus(Rotation2d.fromDegrees(180)));
         });
-        return driveToPose(drive, () -> stagingPose.get().transformBy(new Transform2d(-0.75, 0.0, Rotation2d.kZero)))
-                .until(() -> PoseUtils.poseInRange(drive::getPose, stagingPose, Inches.of(5.0))
+
+        Supplier<Pose2d> movingPose =
+                () -> stagingPose.get().transformBy(new Transform2d(-0.75, 0.0, Rotation2d.kZero));
+
+        return driveToPose(drive, movingPose)
+                .until(() -> PoseUtils.poseInRange(drive::getPose, movingPose, Inches.of(5.0))
                         && drive.getPose()
                                 .getRotation()
                                 .getMeasure()
@@ -100,12 +106,14 @@ public class AutoAlign {
                 .alongWith(superStructure.moveToPose(SuperStructurePose.STAGED_ALGAE))
                 .andThen(driveToPose(drive, stagingPose)
                         .withDeadline(algaeIntake.runWithSensor(AlgaeIntakeAction.INTAKING)))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .deadlineFor(Commands.startEnd(() -> stagingPose.lock(), () -> stagingPose.unlock()));
     }
 
     // allow movement along coral station plane
     public static Command alignAndReceiveCoral(
-            Drive drive, SuperStructure superStructure, LED leds, Intake intake, DoubleSupplier inputY) {
+            Drive drive, SuperStructure superStructure, LED leds, Intake intake, DoubleSupplier inputY, Vision vision) {
         Supplier<Pose2d> targetPose = () -> {
             Pose2d closestStation =
                     CoralStation.offsetCoralStationPose(CoralStation.getClosestCoralStation(drive.getPose()));
@@ -121,7 +129,7 @@ public class AutoAlign {
                                 targetPose,
                                 () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
                         .deadlineFor((Commands.either(
-                                superStructure.moveToLoadingPose(drive),
+                                superStructure.moveToLoadingPose(drive, vision),
                                 superStructure.moveToPose(SuperStructurePose.LOADING),
                                 () -> Constants.useVariableIntakeHeight))))
                 .deadlineFor(Commands.startEnd(

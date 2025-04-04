@@ -25,6 +25,7 @@ import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.PoseUtils;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -44,6 +45,7 @@ public abstract class PoserAuto {
     protected final Intake intake;
     protected final AlgaeIntake algaeIntake;
     protected final LED leds;
+    protected final Vision vision;
 
     protected final Side autoSide;
 
@@ -53,13 +55,15 @@ public abstract class PoserAuto {
             SuperStructure superStructure,
             Intake intake,
             AlgaeIntake algaeIntake,
-            LED leds) {
+            LED leds,
+            Vision vision) {
         this.autoSide = autoSide;
         this.drive = drive;
         this.superStructure = superStructure;
         this.intake = intake;
         this.algaeIntake = algaeIntake;
         this.leds = leds;
+        this.vision = vision;
     }
 
     protected int sideRelativeIndex(int rightFaceIndex) {
@@ -135,7 +139,7 @@ public abstract class PoserAuto {
                                 .arm
                                 .moveToAngle(SuperStructurePose.BASE.armAngle)
                                 .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false))
-                                .andThen(superStructure.moveToLoadingPose(drive))))
+                                .andThen(superStructure.moveToLoadingPose(drive, vision))))
                 .andThen(() -> intake.stopIntake());
     }
 }

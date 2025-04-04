@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -35,10 +36,16 @@ public class Vision extends SubsystemBase {
     private final VisionIO[] io;
     private final VisionIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
+    private List<Boolean> ioStatus;
 
     public Vision(VisionConsumer consumer, VisionIO... io) {
         this.consumer = consumer;
         this.io = io;
+
+        this.ioStatus = Arrays.asList(new Boolean[io.length]);
+        for (int i = 0; i < io.length; ++i) {
+            ioStatus.set(i, true);
+        }
 
         // Initialize inputs
         this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -52,6 +59,14 @@ public class Vision extends SubsystemBase {
             disconnectedAlerts[i] =
                     new Alert("Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
         }
+    }
+
+    public void disableCamera(int cameraIndex) {
+        ioStatus.set(cameraIndex, false);
+    }
+
+    public void enableCamera(int cameraIndex) {
+        ioStatus.set(cameraIndex, true);
     }
 
     /**
@@ -78,6 +93,7 @@ public class Vision extends SubsystemBase {
 
         // Loop over cameras
         for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+            if (!ioStatus.get(cameraIndex)) continue;
             // Update disconnected alert
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 

@@ -17,6 +17,8 @@ public class LED extends SubsystemBase {
 
     private LEDState currentState = LEDState.NOTHING;
 
+    // add color for moving pose
+    // alert colors for match time events
     public enum LEDState {
         NOTHING,
         HOLDING_CORAL,
