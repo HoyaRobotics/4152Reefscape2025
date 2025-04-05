@@ -168,9 +168,11 @@ public class SuperStructure {
                                     .getMeasureX()
                                     .minus(Meters.of(0.48))
                                     .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
-                                    .abs(Inches);
+                                    .in(Inches);
 
-                            if (xOffset < Units.metersToInches(0.5)) vision.disableCamera(0);
+                            xOffset = Math.max(0.0, xOffset);
+
+                            if (xOffset < Units.metersToInches(1.25)) vision.disableCamera(0);
 
                             // xOffset = filter.calculate(xOffset);
 
