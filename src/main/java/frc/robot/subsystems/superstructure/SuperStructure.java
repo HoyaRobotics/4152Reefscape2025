@@ -44,7 +44,7 @@ public class SuperStructure {
         TROUGH(Inches.of(7.5), Degrees.of(-60)),
         POST_TROUGH(Inches.of(12), Degrees.of(-60)),
         POST_POST_TROUGH(Inches.of(16.75), Degrees.of(-60)),
-        STAGED_ALGAE(Inches.of(0.0), Degrees.of(5)),
+        STAGED_ALGAE(Inches.of(0.0), Degrees.of(2)),
         // TROUGH(Inches.of(0), Degrees.of(135)),
         // POST_TROUGH(Inches.of(0), Degrees.of(110)),
         // TROUGH(Inches.of(0), Degrees.of(120)),
