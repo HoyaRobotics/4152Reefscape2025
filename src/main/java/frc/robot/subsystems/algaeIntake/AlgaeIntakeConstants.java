@@ -16,8 +16,8 @@ public class AlgaeIntakeConstants {
         // (44/8) * (30/15) gear ratio max speed is 9.09 rps
         // (30/11) gear ratio max speed is 36.66 rps
         // (48/11) gear ratio max speed is 22.91 rps
-        HOLDING(Amps.of(50), RevolutionsPerSecond.of(9.0)), // 60, 15
-        INTAKING(Amps.of(50), RevolutionsPerSecond.of(9.0)), // 60, 15
+        HOLDING(Amps.of(40), RevolutionsPerSecond.of(9.0)), // 60, 15
+        INTAKING(Amps.of(40), RevolutionsPerSecond.of(9.0)), // 60, 15
         PROCESSOR(Amps.of(10), RevolutionsPerSecond.of(-8.0)), // 10, -8
         NET(Amps.of(30), RevolutionsPerSecond.of(-6.0)), // 40, -22
         EMPTY(Amps.of(10), RevolutionsPerSecond.of(0)); // 0, 0

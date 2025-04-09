@@ -44,7 +44,7 @@ public class SuperStructure {
         TROUGH(Inches.of(7.5), Degrees.of(-60)),
         POST_TROUGH(Inches.of(12), Degrees.of(-60)),
         POST_POST_TROUGH(Inches.of(16.75), Degrees.of(-60)),
-        STAGED_ALGAE(Inches.of(0.0), Degrees.of(5)),
+        STAGED_ALGAE(Inches.of(0.0), Degrees.of(2)),
         // TROUGH(Inches.of(0), Degrees.of(135)),
         // POST_TROUGH(Inches.of(0), Degrees.of(110)),
         // TROUGH(Inches.of(0), Degrees.of(120)),
@@ -168,9 +168,11 @@ public class SuperStructure {
                                     .getMeasureX()
                                     .minus(Meters.of(0.48))
                                     .minus(Meters.of(Math.abs(targetRelVelocity) * predictionGain))
-                                    .abs(Inches);
+                                    .in(Inches);
 
-                            if (xOffset < Units.metersToInches(0.5)) vision.disableCamera(0);
+                            xOffset = Math.max(0.0, xOffset);
+
+                            if (xOffset < Units.metersToInches(1.25)) vision.disableCamera(0);
 
                             // xOffset = filter.calculate(xOffset);
 

@@ -56,8 +56,8 @@ public class AlgaeCommands {
                     SuperStructurePose prePose = algaePoses.get(0);
                     return superStructure
                             .moveToPose(prePose)
-                            .until(() -> superStructure.arm.withinTolerance(prePose.armAngle, Degrees.of(5))) // 5
-                            .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
+                            .until(() -> superStructure.arm.withinTolerance(prePose.armAngle, Degrees.of(5))); // 5
+                    // .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING));
                 },
                 Set.of(superStructure.arm, superStructure.elevator));
     }

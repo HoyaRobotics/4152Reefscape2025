@@ -91,21 +91,24 @@ public class AutoAlign {
                     currentPose.getTranslation().getX()
                             - algaePose.getTranslation().getX()));
 
-            return new Pose2d(algaePose.getTranslation(), rotationOffset.plus(Rotation2d.fromDegrees(180)));
+            return new Pose2d(algaePose.getTranslation(), rotationOffset.plus(Rotation2d.fromDegrees(180)))
+                    .transformBy(new Transform2d(-0.25, 0.0, Rotation2d.kZero));
         });
 
         Supplier<Pose2d> movingPose =
                 () -> stagingPose.get().transformBy(new Transform2d(-0.75, 0.0, Rotation2d.kZero));
 
         return driveToPose(drive, movingPose)
-                .until(() -> PoseUtils.poseInRange(drive::getPose, movingPose, Inches.of(5.0))
+                .until(() -> PoseUtils.poseInRange(drive::getPose, movingPose, Inches.of(0.5))
                         && drive.getPose()
                                 .getRotation()
                                 .getMeasure()
-                                .isNear(stagingPose.get().getRotation().getMeasure(), Degrees.of(8)))
+                                .isNear(movingPose.get().getRotation().getMeasure(), Degrees.of(5)))
                 .alongWith(superStructure.moveToPose(SuperStructurePose.STAGED_ALGAE))
-                .andThen(driveToPose(drive, stagingPose)
-                        .withDeadline(algaeIntake.runWithSensor(AlgaeIntakeAction.INTAKING)))
+                .andThen(driveToPose(drive, stagingPose))
+                .withDeadline(algaeIntake
+                        .runWithSensor(AlgaeIntakeAction.INTAKING)
+                        .andThen(algaeIntake.run(AlgaeIntakeAction.INTAKING).withTimeout(0.2)))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .deadlineFor(Commands.startEnd(() -> stagingPose.lock(), () -> stagingPose.unlock()));
@@ -128,10 +131,10 @@ public class AutoAlign {
                                 drive,
                                 targetPose,
                                 () -> DriveCommands.getLinearVelocityFromJoysticks(0.0, inputY.getAsDouble()))
-                        .deadlineFor((Commands.either(
+                        .alongWith(Commands.either(
                                 superStructure.moveToLoadingPose(drive, vision),
                                 superStructure.moveToPose(SuperStructurePose.LOADING),
-                                () -> Constants.useVariableIntakeHeight))))
+                                () -> Constants.useVariableIntakeHeight)))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
@@ -193,12 +196,14 @@ public class AutoAlign {
                                 .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         Commands.waitUntil(startSuperStructure),
-                                        Commands.runOnce(() -> leds.requestState(LEDState.PLACING)),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
+                        Commands.runOnce(() -> leds.requestState(LEDState.PLACING)),
                         PlacingCommands.reefPlacingSequence(
                                 superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false))
+                // some kind of wait condition to minimize jerkiness when picking algae
+                // autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty()))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .finallyDo(() -> targetPose.unlock())
@@ -244,6 +249,7 @@ public class AutoAlign {
                                 .deadlineFor(driveToPose(drive, offsetPose)),
                         driveToPose(drive, grabPose),
                         driveToPose(drive, offsetPose))
+                .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }

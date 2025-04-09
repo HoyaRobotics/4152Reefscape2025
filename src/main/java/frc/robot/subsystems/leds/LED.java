@@ -7,6 +7,7 @@ package frc.robot.subsystems.leds;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,7 +26,8 @@ public class LED extends SubsystemBase {
         ALIGNING,
         AUTO,
         PLACING,
-        EMPTY
+        EMPTY,
+        DISABLED
     }
 
     /** Creates a new LED. */
@@ -63,6 +65,8 @@ public class LED extends SubsystemBase {
             case HOLDING_CORAL -> leds.setLEDs(0, 255, 0);
             case ALIGNING -> leds.animate(new RainbowAnimation(1.0, 0.5, 64));
             case PLACING -> leds.animate(new SingleFadeAnimation(0, 0, 255, 0, 1.0, 64));
+            case DISABLED -> leds.animate(
+                    new LarsonAnimation(0, 0, 255, 0, 0.5, 64 - 8, LarsonAnimation.BounceMode.Center, 8, 8));
             default -> {}
         }
         currentState = nextState;
