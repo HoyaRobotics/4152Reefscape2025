@@ -64,6 +64,9 @@ import frc.robot.subsystems.intake.IntakeIORealV1;
 import frc.robot.subsystems.intake.IntakeIORealV2;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.leds.LED;
+import frc.robot.subsystems.leds.LedIO;
+import frc.robot.subsystems.leds.LedIOReal;
+import frc.robot.subsystems.leds.LedIOSim;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
@@ -100,7 +103,7 @@ public class RobotContainer {
     public final AlgaeIntake algaeIntake;
     public final Climber climber;
     public final SuperStructure superStructure;
-    public final LED led = new LED();
+    public final LED led;
 
     public final DriverXbox driveController = new DriverXbox(0);
 
@@ -113,6 +116,7 @@ public class RobotContainer {
     public RobotContainer() {
         switch (Constants.currentMode) {
             case REAL:
+                led = new LED(new LedIOReal());
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIOPigeon2(),
@@ -143,6 +147,7 @@ public class RobotContainer {
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
 
+                led = new LED(new LedIOSim());
                 driveSimulation = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 drive = new Drive(
@@ -215,6 +220,7 @@ public class RobotContainer {
                 break;
 
             default:
+                led = new LED(new LedIO() {});
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
                         new GyroIO() {},

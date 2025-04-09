@@ -9,12 +9,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.AutoAlign;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
-
-import java.lang.StackWalker.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +28,7 @@ import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -135,6 +139,22 @@ public class CoralPlanner extends SubsystemBase {
         return new CoralObjective(faceIndex, branchSide, superStructurePose);
     }
 
+    public Command getPathCommand(Drive drive, Supplier<Pose2d> drivePose) {
+        return Commands.defer(() -> {
+            List<Pose2d> path = dijkstraPath(drivePose.get());
+
+            if (path.isEmpty())
+                return Commands.none();
+
+            SequentialCommandGroup command = new SequentialCommandGroup();
+            path.stream()
+                .forEach(pose ->
+                    command.addCommands(AutoAlign.driveToPose(drive, () -> pose)));
+
+            return command;
+        }, Set.of(drive));
+    }
+
     public List<Pose2d> dijkstraPath(Pose2d drivePose) {
         if (currentObjective.isEmpty()) {
             return List.of();
@@ -164,9 +184,9 @@ public class CoralPlanner extends SubsystemBase {
         Side finalSide = currentObjective.get().branchSide;
 
         Node targetNode = graph.stream()
-                .filter(node -> node.getPose().equals(
-                    Reef.getAllianceReefBranch(finalFace, Side.CENTER)
-                        .transformBy(new Transform2d(1.0, 0.0, Rotation2d.kZero))))
+                .filter(node -> node.getPose()
+                        .equals(Reef.getAllianceReefBranch(finalFace, Side.CENTER)
+                                .transformBy(new Transform2d(1.0, 0.0, Rotation2d.kZero))))
                 .findFirst()
                 .get();
 
