@@ -12,17 +12,16 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
-import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 
+import java.lang.StackWalker.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -42,21 +41,21 @@ public class CoralPlanner extends SubsystemBase {
 
     // undirected, weighted, cyclic graph
     private Set<Node> graph = Reef.getAllianceReefList().stream()
+            .map(pose -> Reef.offsetReefPose(pose, Side.CENTER))
             .flatMap(pose -> Stream.of(
                     new Node(pose.transformBy(new Transform2d(1.0, 0.5, Rotation2d.kZero))),
                     new Node(pose.transformBy(new Transform2d(1.0, 0.0, Rotation2d.kZero))),
                     new Node(pose.transformBy(new Transform2d(1.0, -0.5, Rotation2d.kZero)))))
             .collect(Collectors.toSet());
-    
-    public record CoralObjective (Pose2d drivePose, SuperStructurePose superStructurePose) {}
 
-    private CoralObjective currentObjective = new CoralObjective(new Pose2d(), SuperStructurePose.BASE);
+    public record CoralObjective(int faceIndex, Side branchSide, SuperStructurePose superStructurePose) {}
+
+    private Optional<CoralObjective> currentObjective = Optional.empty();
 
     public class Node {
         private Pose2d pose;
         private Double distance = Double.MAX_VALUE;
         private Node prev;
-        private List<Node> shortestPath = new LinkedList<>();
         private Map<Node, Double> adjacentNodes = new HashMap<>();
 
         public Node(Pose2d pose) {
@@ -116,7 +115,7 @@ public class CoralPlanner extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        currentObjective = getOpObjective();
+        currentObjective = Optional.of(getOpObjective());
     }
 
     private CoralObjective getOpObjective() {
@@ -130,26 +129,53 @@ public class CoralPlanner extends SubsystemBase {
             case 'T' -> superStructurePose = SuperStructurePose.L4;
             case 'M' -> superStructurePose = SuperStructurePose.L3;
             case 'B' -> superStructurePose = SuperStructurePose.L2;
-        };
+        }
+        ;
 
-        return new CoralObjective(Reef.getAllianceReefBranch(faceIndex, branchSide),
-            superStructurePose);
+        return new CoralObjective(faceIndex, branchSide, superStructurePose);
     }
 
     public List<Pose2d> dijkstraPath(Pose2d drivePose) {
-        Node sourceNode = graph.stream().min(Comparator.comparing(
-            node -> ((Node) node).getPose().getTranslation().getDistance(drivePose.getTranslation())))
+        if (currentObjective.isEmpty()) {
+            return List.of();
+        }
+
+        Node sourceNode = graph.stream()
+                .min(Comparator.comparing(
+                        node -> ((Node) node).getPose().getTranslation().getDistance(drivePose.getTranslation())))
                 .get();
-        
-        Node targetNode = graph.stream().filter(node -> node.getPose().equals(currentObjective.drivePose))
-            .findFirst().get();
-        
+
+        // final node will be the target face, extended by like 1 meter
+        //
+        //            L     T     R
+        //               /  |  \
+        //              /   |   \
+        //             *    *    *
+        //            --------------
+        //           /              \
+        //          /                \
+        //         /                  \
+        //         \                  /
+        //          \                /
+        //           \              /
+        //            --------------
+
+        int finalFace = currentObjective.get().faceIndex;
+        Side finalSide = currentObjective.get().branchSide;
+
+        Node targetNode = graph.stream()
+                .filter(node -> node.getPose().equals(
+                    Reef.getAllianceReefBranch(finalFace, Side.CENTER)
+                        .transformBy(new Transform2d(1.0, 0.0, Rotation2d.kZero))))
+                .findFirst()
+                .get();
+
         sourceNode.setDistance(0.0);
 
         Queue<Node> toVisit = new PriorityQueue<>(Collections.singleton(sourceNode));
 
         // keep track of path
-        while (! toVisit.isEmpty()) {
+        while (!toVisit.isEmpty()) {
             Node currentNode = toVisit.poll();
 
             for (var entry : currentNode.getAdjacentNodes().entrySet()) {
@@ -169,13 +195,15 @@ public class CoralPlanner extends SubsystemBase {
         Node currentNode = targetNode;
 
         List<Pose2d> finalPath = new ArrayList<>();
+        finalPath.add(Reef.getAllianceReefBranch(finalFace, finalSide));
+
         while (currentNode != sourceNode) {
             finalPath.add(currentNode.getPose());
             currentNode = currentNode.prev;
         }
+        finalPath.add(sourceNode.getPose());
 
         Collections.reverse(finalPath);
         return finalPath;
     }
-
 }
