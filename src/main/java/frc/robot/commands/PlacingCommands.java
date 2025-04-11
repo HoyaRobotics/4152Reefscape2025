@@ -24,24 +24,28 @@ public class PlacingCommands {
             LED leds,
             Supplier<SuperStructurePose> currentPose,
             boolean isAuto) {
-        return Commands.sequence(
-                        Commands.waitSeconds(L2DelaySeconds)
-                                .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
-                                        || currentPose.get() == SuperStructurePose.L3),
-                        intake.runWithSensor(IntakeAction.PLACING),
-                        Commands.either(
-                                        superStructure
-                                                .arm
-                                                .moveToAngle(SuperStructurePose.BASE.armAngle)
-                                                .until(() -> superStructure.arm.isPastPosition(Degrees.of(130), false)),
-                                        superStructure.arm.moveToAngle(Degrees.of(103)),
-                                        () -> isAuto)
-                                .deadlineFor(Commands.defer(
-                                        (() -> intake.run(
-                                                currentPose.get() == SuperStructurePose.L4
-                                                        ? IntakeAction.PLACING_L4
-                                                        : IntakeAction.PLACING)),
-                                        Set.of(intake))))
+        return Commands.either(
+                        Commands.sequence(
+                                Commands.waitSeconds(L2DelaySeconds)
+                                        .onlyIf(() -> currentPose.get() == SuperStructurePose.L2
+                                                || currentPose.get() == SuperStructurePose.L3),
+                                intake.runWithSensor(IntakeAction.PLACING),
+                                Commands.either(
+                                                superStructure
+                                                        .arm
+                                                        .moveToAngle(SuperStructurePose.BASE.armAngle)
+                                                        .until(() -> superStructure.arm.isPastPosition(
+                                                                Degrees.of(130), false)),
+                                                superStructure.arm.moveToAngle(Degrees.of(103)),
+                                                () -> isAuto)
+                                        .deadlineFor(Commands.defer(
+                                                (() -> intake.run(
+                                                        currentPose.get() == SuperStructurePose.L4
+                                                                ? IntakeAction.PLACING_L4
+                                                                : IntakeAction.PLACING)),
+                                                Set.of(intake)))),
+                        troughPlacingSequence(superStructure, intake, () -> true),
+                        () -> currentPose.get() != SuperStructurePose.TROUGH)
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.PLACING), () -> leds.requestState(LEDState.NOTHING)));
     }

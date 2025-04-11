@@ -10,12 +10,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -51,6 +45,11 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.LockableSupplier;
 import frc.robot.util.PoseUtils;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
@@ -165,7 +164,7 @@ public class AutoAlign {
             return rightCloser ? Side.RIGHT : Side.LEFT;
         };
 
-        final Side[] branchSide = { null };
+        final Side[] branchSide = {null};
 
         Supplier<Pose2d> targetPose = () -> {
             // update branch side based on user input
@@ -188,6 +187,15 @@ public class AutoAlign {
 
             if (branchSide[0] == null) {
                 branchSide[0] = closestBranch.get();
+            }
+
+            if (superStructurePose == SuperStructurePose.TROUGH) {
+                var reefCorner = Reef.offsetReefPose(closestFace, Side.CENTER)
+                        .transformBy(
+                                branchSide[0] == Side.RIGHT
+                                        ? new Transform2d(0.1, 0.175, Rotation2d.fromDegrees(-15 + 180))
+                                        : new Transform2d(0.1, -0.175, Rotation2d.fromDegrees(15 + 180)));
+                return reefCorner;
             }
 
             return Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), branchSide[0]);
