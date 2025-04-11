@@ -10,6 +10,12 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -45,11 +51,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.LockableSupplier;
 import frc.robot.util.PoseUtils;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
@@ -147,16 +148,39 @@ public class AutoAlign {
             LED leds,
             DoubleSupplier inputY) {
 
-        final double SelectSideMagnitude = 1.0;
-        // auto align to closest branch
-        final Side[] branchSide = { Side.CENTER };
+        final double SelectSideMagnitude = 0.5;
+
+        Supplier<Side> closestBranch = () -> {
+                var currentPose = drive.getPose();
+                var closestFace = currentPose.nearest(Reef.getAllianceReefList());
+
+                boolean rightCloser = currentPose.getTranslation()
+                        .getDistance(Reef.offsetReefPose(closestFace, Side.RIGHT).getTranslation())
+                        < currentPose.getTranslation().getDistance(Reef.offsetReefPose(closestFace, Side.LEFT).getTranslation());
+                return rightCloser ? Side.RIGHT : Side.LEFT;
+        };
+
+        final Side[] branchSide = { closestBranch.get() };
 
         Supplier<Pose2d> targetPose = () -> {
             // update branch side based on user input
             double yScale = inputY.getAsDouble();
 
+            var closestFace = drive.getPose()
+                .nearest(Reef.getAllReefLists());
+            var closestIndex = Reef.getAllianceReefList()
+                .indexOf(closestFace);
+
+            // faces 4, 3 and 2 are on the far side from the driver
+            // this will be different from the drivers perspective depending on
+            // what side of the reef we are on, just check using the closest face index
             if (Math.abs(yScale) > SelectSideMagnitude) {
-                branchSide[0] = yScale > 0 ? Side.RIGHT : Side.LEFT;
+                // we are on the far side of the reef
+                if (closestIndex >= 2 && closestIndex <= 4) {
+                        branchSide[0] = yScale > 0 ? Side.RIGHT : Side.LEFT;
+                } else {
+                        branchSide[0] = yScale > 0 ? Side.LEFT : Side.RIGHT;
+                }
             }
 
             return Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), branchSide[0]);
