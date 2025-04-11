@@ -140,12 +140,39 @@ public class AutoAlign {
     }
 
     public static Command autoAlignAndPlace(
+            Drive drive,
+            SuperStructure superStructure,
+            SuperStructurePose superStructurePose,
+            Intake intake,
+            LED leds,
+            DoubleSupplier inputY) {
+
+        final double SelectSideMagnitude = 1.0;
+        // auto align to closest branch
+        final Side[] branchSide = { Side.CENTER };
+
+        Supplier<Pose2d> targetPose = () -> {
+            // update branch side based on user input
+            double yScale = inputY.getAsDouble();
+
+            if (Math.abs(yScale) > SelectSideMagnitude) {
+                branchSide[0] = yScale > 0 ? Side.RIGHT : Side.LEFT;
+            }
+
+            return Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), branchSide[0]);
+        };
+
+        // reduce drive velocity based on elevator height
+
+        return autoAlignAndPlace(drive, superStructure, intake, leds, () -> superStructurePose, targetPose);
+    }
+
+    public static Command autoAlignAndPlace(
             DriveMap driveController,
             Drive drive,
             SuperStructure superStructure,
             Intake intake,
             Side side,
-            AlgaeIntake algaeIntake,
             LED leds,
             DoubleSupplier inputX,
             DoubleSupplier inputY) {
@@ -153,38 +180,47 @@ public class AutoAlign {
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         buttonWatcher.selectedPose = Optional.of(SuperStructurePose.L4);
 
-        Supplier<Pose2d> targetPose = () -> Reef.offsetReefPose(drive.getPose()
-                .nearest(Reef.getAllianceReefList()),
-                side);
+        Supplier<Pose2d> targetPose =
+                () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), side);
 
+        return autoAlignAndPlace(drive, superStructure, intake, leds, buttonWatcher::getSelectedPose, targetPose);
+    }
+
+    public static Command autoAlignAndPlace(
+            Drive drive,
+            SuperStructure superStructure,
+            Intake intake,
+            LED leds,
+            Supplier<SuperStructurePose> superPose,
+            Supplier<Pose2d> targetPose) {
         BooleanSupplier startSuperStructure = () -> {
-            final boolean superstructureLow = buttonWatcher.getSelectedPose() == SuperStructurePose.L2
-                    || buttonWatcher.getSelectedPose() == SuperStructurePose.L3;
+            var targetSuperPose = superPose.get();
+            var finalPose = targetPose.get();
+            final boolean superstructureLow =
+                    targetSuperPose == SuperStructurePose.L2 || targetSuperPose == SuperStructurePose.L3;
 
             final boolean horizontalVelocitySlow =
-                    Math.abs(DriveCommands.getTargetRelativeLinearVelocity(drive, targetPose.get())
+                    Math.abs(DriveCommands.getTargetRelativeLinearVelocity(drive, finalPose)
                                     .getY())
                             < HorizontalVelocityRisingTolerance.in(MetersPerSecond);
 
             final boolean mostlyRotated = drive.getPose()
                     .getRotation()
                     .getMeasure()
-                    .isNear(targetPose.get().getRotation().getMeasure(), AngleDifferenceRisingTolerance);
+                    .isNear(finalPose.getRotation().getMeasure(), AngleDifferenceRisingTolerance);
 
             return PoseUtils.poseInRange(drive::getPose, targetPose, StartSuperStructureRange)
                     && (superstructureLow || (horizontalVelocitySlow && mostlyRotated));
         };
-
         return Commands.sequence(
                         driveToPose(drive, targetPose)
                                 .alongWith(Commands.sequence(
                                         Commands.waitUntil(startSuperStructure),
                                         Commands.defer(
-                                                () -> superStructure.moveToPose(buttonWatcher.getSelectedPose()),
+                                                () -> superStructure.moveToPose(superPose.get()),
                                                 Set.of(superStructure.arm, superStructure.elevator)))),
                         Commands.runOnce(() -> leds.requestState(LEDState.PLACING)),
-                        PlacingCommands.reefPlacingSequence(
-                                superStructure, intake, leds, () -> buttonWatcher.getSelectedPose(), false))
+                        PlacingCommands.reefPlacingSequence(superStructure, intake, leds, superPose, false))
                 // some kind of wait condition to minimize jerkiness when picking algae
                 // autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty()))
                 .deadlineFor(Commands.startEnd(

@@ -362,6 +362,15 @@ public class RobotContainer {
         driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
         */
+        driveController.moveToL4(false)
+                .whileTrue(AutoAlign.autoAlignAndPlace(drive, superStructure, SuperStructurePose.L4, intake, led,
+                        driveController.driveY()));
+        driveController.moveToL3(false)
+                .whileTrue(AutoAlign.autoAlignAndPlace(drive, superStructure, SuperStructurePose.L3, intake, led,
+                        driveController.driveY()));
+        driveController.moveToL2(false)
+                .whileTrue(AutoAlign.autoAlignAndPlace(drive, superStructure, SuperStructurePose.L2, intake, led,
+                        driveController.driveY()));
 
         driveController
                 .moveToTrough(false)
@@ -387,7 +396,6 @@ public class RobotContainer {
                         superStructure,
                         intake,
                         Side.LEFT,
-                        algaeIntake,
                         led,
                         driveController.driveX(),
                         driveController.driveY()));
@@ -400,7 +408,6 @@ public class RobotContainer {
                         superStructure,
                         intake,
                         Side.RIGHT,
-                        algaeIntake,
                         led,
                         driveController.driveX(),
                         driveController.driveY()));
