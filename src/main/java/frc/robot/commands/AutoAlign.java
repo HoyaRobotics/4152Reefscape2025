@@ -153,25 +153,9 @@ public class AutoAlign {
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         buttonWatcher.selectedPose = Optional.of(SuperStructurePose.L4);
 
-        LockableSupplier<Pose2d> targetPose = new LockableSupplier<>(() -> {
-            var reefFaces = Reef.getAllianceReefList();
-            var closestFace = drive.getPose().nearest(reefFaces);
-            var closestIndex = reefFaces.indexOf(closestFace);
-
-            var horizontalVelocity = DriveCommands.getTargetRelativeLinearVelocity(drive, closestFace)
-                    .getY();
-
-            if (Math.abs(horizontalVelocity) < HorizontalVelocityPredictionTolerance
-                    || drive.getPose()
-                                    .getTranslation()
-                                    .getDistance(Reef.offsetReefPose(closestFace, side)
-                                            .getTranslation())
-                            < LockingDistance.in(Meters)) return Reef.offsetReefPose(closestFace, side);
-
-            return horizontalVelocity > 0
-                    ? Reef.getAllianceReefBranch(closestIndex == 5 ? 0 : closestIndex + 1, side)
-                    : Reef.getAllianceReefBranch(closestIndex == 0 ? 5 : closestIndex - 1, side);
-        });
+        Supplier<Pose2d> targetPose = () -> Reef.offsetReefPose(drive.getPose()
+                .nearest(Reef.getAllianceReefList()),
+                side);
 
         BooleanSupplier startSuperStructure = () -> {
             final boolean superstructureLow = buttonWatcher.getSelectedPose() == SuperStructurePose.L2
@@ -193,7 +177,6 @@ public class AutoAlign {
 
         return Commands.sequence(
                         driveToPose(drive, targetPose)
-                                .beforeStarting(() -> targetPose.lock())
                                 .alongWith(Commands.sequence(
                                         Commands.waitUntil(startSuperStructure),
                                         Commands.defer(
@@ -206,7 +189,6 @@ public class AutoAlign {
                 // autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty()))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
-                .finallyDo(() -> targetPose.unlock())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
