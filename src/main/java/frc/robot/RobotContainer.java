@@ -163,12 +163,7 @@ public class RobotContainer {
                 // elevator = new Elevator(new ElevatorIOAdvancedSim());
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
-                // intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
-                intake = new Intake(
-                        // 0 angle is horizontal?
-                        // -113.5 + 90 + 15 = -8.5
-                        // intake is also at a 15 degree angle from the arm
-                        new IntakeIOSim(driveSimulation, elevator, arm), elevator, arm, led);
+                intake = new Intake(new IntakeIOSim(driveSimulation, elevator, arm), elevator, arm, led);
                 algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim());
                 climber = new Climber(new ClimberIOSim());
                 break;

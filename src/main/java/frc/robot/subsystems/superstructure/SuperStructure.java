@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.constants.FieldConstants.CoralStation;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
