@@ -20,15 +20,15 @@ public class ClimberIOSim implements ClimberIO {
     public ClimberIOSim() {
         climberSim = new SingleJointedArmSim(
                 DCMotor.getNeoVortex(1),
-                251.8519,
+                805.9259,
                 0.16931712,
                 0.28778209,
-                Rotations.of(-0.26).in(Radians),
+                Rotations.of(-0.05).in(Radians),
                 Rotations.of(0.3).in(Radians),
                 false,
-                Rotations.of(-0.25).in(Radians));
+                Rotations.of(0.0).in(Radians));
         climberController.setTolerance(2.0);
-        setAngle(Rotations.of(-0.25), true);
+        setAngle(Rotations.of(0.0), true);
     }
 
     @Override
