@@ -123,7 +123,7 @@ public class RobotContainer {
                         intake = new Intake(new IntakeIORealV2(), elevator, arm, led);
                         break;
                 }
-                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOReal());
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOReal(), elevator, arm);
                 climber = new Climber(new ClimberIOReal());
 
                 vision = new Vision(
@@ -163,7 +163,7 @@ public class RobotContainer {
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 intake = new Intake(new IntakeIOSim(driveSimulation, elevator, arm), elevator, arm, led);
-                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim());
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim(driveSimulation), elevator, arm);
                 climber = new Climber(new ClimberIOSim());
                 break;
 
@@ -181,7 +181,7 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorIO() {});
                 arm = new Arm(new ArmIO() {}, elevator);
                 intake = new Intake(new IntakeIO() {}, elevator, arm, led);
-                algaeIntake = new AlgaeIntake(new AlgaeIntakeIO() {});
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIO() {}, elevator, arm);
                 climber = new Climber(new ClimberIO() {});
                 break;
         }
@@ -393,6 +393,8 @@ public class RobotContainer {
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
 
         intake.visualizeCoralInIntake(
+                driveSimulation == null ? drive.getPose() : driveSimulation.getSimulatedDriveTrainPose());
+        algaeIntake.visualizeAlgaeInIntake(
                 driveSimulation == null ? drive.getPose() : driveSimulation.getSimulatedDriveTrainPose());
     }
 }

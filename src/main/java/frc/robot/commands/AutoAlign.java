@@ -299,7 +299,7 @@ public class AutoAlign {
             Optional<Integer> faceIndex) {
         Supplier<Pose2d> grabPose = () -> faceIndex
                 .map(index -> Reef.getAllianceReefBranch(index, Side.CENTER))
-                .orElse(Reef.getClosestBranchPose(drive, Side.CENTER));
+                .orElse(Reef.getClosestBranchPose(drive::getPose, Side.CENTER));
         Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
                         AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)

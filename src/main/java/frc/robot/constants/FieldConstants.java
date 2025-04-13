@@ -22,6 +22,7 @@ import frc.robot.util.CoordinateUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -158,8 +159,8 @@ public class FieldConstants {
             return FieldMirroringUtils.toCurrentAlliancePose(offsetReefPose(blueCenterFaces[faceIndex], side));
         }
 
-        public static Pose2d getClosestBranchPose(Drive drive, Side side) {
-            return offsetReefPose(drive.getPose().nearest(getAllReefLists()), side);
+        public static Pose2d getClosestBranchPose(Supplier<Pose2d> drivePose, Side side) {
+            return offsetReefPose(drivePose.get().nearest(getAllReefLists()), side);
         }
 
         public static List<Pose2d> getAllReefLists() {

@@ -96,13 +96,14 @@ public class IntakeIOSim implements IntakeIO {
             Pose2d currentPose = driveSimulation.getSimulatedDriveTrainPose();
             Pose2d reletaveLoadingPose = currentPose.relativeTo(CoralStation.getClosestCoralStation(currentPose));
             Distance xOffset = reletaveLoadingPose.getMeasureX().minus(Meters.of(0.48));
-            if (xOffset.lt(Inches.of(4)) && Math.abs(reletaveLoadingPose.getRotation().getDegrees())-180 >= -2.0) {
+            if (xOffset.lt(Inches.of(4))
+                    && Math.abs(reletaveLoadingPose.getRotation().getDegrees()) - 180 >= -2.0) {
                 addSimulatedGamePiece();
             }
             Logger.recordOutput("Loading/simXOffset", xOffset.in(Inches));
             Logger.recordOutput(
                     "Loading/simRotationOffset",
-                    Math.abs(reletaveLoadingPose.getRotation().getDegrees())-180);
+                    Math.abs(reletaveLoadingPose.getRotation().getDegrees()) - 180);
         }
     }
 }
