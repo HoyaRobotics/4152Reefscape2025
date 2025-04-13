@@ -5,8 +5,11 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -64,8 +67,6 @@ public class Intake extends SubsystemBase {
             leds.requestState(LEDState.EMPTY);
         }
         Logger.processInputs("Intake", inputs);
-        // Pose3d coralPose = new Pose3d(0, 0, 0, new Rotation3d(Degrees.of(0), arm.getArmPosition(), Degrees.of(0)));
-        // Logger.recordOutput("IntakeCoral", coralPose);
     }
 
     public void addSimulatedGamePiece() {
@@ -99,5 +100,30 @@ public class Intake extends SubsystemBase {
 
     public boolean hasCoral() {
         return inputs.hasCoral;
+    }
+
+    public void visualizeCoralInIntake(Pose2d robotPose) {
+        Pose3d coralPose = new Pose3d();
+        coralPose = coralPose.transformBy(new Transform3d(
+                Inches.of(11.625),
+                Inches.of(0),
+                Inches.of(7.8),
+                new Rotation3d(Degrees.of(0), Degrees.of(90), Degrees.of(0))));
+        coralPose = coralPose.rotateBy(new Rotation3d(
+                Degrees.of(0),
+                arm.getArmPosition().times(-1).plus(Degrees.of(13)),
+                robotPose.getRotation().getMeasure()));
+        coralPose = new Pose3d(
+                coralPose.getMeasureX(),
+                coralPose.getMeasureY(),
+                coralPose.getMeasureZ().plus(Inches.of(21.875).plus(elevator.getPosition())),
+                coralPose.getRotation());
+        coralPose = new Pose3d(
+                coralPose.getMeasureX().plus(robotPose.getMeasureX()),
+                coralPose.getMeasureY().plus(robotPose.getMeasureY()),
+                coralPose.getMeasureZ(),
+                coralPose.getRotation());
+
+        Logger.recordOutput("Intake/CoralInIntake", inputs.hasCoral ? new Pose3d[] {coralPose} : new Pose3d[0]);
     }
 }
