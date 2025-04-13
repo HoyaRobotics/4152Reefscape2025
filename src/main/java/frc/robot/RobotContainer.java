@@ -13,19 +13,8 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -83,7 +72,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.Optional;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -174,46 +162,7 @@ public class RobotContainer {
                 // elevator = new Elevator(new ElevatorIOAdvancedSim());
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
-                // intake = new Intake(new IntakeIOSim(driveSimulation, (test) -> {}), elevator, arm);
-                intake = new Intake(
-                        // 0 angle is horizontal?
-                        // -113.5 + 90 + 15 = -8.5
-                        // intake is also at a 15 degree angle from the arm
-                        new IntakeIOSim(driveSimulation, (targetSpeed) -> {
-                            Angle intakeAngle = Degrees.of(arm.getArmPosition().in(Degrees) - 113.5 - 15 + 90);
-                            // notes: too much of an angle, not high enough
-                            Distance armLength = Inches.of(18.0);
-                            Distance intakeY = Inches.of(-1.013);
-                            Distance intakeX = armLength.times(-Math.cos(intakeAngle.in(Radians)));
-                            Distance intakeZFromCarriage = armLength.times(Math.sin(intakeAngle.in(Radians)));
-                            Distance intakeHeight = elevator.getCarriagePose()
-                                    .getMeasureZ()
-                                    .minus(Inches.of(4.25 / 2))
-                                    .plus(Inches.of(16.0))
-                                    .plus(intakeZFromCarriage);
-                            Translation2d intakePosition = new Translation2d(intakeX, intakeY);
-                            // convert from angular to linear velocity?
-                            // wheel vs arm radius?
-                            LinearVelocity intakeSpeed = MetersPerSecond.of(targetSpeed.in(RadiansPerSecond)
-                                    * Inches.of(1.5).in(Meters));
-                            SimulatedArena.getInstance()
-                                    .addGamePieceProjectile(new ReefscapeCoralOnFly(
-                                            driveSimulation
-                                                    .getSimulatedDriveTrainPose()
-                                                    .getTranslation(),
-                                            intakePosition,
-                                            driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                                            driveSimulation
-                                                    .getSimulatedDriveTrainPose()
-                                                    .getRotation()
-                                                    .rotateBy(new Rotation2d(Degrees.of(180))),
-                                            intakeHeight,
-                                            intakeSpeed,
-                                            intakeAngle)); // 10
-                        }),
-                        elevator,
-                        arm,
-                        led);
+                intake = new Intake(new IntakeIOSim(driveSimulation, elevator, arm), elevator, arm, led);
                 algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim());
                 climber = new Climber(new ClimberIOSim());
                 break;
@@ -442,5 +391,8 @@ public class RobotContainer {
                 "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
         Logger.recordOutput(
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+
+        intake.visualizeCoralInIntake(
+                driveSimulation == null ? drive.getPose() : driveSimulation.getSimulatedDriveTrainPose());
     }
 }
