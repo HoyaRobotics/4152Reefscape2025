@@ -86,12 +86,12 @@ public class AlgaeIntake extends SubsystemBase {
                 Degrees.of(0),
                 arm.getArmPosition().times(-1).plus(Degrees.of(13)),
                 robotPose.getRotation().getMeasure()));
-        algaePose = algaePose.plus(new Transform3d(
-                robotPose.getMeasureX(),
-                robotPose.getMeasureY(),
-                Inches.of(21.875).plus(elevator.getPosition()),
-                Rotation3d.kZero));
+        algaePose = new Pose3d(
+                algaePose.getMeasureX().plus(robotPose.getMeasureX()),
+                algaePose.getMeasureY().plus(robotPose.getMeasureY()),
+                algaePose.getMeasureZ().plus(Inches.of(21.875)).plus(elevator.getPosition()),
+                Rotation3d.kZero);
 
-        Logger.recordOutput("AlgaeIntake/AlgaeInIntake", inputs.hasAlgae ? algaePose : Pose3d.kZero);
+        Logger.recordOutput("AlgaeIntake/AlgaeInIntake", inputs.hasAlgae ? new Pose3d[] {algaePose} : new Pose3d[0] );
     }
 }
