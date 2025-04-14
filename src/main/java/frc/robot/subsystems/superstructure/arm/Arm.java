@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -57,6 +58,10 @@ public class Arm extends SubsystemBase {
 
     public void setArmPosition(Angle targetAngle) {
         this.io.setPosition(targetAngle, ArmConstants.useMotionMagic);
+    }
+
+    public AngularVelocity getRotationalVelocity() {
+        return io.getRotationalVelocity();
     }
 
     public boolean isArmAtPosition(Angle queriedAngle) {

@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -26,6 +28,8 @@ public interface ElevatorIO {
     }
 
     default void stop() {}
+    
+    default LinearVelocity getVelocity() { return MetersPerSecond.of(0); }
 
     default void updateInputs(ElevatorInputs inputs) {}
 

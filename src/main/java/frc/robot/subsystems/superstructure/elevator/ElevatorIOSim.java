@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 public class ElevatorIOSim implements ElevatorIO {
@@ -26,6 +27,11 @@ public class ElevatorIOSim implements ElevatorIO {
     @Override
     public void setPosition(Distance targetPosition, boolean motionMagic) {
         elevatorController.setSetpoint(targetPosition.in(Meters));
+    }
+
+    @Override
+    public LinearVelocity getVelocity() {
+        return MetersPerSecond.of(elevatorSim.getVelocityMetersPerSecond());
     }
 
     @Override

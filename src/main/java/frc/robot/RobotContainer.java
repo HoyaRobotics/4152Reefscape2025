@@ -163,7 +163,7 @@ public class RobotContainer {
                 arm = new Arm(new ArmIOSim(), elevator);
                 // arm = new Arm(new ArmIOAdvancedSim(), elevator);
                 intake = new Intake(new IntakeIOSim(driveSimulation, elevator, arm), elevator, arm, led);
-                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim(driveSimulation), elevator, arm);
+                algaeIntake = new AlgaeIntake(new AlgaeIntakeIOSim(driveSimulation, elevator, arm), elevator, arm);
                 climber = new Climber(new ClimberIOSim());
                 break;
 

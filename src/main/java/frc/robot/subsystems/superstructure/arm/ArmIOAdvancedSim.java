@@ -23,6 +23,7 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
@@ -46,6 +47,11 @@ public class ArmIOAdvancedSim implements ArmIO {
                 Units.degreesToRadians(180.0),
                 false,
                 ArmConstants.startingAngle.in(Radians));
+    }
+
+    @Override
+    public AngularVelocity getRotationalVelocity() {
+        return RadiansPerSecond.of(armSim.getVelocityRadPerSec());
     }
 
     @Override
