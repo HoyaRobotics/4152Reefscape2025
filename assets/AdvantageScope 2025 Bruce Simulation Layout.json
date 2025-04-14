@@ -1,26 +1,34 @@
 {
   "hubs": [
     {
-      "x": 217,
-      "y": 106,
-      "width": 1105,
-      "height": 654,
+      "x": -8,
+      "y": -8,
+      "width": 1552,
+      "height": 832,
       "state": {
         "sidebar": {
-          "width": 268,
+          "width": 319,
           "expanded": [
-            "/AdvantageKit",
-            "/AdvantageKit/RealOutputs",
-            "/RealOutputs",
-            "/Vision/Camera0/LatestTargetObservation",
-            "/Vision/Camera0/PoseObservations",
-            "/RealOutputs/Vision/Summary",
             "/RealOutputs/Vision/Camera0",
-            "/AdvantageKit/RealOutputs/Arm"
+            "/AdvantageKit/RealOutputs/PIDToPose",
+            "/AdvantageKit/RealOutputs/relativeDifference",
+            "/RealOutputs",
+            "/RealOutputs/Arm",
+            "/RealOutputs/Vision",
+            "/Vision",
+            "/Vision/Camera0",
+            "/Vision/Camera1",
+            "/RealOutputs/Vision/Camera1",
+            "/DriverStation",
+            "/PowerDistribution",
+            "/RealOutputs/Loading",
+            "/RealOutputs/SwerveChassisSpeeds",
+            "/AdvantageKit/RealOutputs/IntakeCoral",
+            "/AdvantageKit/RealOutputs/Loading"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -29,30 +37,6 @@
               "controllerUUID": "zrk455rzeo48o20fodg6hugo3bnxb6cy",
               "renderer": "#/",
               "controlsHeight": 0
-            },
-            {
-              "type": 1,
-              "title": "Line Graph",
-              "controller": {
-                "leftSources": [],
-                "rightSources": [],
-                "discreteSources": [],
-                "leftLockedRange": null,
-                "rightLockedRange": null,
-                "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "leftFilter": 0,
-                "rightFilter": 0
-              },
-              "controllerUUID": "ahtqldvw28m4ezhf31iu53oone011d73",
-              "renderer": null,
-              "controlsHeight": 200
             },
             {
               "type": 3,
@@ -65,7 +49,7 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "Robot 2025 V2"
+                      "model": "Robot 2025 V3"
                     }
                   },
                   {
@@ -85,6 +69,13 @@
                   {
                     "type": "component",
                     "logKey": "NT:/AdvantageKit/RealOutputs/Arm/ArmPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Climber/ClimberPose",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
@@ -108,35 +99,23 @@
                     }
                   },
                   {
-                    "type": "ghost",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/Odometry/Robot",
-                    "logType": "Pose2d",
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Intake/CoralInIntake",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "Robot 2025 V2",
-                      "color": "#00ff00"
+                      "variant": "Coral"
                     }
                   },
                   {
-                    "type": "component",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/Elevator/ElevatorPose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "component",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/Elevator/CarriagePose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "component",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/Arm/ArmPose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {}
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/DriveToPose/targetPose",
+                    "logType": "Pose2d",
+                    "visible": false,
+                    "options": {
+                      "model": "2025 KitBot",
+                      "color": "#00ff00"
+                    }
                   }
                 ],
                 "game": "2025 Field (Welded)",
@@ -144,30 +123,35 @@
               },
               "controllerUUID": "wpxs88yuz4pjis8ibj54a7pw7larxm1d",
               "renderer": {
-                "cameraIndex": -1,
-                "orbitFov": 10,
+                "cameraIndex": -2,
+                "orbitFov": 35,
                 "cameraPosition": [
-                  -32.984401866782555,
-                  15.126655755909258,
-                  -10.812310985350008
+                  -0.9822957433943009,
+                  1.0289694683790933,
+                  -0.0219889042555855
                 ],
                 "cameraTarget": [
-                  0.1166602538456919,
-                  -0.29615109736845247,
-                  0.5788328131710283
+                  0.016240206088781906,
+                  0.35207318634136114,
+                  0.010145809731705487
                 ]
               },
-              "controlsHeight": 129
+              "controlsHeight": 297
             },
             {
-              "type": 5,
-              "title": "Console",
-              "controller": "/RealOutputs/Console",
-              "controllerUUID": "5xfbihm3aufgtcymrx8xm1flelyhpmso",
-              "renderer": {
-                "highlight": false
-              },
-              "controlsHeight": 0
+              "type": 8,
+              "title": "Joysticks",
+              "controller": [
+                "Xbox Controller (Blue)",
+                "None",
+                "None",
+                "None",
+                "None",
+                "None"
+              ],
+              "controllerUUID": "zlxnks1aa49brdt1k2e4zcnnn2pen5el",
+              "renderer": null,
+              "controlsHeight": 85
             }
           ]
         }
