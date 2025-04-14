@@ -1,0 +1,163 @@
+{
+  "hubs": [
+    {
+      "x": -8,
+      "y": -8,
+      "width": 1552,
+      "height": 832,
+      "state": {
+        "sidebar": {
+          "width": 319,
+          "expanded": [
+            "/RealOutputs/Vision/Camera0",
+            "/AdvantageKit/RealOutputs/PIDToPose",
+            "/AdvantageKit/RealOutputs/relativeDifference",
+            "/RealOutputs",
+            "/RealOutputs/Arm",
+            "/RealOutputs/Vision",
+            "/Vision",
+            "/Vision/Camera0",
+            "/Vision/Camera1",
+            "/RealOutputs/Vision/Camera1",
+            "/DriverStation",
+            "/PowerDistribution",
+            "/RealOutputs/Loading",
+            "/RealOutputs/SwerveChassisSpeeds",
+            "/AdvantageKit/RealOutputs/IntakeCoral",
+            "/AdvantageKit/RealOutputs/Loading"
+          ]
+        },
+        "tabs": {
+          "selected": 1,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "zrk455rzeo48o20fodg6hugo3bnxb6cy",
+              "renderer": "#/",
+              "controlsHeight": 0
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/RobotPosition",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Robot 2025 V3"
+                    }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Elevator/ElevatorPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Elevator/CarriagePose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Arm/ArmPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Climber/ClimberPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/Algae",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Algae"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/Coral",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Intake/CoralInIntake",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/DriveToPose/targetPose",
+                    "logType": "Pose2d",
+                    "visible": false,
+                    "options": {
+                      "model": "2025 KitBot",
+                      "color": "#00ff00"
+                    }
+                  }
+                ],
+                "game": "2025 Field (Welded)",
+                "origin": "blue"
+              },
+              "controllerUUID": "wpxs88yuz4pjis8ibj54a7pw7larxm1d",
+              "renderer": {
+                "cameraIndex": -2,
+                "orbitFov": 35,
+                "cameraPosition": [
+                  -0.9822957433943009,
+                  1.0289694683790933,
+                  -0.0219889042555855
+                ],
+                "cameraTarget": [
+                  0.016240206088781906,
+                  0.35207318634136114,
+                  0.010145809731705487
+                ]
+              },
+              "controlsHeight": 297
+            },
+            {
+              "type": 8,
+              "title": "Joysticks",
+              "controller": [
+                "Xbox Controller (Blue)",
+                "None",
+                "None",
+                "None",
+                "None",
+                "None"
+              ],
+              "controllerUUID": "zlxnks1aa49brdt1k2e4zcnnn2pen5el",
+              "renderer": null,
+              "controlsHeight": 85
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "4.1.1"
+}

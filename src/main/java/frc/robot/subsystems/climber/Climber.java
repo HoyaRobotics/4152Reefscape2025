@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +30,12 @@ public class Climber extends SubsystemBase {
         // This method will be called once per scheduler run
         this.io.updateInputs(inputs);
         Logger.processInputs("Climber", inputs);
+        Pose3d climberPose = new Pose3d(
+                Inches.of(0),
+                Inches.of(12),
+                Inches.of(14.875),
+                new Rotation3d(inputs.climberAngle.unaryMinus(), Degrees.of(0), Degrees.of(0)));
+        Logger.recordOutput("Climber/ClimberPose", climberPose);
     }
 
     public void setVoltage(Voltage volts) {
