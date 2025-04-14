@@ -4,20 +4,12 @@
 
 package frc.robot.subsystems.algaeIntake;
 
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-
-import java.util.List;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -25,8 +17,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.constants.FieldConstants.Side;
@@ -34,6 +26,11 @@ import frc.robot.constants.FieldConstants.StagingPositions;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import java.util.List;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
@@ -76,46 +73,52 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
                     algaePose.getMeasureZ().plus(Inches.of(21.875)).plus(elevator.getPosition()),
                     Rotation3d.kZero);
 
-            Pose3d pivotRelPosition = new Pose3d(
-                Inches.of(-9.261),
-                Inches.of(15.785),
-                Inches.of(-0.048),
-                Rotation3d.kZero);
-            double armRadius = 2.0;
+            Pose3d pivotRelPosition =
+                    new Pose3d(Inches.of(-9.261), Inches.of(15.785), Inches.of(-0.048), Rotation3d.kZero);
+            Distance intakeWheelRadius = Inches.of(2.0);
 
             Translation2d tangentialVelocity = new Translation2d(
-                arm.getRotationalVelocity().in(RadiansPerSecond) * pivotRelPosition.getTranslation().getNorm(),
-                Rotation2d.fromDegrees(algaePose.getRotation().getMeasureY().minus(Degrees.of(90)).in(Degrees))
-            );
+                    arm.getRotationalVelocity().in(RadiansPerSecond)
+                            * pivotRelPosition.getTranslation().getNorm(),
+                    Rotation2d.fromDegrees(algaePose
+                            .getRotation()
+                            .getMeasureY()
+                            .minus(Degrees.of(90))
+                            .in(Degrees)));
 
             Translation2d intakeVelocity = new Translation2d(
-                intakeSpeed.in(RotationsPerSecond) * Math.PI * 2.0 * armRadius,
-                Rotation2d.fromDegrees(algaePose.getRotation().getMeasureY().in(Degrees)));
+                    intakeSpeed.in(RotationsPerSecond) * Math.PI * 2.0 * intakeWheelRadius.in(Meters),
+                    Rotation2d.fromDegrees(algaePose.getRotation().getMeasureY().in(Degrees)));
 
-            Translation2d elevatorVelocity = new Translation2d(
-                elevator.getVelocity().in(MetersPerSecond),
-                Rotation2d.fromDegrees(90)
-            );
+            Translation2d elevatorVelocity =
+                    new Translation2d(elevator.getVelocity().in(MetersPerSecond), Rotation2d.fromDegrees(90));
 
             LinearVelocity finalSpeed = MetersPerSecond.of(tangentialVelocity
-                .plus(intakeVelocity)
-                .plus(elevatorVelocity).getNorm());
+                    .plus(intakeVelocity)
+                    .plus(elevatorVelocity)
+                    .getNorm());
 
             SimulatedArena.getInstance()
-                .addGamePieceProjectile(new ReefscapeAlgaeOnFly(
-                    driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                    arm.getArmPosition().gt(Degrees.of(0)) ? 
-                        new Translation2d(algaePose.getMeasureX().times(-1), algaePose.getMeasureY()) :
-                        new Translation2d(algaePose.getMeasureX(), algaePose.getMeasureY()),
-                    driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                    arm.getArmPosition().gt(Degrees.of(0)) ?
-                        robotPose.getRotation().plus(Rotation2d.k180deg) :
-                        robotPose.getRotation(),
-                    algaePose.getMeasureZ(),
-                    // account for upwards, elevator velocity + arm velocity for barge
-                    // treat each as velocity vector
-                    finalSpeed,
-                    algaePose.getRotation().getMeasureY())); // pitch
+                    .addGamePieceProjectile(new ReefscapeAlgaeOnFly(
+                                    driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+                                    arm.getArmPosition().gt(Degrees.of(0))
+                                            ? new Translation2d(
+                                                    algaePose.getMeasureX().times(-1), algaePose.getMeasureY())
+                                            : new Translation2d(algaePose.getMeasureX(), algaePose.getMeasureY()),
+                                    driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                                    arm.getArmPosition().gt(Degrees.of(0))
+                                            ? robotPose.getRotation().plus(Rotation2d.k180deg)
+                                            : robotPose.getRotation(),
+                                    algaePose.getMeasureZ(),
+                                    // account for upwards, elevator velocity + arm velocity for barge
+                                    // treat each as velocity vector
+                                    finalSpeed,
+                                    algaePose.getRotation().getMeasureY())
+                            .withProjectileTrajectoryDisplayCallBack(
+                                    (poses) -> Logger.recordOutput(
+                                            "successfulShotsTrajectory", poses.toArray(Pose3d[]::new)),
+                                    (poses) -> Logger.recordOutput(
+                                            "missedShotsTrajectory", poses.toArray(Pose3d[]::new)))); // pitch
             // just processor to start
             hasAlgae = false;
         }

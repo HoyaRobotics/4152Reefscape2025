@@ -24,7 +24,6 @@ public class ArmIOReal implements ArmIO {
     final CANcoder armEncoder = new CANcoder(33, "rio");
     double armRatio = 119.5887; // 185.7143;
 
-
     private final MotionMagicVoltage magicRequest = new MotionMagicVoltage(0.0);
     private final PositionVoltage positionRequest = new PositionVoltage(0.0);
 

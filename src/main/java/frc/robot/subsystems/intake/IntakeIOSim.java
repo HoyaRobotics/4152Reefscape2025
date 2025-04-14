@@ -81,7 +81,8 @@ public class IntakeIOSim implements IntakeIO {
                             // v_linear = (2 * PI * r) * v_rotation
                             // 2*PI = circumference
                             // angular velocity = rate of change of angle
-                            InchesPerSecond.of(Math.PI * 2.0 * targetSpeed.in(RotationsPerSecond) * 2), // 2PI * rps * 2?
+                            InchesPerSecond.of(
+                                    Math.PI * 2.0 * targetSpeed.in(RotationsPerSecond) * 2), // 2PI * rps * 2?
                             coralPose.getRotation().getMeasureY().plus(Degrees.of(180))));
         }
     }
