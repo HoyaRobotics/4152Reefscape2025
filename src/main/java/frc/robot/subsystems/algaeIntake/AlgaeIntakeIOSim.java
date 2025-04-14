@@ -4,19 +4,15 @@
 
 package frc.robot.subsystems.algaeIntake;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -26,11 +22,11 @@ import frc.robot.constants.FieldConstants.StagingPositions;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants.AlgaeIntakeAction;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonUtils;
 
 /** Add your docs here. */
 public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
@@ -63,13 +59,11 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
                     Rotation3d.kZero));
 
             // roll, pitch, yaw
-            algaePose = algaePose.rotateBy(new Rotation3d(
-                    Degrees.of(0),
-                    arm.getArmPosition().times(-1).plus(Degrees.of(13)),
-                    robotPose.getRotation().getMeasure()));
+            algaePose = algaePose.rotateBy(
+                    new Rotation3d(Degrees.of(0), arm.getArmPosition().times(-1).plus(Degrees.of(13)), Degrees.of(0)));
             algaePose = new Pose3d(
-                    algaePose.getMeasureX().plus(robotPose.getMeasureX()),
-                    algaePose.getMeasureY().plus(robotPose.getMeasureY()),
+                    algaePose.getMeasureX(),
+                    algaePose.getMeasureY(),
                     algaePose.getMeasureZ().plus(Inches.of(21.875)).plus(elevator.getPosition()),
                     Rotation3d.kZero);
 
@@ -101,12 +95,12 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
             SimulatedArena.getInstance()
                     .addGamePieceProjectile(new ReefscapeAlgaeOnFly(
                                     robotPose.getTranslation(),
-                                    new Translation2d(algaePose.getMeasureX().times(-1), algaePose.getMeasureY()),
+                                    new Translation2d(algaePose.getMeasureX(), algaePose.getMeasureY()),
                                     driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                                    robotPose.getRotation().plus(Rotation2d.k180deg),
+                                    robotPose.getRotation(),
                                     algaePose.getMeasureZ(),
                                     finalSpeed,
-                                    algaePose.getRotation().getMeasureY()) // pitch
+                                    (arm.getArmPosition().gt(Degrees.of(103))) ? algaePose.getRotation().getMeasureY().plus(Degrees.of(70)) : algaePose.getRotation().getMeasureY().plus(Degrees.of(0))) // pitch
                             .withProjectileTrajectoryDisplayCallBack(
                                     (poses) -> Logger.recordOutput(
                                             "successfulShotsTrajectory", poses.toArray(Pose3d[]::new)),
@@ -125,14 +119,24 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
         if (intakeSpeed.isEquivalent(AlgaeIntakeAction.INTAKING.speed) && !hasAlgae) {
             Pose2d currentPose = driveSimulation.getSimulatedDriveTrainPose();
 
-            Pose2d closestFace = Reef.getClosestBranchPose(() -> currentPose, Side.CENTER);
-            Pose2d closestLollipop = currentPose.nearest(StagingPositions.getAllianceStartingAlgaePoses());
+            Distance distanceError;
+            Rotation2d rotationError;
+            Distance distanceTolerance;
+            if(arm.getArmPosition().gt(Degrees.of(103))) {
+                Pose2d closestFace = Reef.getClosestBranchPose(() -> currentPose, Side.CENTER);
+                distanceError = Units.Meters.of(PhotonUtils.getDistanceToPose(currentPose, closestFace));
+                rotationError = PhotonUtils.getYawToPose(currentPose.plus(new Transform2d(new Translation2d(), Rotation2d.k180deg)), closestFace);
+                distanceTolerance = Inches.of(2.0);
+            }else{
+                Pose2d closestLollipop = currentPose.nearest(StagingPositions.getAllianceStartingAlgaePoses());
+                distanceError = Units.Meters.of(PhotonUtils.getDistanceToPose(currentPose, closestLollipop));
+                rotationError = PhotonUtils.getYawToPose(currentPose, closestLollipop);
+                distanceTolerance = Inches.of(22.0);
+            }
 
-            Pose2d closestAlgae = currentPose.nearest(List.of(closestFace, closestLollipop));
-            var xOffset = currentPose.relativeTo(closestAlgae).getMeasureX();
-            var rotationError = currentPose.relativeTo(closestAlgae).getRotation();
-
-            if (xOffset.lt(Inches.of(5.0)) && rotationError.getMeasure().lt(Degrees.of(8))) {
+            Logger.recordOutput("AlgaeIntake/DistanceError", distanceError.in(Inches));
+            Logger.recordOutput("AlgaeIntake/RotationError", rotationError.getDegrees());
+            if (distanceError.lt(distanceTolerance) && rotationError.getMeasure().abs(Degrees) <=5) {
                 hasAlgae = true;
             }
         }
