@@ -100,25 +100,18 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
 
             SimulatedArena.getInstance()
                     .addGamePieceProjectile(new ReefscapeAlgaeOnFly(
-                                    driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                                    arm.getArmPosition().gt(Degrees.of(0))
-                                            ? new Translation2d(
-                                                    algaePose.getMeasureX().times(-1), algaePose.getMeasureY())
-                                            : new Translation2d(algaePose.getMeasureX(), algaePose.getMeasureY()),
+                                    robotPose.getTranslation(),
+                                    new Translation2d(algaePose.getMeasureX().times(-1), algaePose.getMeasureY()),
                                     driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                                    arm.getArmPosition().gt(Degrees.of(0))
-                                            ? robotPose.getRotation().plus(Rotation2d.k180deg)
-                                            : robotPose.getRotation(),
+                                    robotPose.getRotation().plus(Rotation2d.k180deg),
                                     algaePose.getMeasureZ(),
-                                    // account for upwards, elevator velocity + arm velocity for barge
-                                    // treat each as velocity vector
                                     finalSpeed,
-                                    algaePose.getRotation().getMeasureY())
+                                    algaePose.getRotation().getMeasureY()) // pitch
                             .withProjectileTrajectoryDisplayCallBack(
                                     (poses) -> Logger.recordOutput(
                                             "successfulShotsTrajectory", poses.toArray(Pose3d[]::new)),
                                     (poses) -> Logger.recordOutput(
-                                            "missedShotsTrajectory", poses.toArray(Pose3d[]::new)))); // pitch
+                                            "missedShotsTrajectory", poses.toArray(Pose3d[]::new))));
             // just processor to start
             hasAlgae = false;
         }

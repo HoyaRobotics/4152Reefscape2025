@@ -5,11 +5,13 @@
 package frc.robot.subsystems.superstructure.arm;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Add your docs here. */
@@ -30,6 +32,11 @@ public class ArmIOSim implements ArmIO {
                 ArmConstants.startingAngle.in(Radians));
         armController.setTolerance(2.0);
         setPosition(ArmConstants.startingAngle, true);
+    }
+
+    @Override
+    public AngularVelocity getRotationalVelocity() {
+        return RadiansPerSecond.of(armSim.getVelocityRadPerSec());
     }
 
     @Override

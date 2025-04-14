@@ -50,11 +50,6 @@ public class ArmIOAdvancedSim implements ArmIO {
     }
 
     @Override
-    public AngularVelocity getRotationalVelocity() {
-        return RadiansPerSecond.of(armSim.getVelocityRadPerSec());
-    }
-
-    @Override
     public void updateInputs(ArmInputs inputs) {
         var armEncoderSim = armEncoder.getSimState();
         armEncoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
