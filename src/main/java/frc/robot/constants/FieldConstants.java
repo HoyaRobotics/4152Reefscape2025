@@ -175,7 +175,7 @@ public class FieldConstants {
         }
 
         public static Pose2d offsetReefPose(Pose2d facePose, Side side) {
-            final double distanceFromReef = 0.48;
+            final double distanceFromReef = 0.48 + Units.inchesToMeters(0.25);
             final double rightOffset = PIPE_FROM_REEF_CENTER_INCHES + 0.75; // 1.2 V1, - 0.5
             final double leftOffset = PIPE_FROM_REEF_CENTER_INCHES; // 1.45 V1
 

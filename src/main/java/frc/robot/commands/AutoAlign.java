@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -277,6 +278,7 @@ public class AutoAlign {
             LED leds,
             Supplier<SuperStructurePose> superPose,
             Supplier<Pose2d> targetPose) {
+
         BooleanSupplier startSuperStructure = () -> {
             var targetSuperPose = superPose.get();
             var finalPose = targetPose.get();
@@ -296,13 +298,30 @@ public class AutoAlign {
             return PoseUtils.poseInRange(drive::getPose, targetPose, StartSuperStructureRange)
                     && (superstructureLow || (horizontalVelocitySlow && mostlyRotated));
         };
+
+        Supplier<Pose2d> movingPose =
+                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(10.0), 0.0, Rotation2d.kZero));
+
+        // rotation pose farther out as well
         return Commands.sequence(
-                        driveToPose(drive, targetPose)
+                        driveToPose(drive, movingPose)
                                 .alongWith(Commands.sequence(
                                         Commands.waitUntil(startSuperStructure),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(superPose.get()),
-                                                Set.of(superStructure.arm, superStructure.elevator)))),
+                                                Set.of(superStructure.arm, superStructure.elevator))))
+                                .until(() -> {
+                                        var yOffset = drive.getPose()
+                                        .relativeTo(movingPose.get())
+                                        .getMeasureY();
+
+                                        Logger.recordOutput("AutoPlace/yOffset", yOffset);
+                                        return yOffset.lt(Inches.of(1.5));
+                                }),
+                        driveToPose(drive, targetPose)
+                                .alongWith(Commands.defer(
+                                        () -> superStructure.moveToPose(superPose.get()),
+                                        Set.of(superStructure.arm, superStructure.elevator))),
                         Commands.runOnce(() -> leds.requestState(LEDState.PLACING)),
                         PlacingCommands.reefPlacingSequence(superStructure, intake, leds, superPose, false))
                 // some kind of wait condition to minimize jerkiness when picking algae
@@ -354,6 +373,32 @@ public class AutoAlign {
                 .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
+    }
+
+    public static Command autoScoreBarge(
+            Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake, LED leds) {
+        Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), Optional.empty());
+        return Commands.sequence(
+                driveToPose(drive, drivePose::get)
+                        .alongWith(Commands.waitUntil(() ->
+                                        PoseUtils.poseInRange(drive::getPose, drivePose::get, BargeDistanceTolerance)
+                                                && drive.getPose()
+                                                        .getRotation()
+                                                        .getMeasure()
+                                                        .isNear(
+                                                                drivePose
+                                                                        .get()
+                                                                        .getRotation()
+                                                                        .getMeasure(),
+                                                                BargeRaisingRotTolerance))
+                                .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET_V2))),
+                superStructure
+                        .arm
+                        .moveToAngle(Degrees.of(0))
+                        .withDeadline(Commands.waitUntil(
+                                        () -> superStructure.arm.isPastPosition(Degrees.of(120), false))
+                                .andThen(algaeIntake.runWithSensor(AlgaeIntakeAction.NET))
+                                .andThen(algaeIntake.run(AlgaeIntakeAction.NET).withTimeout(0.2))));
     }
 
     public static Command autoScoreBarge(

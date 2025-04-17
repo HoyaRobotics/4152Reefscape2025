@@ -65,6 +65,7 @@ public class SuperStructure {
 
         // ALGAE_PRE_NET(Inches.of(52.7), Degrees.of(103)),
         ALGAE_NET(Inches.of(52.7), Degrees.of(83)),
+        ALGAE_NET_V2(Inches.of(52.7), Degrees.of(140)),
         ZERO(Inches.of(0.0), Degrees.of(103)),
         HOLD(Inches.of(3.0), Degrees.of(103)),
         CLIMB_STOW(Inches.of(0.0), Degrees.of(-15)),
