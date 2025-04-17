@@ -23,6 +23,7 @@ import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AutoAlign;
 import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.CoralClose;
+import frc.robot.commands.Autos.CoralFar;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
 import frc.robot.commands.PlacingCommands;
@@ -200,12 +201,12 @@ public class RobotContainer {
         autoChooser.addOption(
                 "CenterAlgae",
                 new AlgaeCenter(Side.LEFT, drive, superStructure, intake, algaeIntake, led, vision).getAutoCommand());
-        /*autoChooser.addOption(
-                "4PieceFarRight",
-                new CoralFar(Side.RIGHT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());
         autoChooser.addOption(
-                "4PieceFarLeft",
-                new CoralFar(Side.LEFT, drive, superStructure, intake, algaeIntake, led).getAutoCommand());*/
+                "RightCoralFar",
+                new CoralFar(Side.RIGHT, drive, superStructure, intake, algaeIntake, led, vision).getAutoCommand());
+        autoChooser.addOption(
+                "LeftCoralFar",
+                new CoralFar(Side.LEFT, drive, superStructure, intake, algaeIntake, led, vision).getAutoCommand());
         /*
         autoChooser.addOption(
                 "algaeCenter",
@@ -289,8 +290,9 @@ public class RobotContainer {
 
                 driveController
                         .scoreBarge()
-                        .whileTrue(AutoAlign.autoScoreBarge(
-                                drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));
+                .whileTrue(AutoAlign.autoScoreBarge(
+                        drive, superStructure, algaeIntake, led, Optional.empty(), driveController.driveY()));
+                        //.whileTrue(AutoAlign.autoScoreBarge(drive, superStructure, algaeIntake, led));
 
                 driveController
                         .scoreProcessor()
