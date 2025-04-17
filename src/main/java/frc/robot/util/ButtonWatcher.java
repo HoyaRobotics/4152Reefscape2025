@@ -19,6 +19,9 @@ public class ButtonWatcher {
     public ButtonWatcher(DriveMap controller) {
         this.controller = controller;
 
+        controller
+                .moveToTrough(true)
+                .onTrue(Commands.runOnce(() -> selectedPose = Optional.of(SuperStructurePose.TROUGH)));
         controller.moveToL2(true).onTrue(Commands.runOnce(() -> selectedPose = Optional.of(SuperStructurePose.L2)));
         controller.moveToL3(true).onTrue(Commands.runOnce(() -> selectedPose = Optional.of(SuperStructurePose.L3)));
         controller.moveToL4(true).onTrue(Commands.runOnce(() -> selectedPose = Optional.of(SuperStructurePose.L4)));

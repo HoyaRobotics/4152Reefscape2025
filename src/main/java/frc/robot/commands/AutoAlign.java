@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
@@ -230,8 +231,41 @@ public class AutoAlign {
         ButtonWatcher buttonWatcher = new ButtonWatcher(driveController);
         buttonWatcher.selectedPose = Optional.of(SuperStructurePose.L4);
 
-        Supplier<Pose2d> targetPose =
-                () -> Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), side);
+        Supplier<Pose2d> targetPose = () -> {
+            var closestFace = drive.getPose().nearest(Reef.getAllianceReefList());
+            SuperStructurePose superPose = buttonWatcher.getSelectedPose();
+
+            if (superPose == SuperStructurePose.TROUGH) {
+                var reefCorner = Reef.offsetReefPose(closestFace, Side.CENTER)
+                        .transformBy(
+                                side == Side.RIGHT
+                                        ? new Transform2d(0.12, 0.175, Rotation2d.fromDegrees(-15 + 180))
+                                        : new Transform2d(0.12, -0.175, Rotation2d.fromDegrees(15 + 180)));
+
+                var movingPose = reefCorner.transformBy(new Transform2d(-0.25, 0.0, Rotation2d.kZero));
+
+                Logger.recordOutput(
+                        "AutoAlign/relativeDx",
+                        drive.getPose().relativeTo(movingPose).getMeasureX());
+                boolean withinTransitionTolerance =
+                        drive.getPose().relativeTo(movingPose).getMeasureX().gt(Inches.of(-5.0))
+                                && drive.getPose()
+                                        .getRotation()
+                                        .getMeasure()
+                                        .isNear(movingPose.getRotation().getMeasure(), Degrees.of(8));
+                /*
+                boolean withinTransitionTolerance =
+                        PoseUtils.poseInRange(drive::getPose, () -> movingPose, Inches.of(0.5))
+                                && drive.getPose()
+                                        .getRotation()
+                                        .getMeasure()
+                                        .isNear(movingPose.getRotation().getMeasure(), Degrees.of(8));*/
+
+                return withinTransitionTolerance ? reefCorner : movingPose;
+            }
+
+            return Reef.offsetReefPose(closestFace, side);
+        };
 
         return autoAlignAndPlace(drive, superStructure, intake, leds, buttonWatcher::getSelectedPose, targetPose);
     }

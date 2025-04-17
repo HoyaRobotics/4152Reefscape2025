@@ -25,6 +25,7 @@ import frc.robot.commands.Autos.AlgaeCenter;
 import frc.robot.commands.Autos.CoralClose;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldPosition;
+import frc.robot.commands.PlacingCommands;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants.Side;
 import frc.robot.constants.VisionConstants;
@@ -310,6 +311,8 @@ public class RobotContainer {
         driveController.moveToL3(false).onTrue(superStructure.moveToPose(SuperStructurePose.L3));
         driveController.moveToL2(false).onTrue(superStructure.moveToPose(SuperStructurePose.L2));
         */
+
+        /*
         driveController
                 .moveToL4(false)
                 .whileTrue(AutoAlign.autoAlignAndPlace(
@@ -322,12 +325,14 @@ public class RobotContainer {
                 .moveToL2(false)
                 .whileTrue(AutoAlign.autoAlignAndPlace(
                         drive, superStructure, SuperStructurePose.L2, intake, led, driveController.driveY()));
+                        */
 
         driveController
                 .moveToTrough(false)
-                .whileTrue(AutoAlign.autoAlignAndPlace(
-                        drive, superStructure, SuperStructurePose.TROUGH, intake, led, driveController.driveY()));
-        // .onTrue(PlacingCommands.troughPlacingSequence(superStructure, intake, driveController.ejectCoral()));
+                .onTrue(PlacingCommands.troughPlacingSequence(superStructure, intake, driveController.ejectCoral()));
+        /*
+        .whileTrue(AutoAlign.autoAlignAndPlace(
+                drive, superStructure, SuperStructurePose.TROUGH, intake, led, driveController.driveY()));*/
 
         driveController
                 .deployClimber()
