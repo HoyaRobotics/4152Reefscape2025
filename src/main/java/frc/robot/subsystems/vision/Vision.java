@@ -121,6 +121,10 @@ public class Vision extends SubsystemBase {
                         || Math.abs(observation.pose().getZ()) > maxZError // Must have realistic Z coordinate
 
                         // Must be within the field boundaries
+                        || Double.isNaN(observation.pose().getX())
+                        || Double.isNaN(observation.pose().getY())
+                        || Double.isNaN(observation.pose().getZ())
+                        || Double.isNaN(observation.pose().getRotation().getAngle())
                         || observation.pose().getX() < 0.0
                         || observation.pose().getX() > aprilTagLayout.getFieldLength()
                         || observation.pose().getY() < 0.0

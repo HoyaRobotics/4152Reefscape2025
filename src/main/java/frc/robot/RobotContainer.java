@@ -103,7 +103,6 @@ public class RobotContainer {
     public RobotContainer() {
         switch (Constants.currentMode) {
             case REAL:
-                led = new LED(new LedIOReal());
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIOPigeon2(),
@@ -114,6 +113,7 @@ public class RobotContainer {
                         (pose) -> {});
                 elevator = new Elevator(new ElevatorIOReal());
                 arm = new Arm(new ArmIOReal(), elevator);
+                led = new LED(new LedIOReal());
                 switch (Constants.intakeVersion) {
                     case V1:
                         intake = new Intake(new IntakeIORealV1(), elevator, arm, led);

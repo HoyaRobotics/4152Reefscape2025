@@ -62,7 +62,8 @@ public class VisionIOLimelight implements VisionIO {
         megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
         megatag2Subscriber = table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
 
-        imuModePublisher.accept(3);
+        // imuModePublisher.accept(3);
+        imuModePublisher.accept(1);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class VisionIOLimelight implements VisionIO {
         inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
 
         if (!DriverStation.isDSAttached() || DriverStation.isDisabled()) {
-            throttlePublisher.accept(1000);
+            throttlePublisher.accept(200);
         } else {
             throttlePublisher.accept(0);
         }

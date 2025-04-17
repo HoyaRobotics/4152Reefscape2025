@@ -5,6 +5,7 @@
 package frc.robot.subsystems.algaeIntake;
 
 import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -100,7 +101,15 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
                                     robotPose.getRotation(),
                                     algaePose.getMeasureZ(),
                                     finalSpeed,
-                                    (arm.getArmPosition().gt(Degrees.of(103))) ? algaePose.getRotation().getMeasureY().plus(Degrees.of(70)) : algaePose.getRotation().getMeasureY().plus(Degrees.of(0))) // pitch
+                                    (arm.getArmPosition().gt(Degrees.of(103)))
+                                            ? algaePose
+                                                    .getRotation()
+                                                    .getMeasureY()
+                                                    .plus(Degrees.of(70))
+                                            : algaePose
+                                                    .getRotation()
+                                                    .getMeasureY()
+                                                    .plus(Degrees.of(0))) // pitch
                             .withProjectileTrajectoryDisplayCallBack(
                                     (poses) -> Logger.recordOutput(
                                             "successfulShotsTrajectory", poses.toArray(Pose3d[]::new)),
@@ -122,12 +131,13 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
             Distance distanceError;
             Rotation2d rotationError;
             Distance distanceTolerance;
-            if(arm.getArmPosition().gt(Degrees.of(103))) {
+            if (arm.getArmPosition().gt(Degrees.of(103))) {
                 Pose2d closestFace = Reef.getClosestBranchPose(() -> currentPose, Side.CENTER);
                 distanceError = Units.Meters.of(PhotonUtils.getDistanceToPose(currentPose, closestFace));
-                rotationError = PhotonUtils.getYawToPose(currentPose.plus(new Transform2d(new Translation2d(), Rotation2d.k180deg)), closestFace);
+                rotationError = PhotonUtils.getYawToPose(
+                        currentPose.plus(new Transform2d(new Translation2d(), Rotation2d.k180deg)), closestFace);
                 distanceTolerance = Inches.of(2.0);
-            }else{
+            } else {
                 Pose2d closestLollipop = currentPose.nearest(StagingPositions.getAllianceStartingAlgaePoses());
                 distanceError = Units.Meters.of(PhotonUtils.getDistanceToPose(currentPose, closestLollipop));
                 rotationError = PhotonUtils.getYawToPose(currentPose, closestLollipop);
@@ -136,7 +146,8 @@ public class AlgaeIntakeIOSim implements AlgaeIntakeIO {
 
             Logger.recordOutput("AlgaeIntake/DistanceError", distanceError.in(Inches));
             Logger.recordOutput("AlgaeIntake/RotationError", rotationError.getDegrees());
-            if (distanceError.lt(distanceTolerance) && rotationError.getMeasure().abs(Degrees) <=5) {
+            if (distanceError.lt(distanceTolerance)
+                    && rotationError.getMeasure().abs(Degrees) <= 5) {
                 hasAlgae = true;
             }
         }

@@ -190,12 +190,23 @@ public class AutoAlign {
             }
 
             if (superStructurePose == SuperStructurePose.TROUGH) {
+                // add moving pose, switch to other pose once within tolerance of moving pose
                 var reefCorner = Reef.offsetReefPose(closestFace, Side.CENTER)
                         .transformBy(
                                 branchSide[0] == Side.RIGHT
-                                        ? new Transform2d(0.1, 0.175, Rotation2d.fromDegrees(-15 + 180))
-                                        : new Transform2d(0.1, -0.175, Rotation2d.fromDegrees(15 + 180)));
-                return reefCorner;
+                                        ? new Transform2d(0.12, 0.175, Rotation2d.fromDegrees(-15 + 180))
+                                        : new Transform2d(0.12, -0.175, Rotation2d.fromDegrees(15 + 180)));
+
+                var movingPose = reefCorner.transformBy(new Transform2d(0.5, 0.0, Rotation2d.kZero));
+
+                boolean withinTransitionTolerance =
+                        PoseUtils.poseInRange(drive::getPose, () -> movingPose, Inches.of(0.5))
+                                && drive.getPose()
+                                        .getRotation()
+                                        .getMeasure()
+                                        .isNear(movingPose.getRotation().getMeasure(), Degrees.of(8));
+
+                return withinTransitionTolerance ? reefCorner : movingPose;
             }
 
             return Reef.offsetReefPose(drive.getPose().nearest(Reef.getAllianceReefList()), branchSide[0]);
