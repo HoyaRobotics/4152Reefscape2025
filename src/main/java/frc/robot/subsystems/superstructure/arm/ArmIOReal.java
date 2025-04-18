@@ -4,7 +4,11 @@
 
 package frc.robot.subsystems.superstructure.arm;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -46,6 +50,14 @@ public class ArmIOReal implements ArmIO {
     }
 
     @Override
+    public void setMotionMagicVelocity(double targetVelocity) {
+        MotionMagicConfigs config = new MotionMagicConfigs();
+        config.MotionMagicCruiseVelocity = targetVelocity;
+        config.MotionMagicAcceleration = 4.0;
+        armMotor.getConfigurator().apply(config);
+    }
+
+    @Override
     public void stop() {
         armMotor.stopMotor();
     }
@@ -63,8 +75,9 @@ public class ArmIOReal implements ArmIO {
         armConfig.Feedback.FeedbackRemoteSensorID = 33;
         armConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         armConfig.Feedback.RotorToSensorRatio = armRatio;
-        armConfig.MotionMagic.MotionMagicAcceleration = 4.0; // 6.0
-        armConfig.MotionMagic.MotionMagicCruiseVelocity = 1.0; // 2.0
+        armConfig.MotionMagic.MotionMagicAcceleration =
+                ArmConstants.defultArmAcceleration.in(RotationsPerSecondPerSecond); // 6.0
+        armConfig.MotionMagic.MotionMagicCruiseVelocity = ArmConstants.defultArmVelocity.in(RotationsPerSecond); // 2.0
         armConfig.MotionMagic.MotionMagicJerk = 0.0;
         armConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

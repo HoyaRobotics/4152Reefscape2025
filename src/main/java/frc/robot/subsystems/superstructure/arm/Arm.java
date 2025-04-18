@@ -56,6 +56,10 @@ public class Arm extends SubsystemBase {
                 .until(() -> isArmAtPosition(targetAngle));
     }
 
+    public void setCruiseVelocity(double targetVelocity) {
+        this.io.setMotionMagicVelocity(targetVelocity);
+    }
+
     public void setArmPosition(Angle targetAngle) {
         this.io.setPosition(targetAngle, ArmConstants.useMotionMagic);
     }

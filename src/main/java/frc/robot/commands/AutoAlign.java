@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,6 +43,7 @@ import frc.robot.subsystems.leds.LED;
 import frc.robot.subsystems.leds.LED.LEDState;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ButtonWatcher;
 import frc.robot.util.LockableSupplier;
@@ -110,6 +112,13 @@ public class AutoAlign {
                 .withDeadline(algaeIntake
                         .runWithSensor(AlgaeIntakeAction.INTAKING)
                         .andThen(algaeIntake.run(AlgaeIntakeAction.INTAKING).withTimeout(0.2)))
+                .andThen(superStructure
+                        .arm
+                        .moveToAngle(SuperStructurePose.HOLD.armAngle)
+                        .deadlineFor(Commands.startEnd(
+                                () -> superStructure.arm.setCruiseVelocity(0.5),
+                                () -> superStructure.arm.setCruiseVelocity(
+                                        ArmConstants.defultArmVelocity.in(RotationsPerSecond)))))
                 .deadlineFor(Commands.startEnd(
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
                 .deadlineFor(Commands.startEnd(() -> stagingPose.lock(), () -> stagingPose.unlock()));
@@ -296,7 +305,7 @@ public class AutoAlign {
         // TODO: fix rembrandt style barge
         // TODO: trough align
         Supplier<Pose2d> movingPose =
-                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(6.0), 0.0, Rotation2d.kZero));
+                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(8.0), 0.0, Rotation2d.kZero));
 
         // rotation pose farther out as well
         return Commands.sequence(
@@ -311,7 +320,7 @@ public class AutoAlign {
                                     var yOffset = relPose.getMeasureY();
                                     var rotationError = relPose.getRotation().getDegrees();
 
-                                    return yOffset.abs(Inches) < 4.0 && Math.abs(rotationError) < 10.0;
+                                    return yOffset.abs(Inches) < 4.0 && Math.abs(rotationError) < 6.0;
                                 }),
                         driveToPose(drive, targetPose)
                                 .alongWith(Commands.defer(
@@ -432,10 +441,14 @@ public class AutoAlign {
                                                                         .getMeasure(),
                                                                 BargeRaisingRotTolerance))
                                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET_V2))),
-                Commands.waitSeconds(0.1),
+                Commands.waitSeconds(0.075),
                 superStructure
                         .arm
                         .moveToAngle(Degrees.of(0))
+                        .deadlineFor(Commands.startEnd(
+                                () -> superStructure.arm.setCruiseVelocity(0.45),
+                                () -> superStructure.arm.setCruiseVelocity(
+                                        ArmConstants.defultArmVelocity.in(RotationsPerSecond))))
                         .withDeadline(Commands.waitUntil(
                                         () -> superStructure.arm.isPastPosition(Degrees.of(120), false))
                                 .andThen(algaeIntake.runWithSensor(AlgaeIntakeAction.NET))

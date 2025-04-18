@@ -23,6 +23,8 @@ public interface ArmIO {
         return RotationsPerSecond.of(0);
     }
 
+    default void setMotionMagicVelocity(double targetVelocity) {}
+
     default void setPosition(Angle targetAngle, boolean motionMagic) {}
 
     default void stop() {}

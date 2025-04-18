@@ -16,6 +16,10 @@ public class CoordinateUtils {
         return DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
     }
+    /*
+    public static Pose2d flipPoseSide(Pose2d sourcePose) {
+
+    }*/
 
     public static Pose2d getAlliancePose(Pose2d pose) {
         return new Pose2d(
