@@ -64,7 +64,7 @@ public class AutoAlign {
     public static final Angle BargeRaisingRotTolerance = Degrees.of(10);
     public static final Distance ProcessorThrowTolerance = Inches.of(5.0);
     public static final Angle ProcessorRotTolerance = Degrees.of(8);
-    public static final Distance BargeDistanceTolerance = Inches.of(5.0);
+    public static final Distance BargeDistanceTolerance = Inches.of(8.0);
 
     public static Command driveToPose(Drive drive, Supplier<Pose2d> targetPose) {
         return Commands.either(
@@ -215,7 +215,7 @@ public class AutoAlign {
 
         // reduce drive velocity based on elevator height
 
-        return autoAlignAndPlace(drive, superStructure, intake, leds, () -> superStructurePose, targetPose);
+        return autoAlignAndPlaceControlled(drive, superStructure, intake, leds, () -> superStructurePose, targetPose);
     }
 
     public static Command autoAlignAndPlace(
@@ -233,16 +233,13 @@ public class AutoAlign {
 
         Supplier<Pose2d> targetPose = () -> {
             var closestFace = drive.getPose().nearest(Reef.getAllianceReefList());
-            var closestIndex = Reef.getAllReefLists().indexOf(closestFace);
-            var driverRelativeSide =
-                    closestIndex >= 2 && closestIndex <= 4 ? side == Side.RIGHT ? Side.LEFT : Side.RIGHT : side;
 
             SuperStructurePose superPose = buttonWatcher.getSelectedPose();
 
             if (superPose == SuperStructurePose.TROUGH) {
                 var reefCorner = Reef.offsetReefPose(closestFace, Side.CENTER)
                         .transformBy(
-                                driverRelativeSide == Side.RIGHT
+                                side == Side.RIGHT
                                         ? new Transform2d(0.12, 0.175, Rotation2d.fromDegrees(-15 + 180))
                                         : new Transform2d(0.12, -0.175, Rotation2d.fromDegrees(15 + 180)));
 
@@ -258,10 +255,75 @@ public class AutoAlign {
                 return withinTransitionTolerance ? reefCorner : movingPose;
             }
 
-            return Reef.offsetReefPose(closestFace, driverRelativeSide);
+            return Reef.offsetReefPose(closestFace, side);
         };
 
-        return autoAlignAndPlace(drive, superStructure, intake, leds, buttonWatcher::getSelectedPose, targetPose);
+        return Commands.either(
+                autoAlignAndPlaceControlled(
+                        drive, superStructure, intake, leds, buttonWatcher::getSelectedPose, targetPose),
+                autoAlignAndPlace(drive, superStructure, intake, leds, buttonWatcher::getSelectedPose, targetPose),
+                () -> buttonWatcher.getSelectedPose() != SuperStructurePose.TROUGH);
+    }
+
+    public static Command autoAlignAndPlaceControlled(
+            Drive drive,
+            SuperStructure superStructure,
+            Intake intake,
+            LED leds,
+            Supplier<SuperStructurePose> superPose,
+            Supplier<Pose2d> targetPose) {
+
+        BooleanSupplier startSuperStructure = () -> {
+            var targetSuperPose = superPose.get();
+            var finalPose = targetPose.get();
+            final boolean superstructureLow =
+                    targetSuperPose == SuperStructurePose.L2 || targetSuperPose == SuperStructurePose.L3;
+
+            final boolean horizontalVelocitySlow =
+                    Math.abs(DriveCommands.getTargetRelativeLinearVelocity(drive, finalPose)
+                                    .getY())
+                            < HorizontalVelocityRisingTolerance.in(MetersPerSecond);
+
+            final boolean mostlyRotated = drive.getPose()
+                    .getRotation()
+                    .getMeasure()
+                    .isNear(finalPose.getRotation().getMeasure(), AngleDifferenceRisingTolerance);
+
+            return PoseUtils.poseInRange(drive::getPose, targetPose, StartSuperStructureRange)
+                    && (superstructureLow || (horizontalVelocitySlow && mostlyRotated));
+        };
+
+        // TODO: fix rembrandt style barge
+        // TODO: trough align
+        Supplier<Pose2d> movingPose =
+                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(6.0), 0.0, Rotation2d.kZero));
+
+        // rotation pose farther out as well
+        return Commands.sequence(
+                        driveToPose(drive, movingPose)
+                                .alongWith(Commands.sequence(
+                                        Commands.waitUntil(startSuperStructure),
+                                        Commands.defer(
+                                                () -> superStructure.moveToPose(superPose.get()),
+                                                Set.of(superStructure.arm, superStructure.elevator))))
+                                .until(() -> {
+                                    var relPose = drive.getPose().relativeTo(movingPose.get());
+                                    var yOffset = relPose.getMeasureY();
+                                    var rotationError = relPose.getRotation().getDegrees();
+
+                                    return yOffset.abs(Inches) < 4.0 && Math.abs(rotationError) < 10.0;
+                                }),
+                        driveToPose(drive, targetPose)
+                                .alongWith(Commands.defer(
+                                        () -> superStructure.moveToPose(superPose.get()),
+                                        Set.of(superStructure.arm, superStructure.elevator))),
+                        Commands.runOnce(() -> leds.requestState(LEDState.PLACING)),
+                        PlacingCommands.reefPlacingSequence(superStructure, intake, leds, superPose, false))
+                // some kind of wait condition to minimize jerkiness when picking algae
+                // autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.empty()))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)))
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public static Command autoAlignAndPlace(
@@ -292,31 +354,14 @@ public class AutoAlign {
                     && (superstructureLow || (horizontalVelocitySlow && mostlyRotated));
         };
 
-        // TODO: driver relative side selection
-        // TODO: fix rembrandt style barge
-        // TODO: trough align
-        Supplier<Pose2d> movingPose =
-                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(6.0), 0.0, Rotation2d.kZero));
-
         // rotation pose farther out as well
         return Commands.sequence(
-                        driveToPose(drive, movingPose)
+                        driveToPose(drive, targetPose)
                                 .alongWith(Commands.sequence(
                                         Commands.waitUntil(startSuperStructure),
                                         Commands.defer(
                                                 () -> superStructure.moveToPose(superPose.get()),
-                                                Set.of(superStructure.arm, superStructure.elevator))))
-                                .until(() -> {
-                                    var relPose = drive.getPose().relativeTo(movingPose.get());
-                                    var yOffset = relPose.getMeasureY();
-                                    var rotationError = relPose.getRotation().getDegrees();
-
-                                    return yOffset.abs(Inches) < 4.0 && Math.abs(rotationError) < 10.0;
-                                }),
-                        driveToPose(drive, targetPose)
-                                .alongWith(Commands.defer(
-                                        () -> superStructure.moveToPose(superPose.get()),
-                                        Set.of(superStructure.arm, superStructure.elevator))),
+                                                Set.of(superStructure.arm, superStructure.elevator)))),
                         Commands.runOnce(() -> leds.requestState(LEDState.PLACING)),
                         PlacingCommands.reefPlacingSequence(superStructure, intake, leds, superPose, false))
                 // some kind of wait condition to minimize jerkiness when picking algae
@@ -370,7 +415,7 @@ public class AutoAlign {
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
-    public static Command autoScoreBarge(
+    public static Command autoScoreBargeV2(
             Drive drive, SuperStructure superStructure, AlgaeIntake algaeIntake, LED leds) {
         Supplier<Pose2d> drivePose = () -> FieldConstants.Net.getNetPose(drive.getPose(), Optional.empty());
         return Commands.sequence(
@@ -387,6 +432,7 @@ public class AutoAlign {
                                                                         .getMeasure(),
                                                                 BargeRaisingRotTolerance))
                                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET_V2))),
+                Commands.waitSeconds(0.1),
                 superStructure
                         .arm
                         .moveToAngle(Degrees.of(0))
