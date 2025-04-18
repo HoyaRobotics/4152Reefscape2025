@@ -51,7 +51,6 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class AutoAlign {
     private static final Distance StartSuperStructureRange = Inches.of(45); // 20
@@ -234,38 +233,32 @@ public class AutoAlign {
 
         Supplier<Pose2d> targetPose = () -> {
             var closestFace = drive.getPose().nearest(Reef.getAllianceReefList());
+            var closestIndex = Reef.getAllReefLists().indexOf(closestFace);
+            var driverRelativeSide =
+                    closestIndex >= 2 && closestIndex <= 4 ? side == Side.RIGHT ? Side.LEFT : Side.RIGHT : side;
+
             SuperStructurePose superPose = buttonWatcher.getSelectedPose();
 
             if (superPose == SuperStructurePose.TROUGH) {
                 var reefCorner = Reef.offsetReefPose(closestFace, Side.CENTER)
                         .transformBy(
-                                side == Side.RIGHT
+                                driverRelativeSide == Side.RIGHT
                                         ? new Transform2d(0.12, 0.175, Rotation2d.fromDegrees(-15 + 180))
                                         : new Transform2d(0.12, -0.175, Rotation2d.fromDegrees(15 + 180)));
 
                 var movingPose = reefCorner.transformBy(new Transform2d(-0.25, 0.0, Rotation2d.kZero));
 
-                Logger.recordOutput(
-                        "AutoAlign/relativeDx",
-                        drive.getPose().relativeTo(movingPose).getMeasureX());
                 boolean withinTransitionTolerance =
                         drive.getPose().relativeTo(movingPose).getMeasureX().gt(Inches.of(-5.0))
                                 && drive.getPose()
                                         .getRotation()
                                         .getMeasure()
                                         .isNear(movingPose.getRotation().getMeasure(), Degrees.of(8));
-                /*
-                boolean withinTransitionTolerance =
-                        PoseUtils.poseInRange(drive::getPose, () -> movingPose, Inches.of(0.5))
-                                && drive.getPose()
-                                        .getRotation()
-                                        .getMeasure()
-                                        .isNear(movingPose.getRotation().getMeasure(), Degrees.of(8));*/
 
                 return withinTransitionTolerance ? reefCorner : movingPose;
             }
 
-            return Reef.offsetReefPose(closestFace, side);
+            return Reef.offsetReefPose(closestFace, driverRelativeSide);
         };
 
         return autoAlignAndPlace(drive, superStructure, intake, leds, buttonWatcher::getSelectedPose, targetPose);
@@ -299,8 +292,11 @@ public class AutoAlign {
                     && (superstructureLow || (horizontalVelocitySlow && mostlyRotated));
         };
 
+        // TODO: driver relative side selection
+        // TODO: fix rembrandt style barge
+        // TODO: trough align
         Supplier<Pose2d> movingPose =
-                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(10.0), 0.0, Rotation2d.kZero));
+                () -> targetPose.get().transformBy(new Transform2d(Units.inchesToMeters(6.0), 0.0, Rotation2d.kZero));
 
         // rotation pose farther out as well
         return Commands.sequence(
@@ -311,12 +307,11 @@ public class AutoAlign {
                                                 () -> superStructure.moveToPose(superPose.get()),
                                                 Set.of(superStructure.arm, superStructure.elevator))))
                                 .until(() -> {
-                                        var yOffset = drive.getPose()
-                                        .relativeTo(movingPose.get())
-                                        .getMeasureY();
+                                    var relPose = drive.getPose().relativeTo(movingPose.get());
+                                    var yOffset = relPose.getMeasureY();
+                                    var rotationError = relPose.getRotation().getDegrees();
 
-                                        Logger.recordOutput("AutoPlace/yOffset", yOffset);
-                                        return yOffset.lt(Inches.of(1.5));
+                                    return yOffset.abs(Inches) < 4.0 && Math.abs(rotationError) < 10.0;
                                 }),
                         driveToPose(drive, targetPose)
                                 .alongWith(Commands.defer(
