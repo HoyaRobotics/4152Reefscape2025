@@ -18,6 +18,7 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakeAction;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /** Add your docs here. */
@@ -46,12 +47,13 @@ public class AlgaeCommands {
                 Set.of(superStructure.arm, superStructure.elevator));
     }
 
-    public static Command preStageRemoveAlgaeV2(SuperStructure superStructure, AlgaeIntake algaeIntake, Drive drive) {
+    public static Command preStageRemoveAlgaeV2(
+            SuperStructure superStructure, Optional<Integer> faceIndex, AlgaeIntake algaeIntake, Drive drive) {
 
         return Commands.defer(
                 () -> {
-                    List<SuperStructurePose> algaePoses =
-                            SuperStructure.getAlgaePoses(Reef.getNearestAlgaePoses(drive));
+                    List<SuperStructurePose> algaePoses = SuperStructure.getAlgaePoses(
+                            faceIndex.map(index -> Reef.getALgaePose(index)).orElse(Reef.getNearestAlgaePoses(drive)));
 
                     SuperStructurePose prePose = algaePoses.get(0);
                     return superStructure

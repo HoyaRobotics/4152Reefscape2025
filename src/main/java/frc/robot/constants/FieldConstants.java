@@ -148,6 +148,10 @@ public class FieldConstants {
                         FieldMirroringUtils.flip(blueFace.getRotation())))
                 .toArray(Pose2d[]::new);
 
+        public static AlgaeLevel getALgaePose(int faceIndex) {
+            return faceIndex % 2 == 1 ? AlgaeLevel.ALGAE_L2 : AlgaeLevel.ALGAE_L3;
+        }
+
         public static AlgaeLevel getNearestAlgaePoses(Drive drive) {
             Pose2d centerFace = drive.getPose().nearest(getAllReefLists());
             int faceIndex = getAllReefLists().indexOf(centerFace);

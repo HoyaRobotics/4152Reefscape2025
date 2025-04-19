@@ -92,7 +92,7 @@ public abstract class PoserAuto {
     }
 
     public Command alignAndPickAlgae(int faceIndex) {
-        return AutoAlign.autoAlignAndPickAlgae(drive, superStructure, leds, algaeIntake, Optional.of(faceIndex));
+        return AutoAlign.autoAlignAndPickAlgaeV2(drive, superStructure, leds, algaeIntake, Optional.of(faceIndex));
     }
 
     public Command alignAndPlaceBarge(Distance bargeCenterOffset) {

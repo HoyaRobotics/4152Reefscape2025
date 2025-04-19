@@ -404,6 +404,32 @@ public class AutoAlign {
                         () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
     }
 
+    public static Command autoAlignAndPickAlgaeV2(
+            Drive drive,
+            SuperStructure superStructure,
+            LED leds,
+            AlgaeIntake algaeIntake,
+            Optional<Integer> faceIndex) {
+        Supplier<Pose2d> grabPose = () -> faceIndex
+                .map(index -> Reef.getAllianceReefBranch(index, Side.CENTER))
+                .orElse(Reef.getClosestBranchPose(drive::getPose, Side.CENTER));
+        Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
+        return Commands.sequence(
+                        AlgaeCommands.preStageRemoveAlgaeV2(superStructure, faceIndex, algaeIntake, drive)
+                                .alongWith(driveToPose(drive, offsetPose).until(() -> {
+                                    Pose2d relativePose = drive.getPose().relativeTo(offsetPose.get());
+                                    double dy = relativePose.getMeasureY().abs(Inches);
+                                    double omegaError =
+                                            relativePose.getRotation().getDegrees();
+                                    return dy < 4.0 && omegaError < 6.0;
+                                })),
+                        driveToPose(drive, grabPose),
+                        driveToPose(drive, offsetPose))
+                .deadlineFor(algaeIntake.run(AlgaeIntakeAction.INTAKING))
+                .deadlineFor(Commands.startEnd(
+                        () -> leds.requestState(LEDState.ALIGNING), () -> leds.requestState(LEDState.NOTHING)));
+    }
+
     public static Command autoAlignAndPickAlgae(
             Drive drive,
             SuperStructure superStructure,
@@ -415,7 +441,7 @@ public class AutoAlign {
                 .orElse(Reef.getClosestBranchPose(drive::getPose, Side.CENTER));
         Supplier<Pose2d> offsetPose = () -> grabPose.get().transformBy(new Transform2d(0.15, 0.0, Rotation2d.kZero));
         return Commands.sequence(
-                        AlgaeCommands.preStageRemoveAlgaeV2(superStructure, algaeIntake, drive)
+                        AlgaeCommands.preStageRemoveAlgaeV2(superStructure, faceIndex, algaeIntake, drive)
                                 .deadlineFor(driveToPose(drive, offsetPose)),
                         driveToPose(drive, grabPose),
                         driveToPose(drive, offsetPose))
@@ -441,7 +467,7 @@ public class AutoAlign {
                                                                         .getMeasure(),
                                                                 BargeRaisingRotTolerance))
                                 .andThen(superStructure.moveToPose(SuperStructurePose.ALGAE_NET_V2))),
-                Commands.waitSeconds(0.075),
+                // Commands.waitSeconds(0.075),
                 superStructure
                         .arm
                         .moveToAngle(Degrees.of(0))
